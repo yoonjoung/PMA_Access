@@ -9,7 +9,7 @@ There are three groups of files in this repo.
 --- 1.4 Effective_Access_Indicators_CR.do: Stata do file to create estimates of potential indicators from client exit surveys (summary_Access_Indicators_CR.dta)    
 --- 1.5 app.R: R Shiny to create the app https://yj-choi.shinyapps.io/PMA_Access/
 
-2. Data files are survey-level summary datasets. There are three, and each is saved in both Stata dta and csv files.    
+2. Data files are survey-level summary datasets. There are three, and each is saved in both Stata dta and csv files (thus 6 data files in total).    
 --- 2.1 summary_Access_Indicators_IR: estimates of potential indicators from female surveys   
 --- 2.2 summary_Access_Indicators_CR: estimates of potential indicators from client exit surveys   
 --- 2.3 EA_SDP_Link_Summary: results of EA-SDP linkage   
