@@ -1,0 +1,728 @@
+round,xsurvey,cmc,year,obs,group,grouplabel,mcp,xheard_10,xheard_7,xheard_5,xheard_select6,xheard_select5,xinsurance,SDPall_essential5_rnoso,SDPall_essential5_noso,SDPall_essential5_ready,SDPall_essential5ec_rnoso,SDPall_essential5ec_noso,SDPall_essential5ec_ready,xmii_side,xmii_sidewhat,xmii_other,xmii_switch,xmii3,xmii4,country,latestIR,phase,month
+2,BFR2,1385,2015,2102,All,All,19,11,36,69,16,33,,55,100,56,28,40,29,58,51,71,,42,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,2102,By SDPall_essential5_noso,Yes,19,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,950,By SDPall_essential5_ready,No,17,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1152,By SDPall_essential5_ready,Yes,19,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,993,By SDPall_essential5_rnoso,No,17,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1109,By SDPall_essential5_rnoso,Yes,19,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1411,By SDPall_essential5ec_noso,No,20,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,691,By SDPall_essential5ec_noso,Yes,17,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1571,By SDPall_essential5ec_ready,No,19,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,531,By SDPall_essential5ec_ready,Yes,18,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1614,By SDPall_essential5ec_rnoso,No,19,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,488,By SDPall_essential5ec_rnoso,Yes,18,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1831,By xheard_10,No,17,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,271,By xheard_10,Yes,33,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,595,By xheard_5,No,9,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1507,By xheard_5,Yes,23,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1235,By xheard_7,No,15,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,867,By xheard_7,Yes,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1279,By xheard_select5,No,14,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,823,By xheard_select5,Yes,27,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1680,By xheard_select6,No,16,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,422,By xheard_select6,Yes,32,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1597,Education,less than secondary,17,8,31,66,12,29,,57,100,57,29,40,30,61,54,75,,43,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,505,Education,secondary or more,26,27,64,84,39,57,,46,100,49,23,37,26,47,39,57,,36,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,626,HH wealth,Bottom 2 quintiles,12,7,29,67,10,28,,47,100,47,34,50,34,58,44,69,,33,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1476,HH wealth,Top 3 quintiles,23,13,42,70,20,37,,60,100,62,24,32,25,59,53,72,,45,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1047,Residential area,Rural,15,9,32,66,12,28,,58,100,58,33,45,33,61,54,74,,44,,Burkina Faso,0,0,5
+2,BFR2,1385,2015,1055,Residential area,Urban,31,17,50,78,28,50,,45,100,49,12,21,16,53,45,65,,38,,Burkina Faso,0,0,5
+3,BFR3,1395,2016,3261,All,All,22,14,42,71,18,40,,66,87,68,14,26,15,57,49,64,,41,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,373,By SDPall_essential5_noso,No,20,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,2888,By SDPall_essential5_noso,Yes,22,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,855,By SDPall_essential5_ready,No,17,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,2406,By SDPall_essential5_ready,Yes,24,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,887,By SDPall_essential5_rnoso,No,17,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,2374,By SDPall_essential5_rnoso,Yes,24,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,2278,By SDPall_essential5ec_noso,No,21,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,983,By SDPall_essential5ec_noso,Yes,24,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,2691,By SDPall_essential5ec_ready,No,21,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,570,By SDPall_essential5ec_ready,Yes,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,2729,By SDPall_essential5ec_rnoso,No,21,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,532,By SDPall_essential5ec_rnoso,Yes,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,2766,By xheard_10,No,20,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,495,By xheard_10,Yes,31,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,838,By xheard_5,No,10,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,2423,By xheard_5,Yes,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,1757,By xheard_7,No,16,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,1504,By xheard_7,Yes,29,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,1820,By xheard_select5,No,16,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,1441,By xheard_select5,Yes,30,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,2539,By xheard_select6,No,19,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,722,By xheard_select6,Yes,33,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,2378,Education,less than secondary,20,11,37,68,14,37,,63,87,64,13,24,14,59,52,65,,43,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,883,Education,secondary or more,27,27,60,81,35,54,,80,90,82,18,34,18,51,38,61,,34,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,1027,HH wealth,Bottom 2 quintiles,18,13,38,66,14,35,,42,78,43,12,21,12,58,48,61,,40,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,2234,HH wealth,Top 3 quintiles,24,14,45,74,21,44,,84,94,86,16,30,17,57,49,65,,41,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,1655,Residential area,Rural,18,12,37,68,14,36,,58,86,60,12,21,12,60,51,65,,42,,Burkina Faso,0,0,3
+3,BFR3,1395,2016,1606,Residential area,Urban,31,18,55,81,31,53,,91,93,91,21,43,23,52,45,62,,38,,Burkina Faso,0,0,3
+4,BFR4,1404,2016,3203,All,All,22,13,42,72,20,41,,73,100,80,16,48,16,56,51,64,,39,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,3203,By SDPall_essential5_noso,Yes,22,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,660,By SDPall_essential5_ready,No,23,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,2543,By SDPall_essential5_ready,Yes,22,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,839,By SDPall_essential5_rnoso,No,23,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,2364,By SDPall_essential5_rnoso,Yes,22,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,1479,By SDPall_essential5ec_noso,No,21,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,1724,By SDPall_essential5ec_noso,Yes,23,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,2576,By SDPall_essential5ec_ready,No,22,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,627,By SDPall_essential5ec_ready,Yes,22,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,2576,By SDPall_essential5ec_rnoso,No,22,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,627,By SDPall_essential5ec_rnoso,Yes,22,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,2730,By xheard_10,No,21,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,473,By xheard_10,Yes,27,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,809,By xheard_5,No,9,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,2394,By xheard_5,Yes,27,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,1743,By xheard_7,No,17,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,1460,By xheard_7,Yes,29,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,1753,By xheard_select5,No,16,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,1450,By xheard_select5,Yes,31,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,2418,By xheard_select6,No,19,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,785,By xheard_select6,Yes,33,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,2336,Education,less than secondary,21,12,38,70,16,38,,73,100,81,16,46,16,58,53,63,,40,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,867,Education,secondary or more,26,21,56,81,34,52,,74,100,76,16,56,16,51,44,66,,38,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,991,HH wealth,Bottom 2 quintiles,18,12,38,67,16,35,,72,100,82,19,48,19,52,46,61,,35,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,2212,HH wealth,Top 3 quintiles,25,15,44,76,23,44,,74,100,78,14,49,14,58,53,65,,41,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,1643,Residential area,Rural,19,13,38,69,15,36,,75,100,83,15,44,15,56,52,61,,38,,Burkina Faso,0,0,12
+4,BFR4,1404,2016,1560,Residential area,Urban,33,16,53,81,34,56,,69,100,70,20,61,20,56,48,68,,42,,Burkina Faso,0,0,12
+5,BFR5,1415,2017,3512,All,All,26,12,43,75,21,48,,91,95,96,34,34,44,52,49,65,,40,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,180,By SDPall_essential5_noso,No,36,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,3294,By SDPall_essential5_noso,Yes,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,85,By SDPall_essential5_ready,No,36,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,3389,By SDPall_essential5_ready,Yes,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,263,By SDPall_essential5_rnoso,No,33,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,3211,By SDPall_essential5_rnoso,Yes,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,2444,By SDPall_essential5ec_noso,No,27,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,1030,By SDPall_essential5ec_noso,Yes,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,2102,By SDPall_essential5ec_ready,No,27,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,1372,By SDPall_essential5ec_ready,Yes,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,2444,By SDPall_essential5ec_rnoso,No,27,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,1030,By SDPall_essential5ec_rnoso,Yes,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,3044,By xheard_10,No,25,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,468,By xheard_10,Yes,33,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,800,By xheard_5,No,12,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,2712,By xheard_5,Yes,31,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,1859,By xheard_7,No,21,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,1653,By xheard_7,Yes,33,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,1700,By xheard_select5,No,19,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,1812,By xheard_select5,Yes,34,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,2620,By xheard_select6,No,24,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,892,By xheard_select6,Yes,34,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,2509,Education,less than secondary,26,10,40,74,18,46,,91,94,96,33,33,44,55,52,67,,42,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,1003,Education,secondary or more,27,19,58,83,34,57,,93,96,97,36,36,45,42,37,60,,32,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,1121,HH wealth,Bottom 2 quintiles,23,7,33,67,13,38,,89,91,95,37,37,49,57,54,65,,40,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,2391,HH wealth,Top 3 quintiles,29,15,51,82,27,56,,93,97,97,31,31,41,50,46,66,,40,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,1874,Residential area,Rural,25,10,40,73,18,44,,90,94,95,37,37,48,53,50,66,,40,,Burkina Faso,0,0,11
+5,BFR5,1415,2017,1638,Residential area,Urban,33,16,56,83,33,62,,96,96,100,24,24,31,50,44,65,,39,,Burkina Faso,0,0,11
+6,BFR6,1428,2018,3329,All,All,27,11,42,74,20,45,,,,,,,,42,38,57,,30,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,109,By SDPall_essential5_noso,No,15,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,2494,By SDPall_essential5_noso,Yes,28,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,270,By SDPall_essential5_ready,No,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,2333,By SDPall_essential5_ready,Yes,27,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,270,By SDPall_essential5_rnoso,No,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,2333,By SDPall_essential5_rnoso,Yes,27,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,1679,By SDPall_essential5ec_noso,No,24,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,924,By SDPall_essential5ec_noso,Yes,33,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,1669,By SDPall_essential5ec_ready,No,25,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,934,By SDPall_essential5ec_ready,Yes,31,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,1730,By SDPall_essential5ec_rnoso,No,25,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,873,By SDPall_essential5ec_rnoso,Yes,32,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,2886,By xheard_10,No,26,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,443,By xheard_10,Yes,37,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,776,By xheard_5,No,13,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,2553,By xheard_5,Yes,32,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,1801,By xheard_7,No,21,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,1528,By xheard_7,Yes,35,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,1638,By xheard_select5,No,20,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,1691,By xheard_select5,Yes,35,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,2517,By xheard_select6,No,25,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,812,By xheard_select6,Yes,38,,,,,,,,,,,,,,,,,,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,2241,Education,less than secondary,26,8,36,70,15,41,,,,,,,,44,40,59,,30,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,1088,Education,secondary or more,32,20,60,84,36,59,,,,,,,,37,33,53,,28,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,1070,HH wealth,Bottom 2 quintiles,24,8,32,67,12,33,,,,,,,,43,39,51,,29,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,2259,HH wealth,Top 3 quintiles,30,14,50,79,27,55,,,,,,,,42,37,62,,30,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,1724,Residential area,Rural,26,9,38,71,15,40,,,,,,,,42,38,57,,29,,Burkina Faso,0,0,12
+6,BFR6,1428,2018,1605,Residential area,Urban,33,18,56,83,36,62,,,,,,,,42,38,58,,32,,Burkina Faso,0,0,12
+7,BFR7,1441,2020,6515,All,All,26,13,41,72,20,47,2,,,,,,,55,49,64,67,50,40,Burkina Faso,1,1,1
+7,BFR7,1441,2020,5571,By xheard_10,No,24,,,,,,,,,,,,,,,,,,,Burkina Faso,1,1,1
+7,BFR7,1441,2020,944,By xheard_10,Yes,32,,,,,,,,,,,,,,,,,,,Burkina Faso,1,1,1
+7,BFR7,1441,2020,1530,By xheard_5,No,16,,,,,,,,,,,,,,,,,,,Burkina Faso,1,1,1
+7,BFR7,1441,2020,4985,By xheard_5,Yes,29,,,,,,,,,,,,,,,,,,,Burkina Faso,1,1,1
+7,BFR7,1441,2020,3464,By xheard_7,No,21,,,,,,,,,,,,,,,,,,,Burkina Faso,1,1,1
+7,BFR7,1441,2020,3051,By xheard_7,Yes,31,,,,,,,,,,,,,,,,,,,Burkina Faso,1,1,1
+7,BFR7,1441,2020,3125,By xheard_select5,No,20,,,,,,,,,,,,,,,,,,,Burkina Faso,1,1,1
+7,BFR7,1441,2020,3390,By xheard_select5,Yes,32,,,,,,,,,,,,,,,,,,,Burkina Faso,1,1,1
+7,BFR7,1441,2020,4859,By xheard_select6,No,23,,,,,,,,,,,,,,,,,,,Burkina Faso,1,1,1
+7,BFR7,1441,2020,1656,By xheard_select6,Yes,34,,,,,,,,,,,,,,,,,,,Burkina Faso,1,1,1
+7,BFR7,1441,2020,6334,By xinsurance,No,25,,,,,,,,,,,,,,,,,,,Burkina Faso,1,1,1
+7,BFR7,1441,2020,175,By xinsurance,Yes,37,,,,,,,,,,,,,,,,,,,Burkina Faso,1,1,1
+7,BFR7,1441,2020,4175,Education,less than secondary,24,10,37,70,16,45,2,,,,,,,58,52,65,68,52,43,Burkina Faso,1,1,1
+7,BFR7,1441,2020,2340,Education,secondary or more,30,24,56,79,35,54,3,,,,,,,47,38,62,61,42,32,Burkina Faso,1,1,1
+7,BFR7,1441,2020,1412,HH wealth,Bottom 2 quintiles,22,11,36,68,15,43,2,,,,,,,59,52,67,67,54,42,Burkina Faso,1,1,1
+7,BFR7,1441,2020,5103,HH wealth,Top 3 quintiles,28,15,44,74,24,50,3,,,,,,,53,47,63,67,47,39,Burkina Faso,1,1,1
+7,BFR7,1441,2020,2629,Residential area,Rural,23,12,37,69,16,43,2,,,,,,,57,50,64,67,51,42,Burkina Faso,1,1,1
+7,BFR7,1441,2020,3886,Residential area,Urban,34,18,55,82,33,61,3,,,,,,,52,45,63,65,47,37,Burkina Faso,1,1,1
+4,ETR4,1395,2016,7481,All,All,27,1,16,47,18,41,,49,51,68,41,43,60,48,39,60,,33,,Ethiopia,0,0,3
+4,ETR4,1395,2016,3513,By SDPall_essential5_noso,No,27,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,3895,By SDPall_essential5_noso,Yes,26,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,2374,By SDPall_essential5_ready,No,29,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,5034,By SDPall_essential5_ready,Yes,25,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,3768,By SDPall_essential5_rnoso,No,27,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,3640,By SDPall_essential5_rnoso,Yes,26,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,3985,By SDPall_essential5ec_noso,No,27,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,3423,By SDPall_essential5ec_noso,Yes,26,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,2821,By SDPall_essential5ec_ready,No,28,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,4587,By SDPall_essential5ec_ready,Yes,26,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,4274,By SDPall_essential5ec_rnoso,No,27,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,3134,By SDPall_essential5ec_rnoso,Yes,26,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,7431,By xheard_10,No,26,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,50,By xheard_10,Yes,38,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,3156,By xheard_5,No,22,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,4325,By xheard_5,Yes,31,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,5775,By xheard_7,No,25,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,1706,By xheard_7,Yes,33,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,3440,By xheard_select5,No,22,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,4041,By xheard_select5,Yes,33,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,5459,By xheard_select6,No,25,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,2022,By xheard_select6,Yes,33,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,3
+4,ETR4,1395,2016,5139,Education,less than secondary,27,0,10,40,11,34,,49,50,69,40,42,59,47,38,60,,32,,Ethiopia,0,0,3
+4,ETR4,1395,2016,2342,Education,secondary or more,26,1,38,77,46,72,,50,52,67,45,47,64,53,41,64,,37,,Ethiopia,0,0,3
+4,ETR4,1395,2016,1886,HH wealth,Bottom 2 quintiles,22,0,7,31,6,25,,48,49,73,38,39,61,45,39,54,,30,,Ethiopia,0,0,3
+4,ETR4,1395,2016,5595,HH wealth,Top 3 quintiles,29,1,22,57,25,52,,50,52,66,43,45,59,50,39,64,,35,,Ethiopia,0,0,3
+4,ETR4,1395,2016,3681,Residential area,Rural,25,0,10,38,11,31,,48,50,68,39,41,57,48,39,59,,32,,Ethiopia,0,0,3
+4,ETR4,1395,2016,3800,Residential area,Urban,30,1,33,75,40,73,,50,53,70,46,49,70,50,38,63,,36,,Ethiopia,0,0,3
+5,ETR5,1409,2017,7361,All,All,25,2,23,57,18,44,,61,66,79,41,46,66,46,38,56,,33,,Ethiopia,0,0,5
+5,ETR5,1409,2017,2119,By SDPall_essential5_noso,No,26,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,5151,By SDPall_essential5_noso,Yes,25,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,1497,By SDPall_essential5_ready,No,23,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,5773,By SDPall_essential5_ready,Yes,26,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,2504,By SDPall_essential5_rnoso,No,26,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,4766,By SDPall_essential5_rnoso,Yes,25,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,3497,By SDPall_essential5ec_noso,No,27,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,3773,By SDPall_essential5ec_noso,Yes,24,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,2399,By SDPall_essential5ec_ready,No,25,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,4871,By SDPall_essential5ec_ready,Yes,26,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,3845,By SDPall_essential5ec_rnoso,No,27,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,3425,By SDPall_essential5ec_rnoso,Yes,24,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,7200,By xheard_10,No,25,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,161,By xheard_10,Yes,41,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,2550,By xheard_5,No,19,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,4811,By xheard_5,Yes,30,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,5119,By xheard_7,No,23,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,2242,By xheard_7,Yes,32,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,3316,By xheard_select5,No,20,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,4045,By xheard_select5,Yes,32,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,5332,By xheard_select6,No,24,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,2029,By xheard_select6,Yes,34,,,,,,,,,,,,,,,,,,,Ethiopia,0,0,5
+5,ETR5,1409,2017,4924,Education,less than secondary,26,1,16,51,11,37,,60,64,78,40,45,66,45,38,55,,32,,Ethiopia,0,0,5
+5,ETR5,1409,2017,2437,Education,secondary or more,25,4,47,81,47,73,,64,73,80,45,51,65,50,39,62,,37,,Ethiopia,0,0,5
+5,ETR5,1409,2017,1804,HH wealth,Bottom 2 quintiles,23,0,13,45,9,29,,61,62,82,43,46,72,47,41,55,,35,,Ethiopia,0,0,5
+5,ETR5,1409,2017,5557,HH wealth,Top 3 quintiles,27,2,29,66,24,54,,61,68,77,40,46,62,46,36,57,,32,,Ethiopia,0,0,5
+5,ETR5,1409,2017,3545,Residential area,Rural,25,1,16,50,11,35,,60,62,79,40,43,66,46,39,56,,34,,Ethiopia,0,0,5
+5,ETR5,1409,2017,3816,Residential area,Urban,27,3,44,81,43,73,,64,78,77,47,57,64,45,36,56,,33,,Ethiopia,0,0,5
+6,ETR6,1422,2018,7429,All,All,26,1,22,61,19,47,,,,,,,,44,37,55,,30,,Ethiopia,1,0,6
+6,ETR6,,,5,All,All,26,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,,,3,By SDPall_essential5_noso,No,27,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,1422,2018,2359,By SDPall_essential5_noso,No,27,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,4962,By SDPall_essential5_noso,Yes,26,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,,,2,By SDPall_essential5_noso,Yes,26,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,1422,2018,1173,By SDPall_essential5_ready,No,24,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,,,1,By SDPall_essential5_ready,No,24,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,,,4,By SDPall_essential5_ready,Yes,27,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,1422,2018,6148,By SDPall_essential5_ready,Yes,27,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,,,3,By SDPall_essential5_rnoso,No,26,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,1422,2018,2756,By SDPall_essential5_rnoso,No,26,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,4565,By SDPall_essential5_rnoso,Yes,27,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,,,2,By SDPall_essential5_rnoso,Yes,27,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,1422,2018,3148,By SDPall_essential5ec_noso,No,27,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,,,4,By SDPall_essential5ec_noso,No,27,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,,,1,By SDPall_essential5ec_noso,Yes,26,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,1422,2018,4173,By SDPall_essential5ec_noso,Yes,26,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,,,2,By SDPall_essential5ec_ready,No,24,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,1422,2018,1918,By SDPall_essential5ec_ready,No,24,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,,,3,By SDPall_essential5ec_ready,Yes,27,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,1422,2018,5403,By SDPall_essential5ec_ready,Yes,27,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,3470,By SDPall_essential5ec_rnoso,No,26,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,,,4,By SDPall_essential5ec_rnoso,No,26,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,1422,2018,3851,By SDPall_essential5ec_rnoso,Yes,27,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,,,1,By SDPall_essential5ec_rnoso,Yes,27,,,,,,,,,,,,,,,,,,,Ethiopia,1,1,
+6,ETR6,1422,2018,7337,By xheard_10,No,26,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,92,By xheard_10,Yes,38,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,2383,By xheard_5,No,20,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,5046,By xheard_5,Yes,30,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,5228,By xheard_7,No,25,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,2201,By xheard_7,Yes,32,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,3174,By xheard_select5,No,21,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,4255,By xheard_select5,Yes,33,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,5231,By xheard_select6,No,25,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,2198,By xheard_select6,Yes,32,,,,,,,,,,,,,,,,,,,Ethiopia,1,0,6
+6,ETR6,1422,2018,4920,Education,less than secondary,27,0,15,55,11,39,,,,,,,,45,37,55,,31,,Ethiopia,1,0,6
+6,ETR6,1422,2018,2509,Education,secondary or more,25,3,44,81,47,73,,,,,,,,42,33,55,,29,,Ethiopia,1,0,6
+6,ETR6,1422,2018,1915,HH wealth,Bottom 2 quintiles,24,0,12,49,8,31,,,,,,,,46,39,52,,30,,Ethiopia,1,0,6
+6,ETR6,1422,2018,5514,HH wealth,Top 3 quintiles,28,1,28,68,27,56,,,,,,,,43,35,57,,31,,Ethiopia,1,0,6
+6,ETR6,1422,2018,3565,Residential area,Rural,26,0,15,54,11,37,,,,,,,,45,38,55,,31,,Ethiopia,1,0,6
+6,ETR6,1422,2018,3864,Residential area,Urban,28,2,41,80,43,74,,,,,,,,40,32,56,,29,,Ethiopia,1,0,6
+3,KER3,1386,2015,4396,All,All,47,22,67,88,49,70,,96,98,97,94,95,95,62,55,67,,47,,Kenya,0,0,6
+3,KER3,1386,2015,152,By SDPall_essential5_noso,No,56,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,4219,By SDPall_essential5_noso,Yes,47,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,167,By SDPall_essential5_ready,No,61,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,4204,By SDPall_essential5_ready,Yes,46,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,215,By SDPall_essential5_rnoso,No,58,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,4156,By SDPall_essential5_rnoso,Yes,46,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,288,By SDPall_essential5ec_noso,No,53,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,4083,By SDPall_essential5ec_noso,Yes,47,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,276,By SDPall_essential5ec_ready,No,54,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,4095,By SDPall_essential5ec_ready,Yes,46,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,324,By SDPall_essential5ec_rnoso,No,53,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,4047,By SDPall_essential5ec_rnoso,Yes,46,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,3390,By xheard_10,No,44,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,1006,By xheard_10,Yes,57,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,582,By xheard_5,No,20,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,3814,By xheard_5,Yes,50,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,1468,By xheard_7,No,32,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,2928,By xheard_7,Yes,54,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,1419,By xheard_select5,No,29,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,2977,By xheard_select5,Yes,54,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,2312,By xheard_select6,No,38,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,2084,By xheard_select6,Yes,55,,,,,,,,,,,,,,,,,,,Kenya,0,0,6
+3,KER3,1386,2015,2419,Education,less than secondary,46,13,59,85,34,63,,96,97,97,94,95,95,61,53,64,,43,,Kenya,0,0,6
+3,KER3,1386,2015,1977,Education,secondary or more,47,31,76,93,65,77,,96,98,97,94,94,95,63,57,70,,52,,Kenya,0,0,6
+3,KER3,1386,2015,1996,HH wealth,Bottom 2 quintiles,45,16,58,83,31,58,,92,95,93,89,90,90,58,50,67,,42,,Kenya,0,0,6
+3,KER3,1386,2015,2400,HH wealth,Top 3 quintiles,48,26,74,92,61,78,,99,99,99,98,98,98,64,58,67,,51,,Kenya,0,0,6
+3,KER3,1386,2015,2725,Residential area,Rural,45,20,62,85,37,62,,94,96,95,90,92,91,61,54,66,,45,,Kenya,0,0,6
+3,KER3,1386,2015,1671,Residential area,Urban,49,24,76,94,67,82,,100,100,100,100,100,100,63,56,68,,50,,Kenya,0,0,6
+4,KER4,1391,2015,4921,All,All,46,24,69,87,53,73,,95,98,97,86,88,91,70,63,74,,57,,Kenya,0,0,11
+4,KER4,1391,2015,148,By SDPall_essential5_noso,No,56,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,4773,By SDPall_essential5_noso,Yes,46,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,177,By SDPall_essential5_ready,No,56,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,4744,By SDPall_essential5_ready,Yes,46,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,268,By SDPall_essential5_rnoso,No,54,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,4653,By SDPall_essential5_rnoso,Yes,46,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,551,By SDPall_essential5ec_noso,No,51,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,4370,By SDPall_essential5ec_noso,Yes,45,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,489,By SDPall_essential5ec_ready,No,54,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,4432,By SDPall_essential5ec_ready,Yes,45,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,630,By SDPall_essential5ec_rnoso,No,51,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,4291,By SDPall_essential5ec_rnoso,Yes,45,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,3670,By xheard_10,No,42,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,1251,By xheard_10,Yes,59,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,727,By xheard_5,No,14,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,4194,By xheard_5,Yes,51,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,1556,By xheard_7,No,27,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,3365,By xheard_7,Yes,54,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,1441,By xheard_select5,No,22,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,3480,By xheard_select5,Yes,55,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,2436,By xheard_select6,No,35,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,2485,By xheard_select6,Yes,56,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+4,KER4,1391,2015,2669,Education,less than secondary,46,15,61,82,38,66,,95,98,97,89,91,92,71,64,75,,56,,Kenya,0,0,11
+4,KER4,1391,2015,2252,Education,secondary or more,46,33,79,92,68,80,,95,97,96,83,85,89,68,61,74,,57,,Kenya,0,0,11
+4,KER4,1391,2015,2259,HH wealth,Bottom 2 quintiles,42,16,58,82,34,62,,94,98,97,88,91,89,70,61,73,,53,,Kenya,0,0,11
+4,KER4,1391,2015,2662,HH wealth,Top 3 quintiles,49,29,77,91,66,80,,96,97,96,85,86,92,69,64,75,,59,,Kenya,0,0,11
+4,KER4,1391,2015,3068,Residential area,Rural,44,22,64,83,41,66,,95,99,97,90,93,91,70,62,74,,56,,Kenya,0,0,11
+4,KER4,1391,2015,1853,Residential area,Urban,49,27,78,92,71,83,,96,96,96,81,81,91,69,64,75,,58,,Kenya,0,0,11
+5,KER5,1403,2016,5894,All,All,44,21,64,83,46,66,,83,89,87,77,83,85,61,55,71,,49,,Kenya,0,0,11
+5,KER5,1403,2016,813,By SDPall_essential5_noso,No,33,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,5010,By SDPall_essential5_noso,Yes,46,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,810,By SDPall_essential5_ready,No,37,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,5013,By SDPall_essential5_ready,Yes,45,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,1078,By SDPall_essential5_rnoso,No,37,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,4745,By SDPall_essential5_rnoso,Yes,46,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,1210,By SDPall_essential5ec_noso,No,41,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,4613,By SDPall_essential5ec_noso,Yes,45,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,1007,By SDPall_essential5ec_ready,No,39,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,4816,By SDPall_essential5ec_ready,Yes,45,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,1438,By SDPall_essential5ec_rnoso,No,41,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,4385,By SDPall_essential5ec_rnoso,Yes,45,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,4619,By xheard_10,No,41,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,1275,By xheard_10,Yes,57,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,1103,By xheard_5,No,11,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,4791,By xheard_5,Yes,51,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,2209,By xheard_7,No,25,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,3685,By xheard_7,Yes,55,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,2046,By xheard_select5,No,24,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,3848,By xheard_select5,Yes,55,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,3210,By xheard_select6,No,35,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,2684,By xheard_select6,Yes,56,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+5,KER5,1403,2016,3117,Education,less than secondary,44,14,56,78,33,61,,79,87,86,74,81,83,60,54,70,,46,,Kenya,0,0,11
+5,KER5,1403,2016,2777,Education,secondary or more,45,29,73,88,60,72,,86,92,89,81,85,87,61,56,72,,51,,Kenya,0,0,11
+5,KER5,1403,2016,2255,HH wealth,Bottom 2 quintiles,40,14,53,75,31,56,,77,86,84,71,80,81,57,53,67,,44,,Kenya,0,0,11
+5,KER5,1403,2016,3639,HH wealth,Top 3 quintiles,47,26,71,88,55,73,,86,91,90,81,85,87,62,56,73,,51,,Kenya,0,0,11
+5,KER5,1403,2016,3830,Residential area,Rural,43,20,60,80,37,61,,79,88,85,72,80,82,60,55,71,,49,,Kenya,0,0,11
+5,KER5,1403,2016,2064,Residential area,Urban,46,23,71,90,63,77,,90,92,92,88,90,91,61,55,71,,49,,Kenya,0,0,11
+6,KER6,1415,2017,5876,All,All,44,23,67,85,46,69,,67,69,83,44,45,58,63,58,67,,50,,Kenya,0,0,11
+6,KER6,1415,2017,1808,By SDPall_essential5_noso,No,48,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,4018,By SDPall_essential5_noso,Yes,42,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,987,By SDPall_essential5_ready,No,45,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,4839,By SDPall_essential5_ready,Yes,44,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,1906,By SDPall_essential5_rnoso,No,47,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,3920,By SDPall_essential5_rnoso,Yes,42,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,3225,By SDPall_essential5ec_noso,No,44,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,2601,By SDPall_essential5ec_noso,Yes,44,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,2373,By SDPall_essential5ec_ready,No,43,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,3453,By SDPall_essential5ec_ready,Yes,44,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,3271,By SDPall_essential5ec_rnoso,No,44,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,2555,By SDPall_essential5ec_rnoso,Yes,44,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,4482,By xheard_10,No,41,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,1394,By xheard_10,Yes,54,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,991,By xheard_5,No,9,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,4885,By xheard_5,Yes,50,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,2016,By xheard_7,No,25,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,3860,By xheard_7,Yes,53,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,1867,By xheard_select5,No,25,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,4009,By xheard_select5,Yes,52,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,3163,By xheard_select6,No,36,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,2713,By xheard_select6,Yes,52,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+6,KER6,1415,2017,3053,Education,less than secondary,44,15,60,81,31,63,,69,71,84,44,46,59,66,60,68,,50,,Kenya,0,0,11
+6,KER6,1415,2017,2823,Education,secondary or more,43,32,75,89,61,75,,64,66,82,43,45,57,60,55,67,,49,,Kenya,0,0,11
+6,KER6,1415,2017,2349,HH wealth,Bottom 2 quintiles,40,15,57,78,29,57,,67,70,80,42,44,57,63,57,68,,49,,Kenya,0,0,11
+6,KER6,1415,2017,3527,HH wealth,Top 3 quintiles,46,29,74,90,57,77,,66,68,85,45,46,60,63,58,67,,50,,Kenya,0,0,11
+6,KER6,1415,2017,3852,Residential area,Rural,43,21,64,83,39,65,,71,74,82,45,48,59,64,58,69,,51,,Kenya,0,0,11
+6,KER6,1415,2017,2024,Residential area,Urban,46,28,75,91,63,79,,56,56,84,40,40,57,62,56,64,,46,,Kenya,0,0,11
+7,KER7,1427,2018,5671,All,All,45,22,65,84,49,72,,73,76,86,61,63,77,59,55,67,,47,,Kenya,0,0,11
+7,KER7,1427,2018,1596,By SDPall_essential5_noso,No,39,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,4052,By SDPall_essential5_noso,Yes,46,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,901,By SDPall_essential5_ready,No,42,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,4747,By SDPall_essential5_ready,Yes,45,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,1717,By SDPall_essential5_rnoso,No,40,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,3931,By SDPall_essential5_rnoso,Yes,46,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,2354,By SDPall_essential5ec_noso,No,41,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,3294,By SDPall_essential5ec_noso,Yes,47,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,1441,By SDPall_essential5ec_ready,No,44,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,4207,By SDPall_essential5ec_ready,Yes,45,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,2455,By SDPall_essential5ec_rnoso,No,41,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,3193,By SDPall_essential5ec_rnoso,Yes,47,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,4468,By xheard_10,No,42,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,1203,By xheard_10,Yes,55,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,981,By xheard_5,No,10,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,4690,By xheard_5,Yes,51,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,2062,By xheard_7,No,25,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,3609,By xheard_7,Yes,55,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,1725,By xheard_select5,No,19,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,3946,By xheard_select5,Yes,55,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,2948,By xheard_select6,No,35,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,2723,By xheard_select6,Yes,54,,,,,,,,,,,,,,,,,,,Kenya,0,0,11
+7,KER7,1427,2018,2828,Education,less than secondary,45,15,56,80,35,67,,73,75,86,62,63,78,61,57,67,,47,,Kenya,0,0,11
+7,KER7,1427,2018,2843,Education,secondary or more,44,29,74,88,63,76,,73,76,86,60,64,75,57,53,67,,47,,Kenya,0,0,11
+7,KER7,1427,2018,2241,HH wealth,Bottom 2 quintiles,43,15,55,79,33,63,,72,75,86,64,64,79,60,55,67,,46,,Kenya,0,0,11
+7,KER7,1427,2018,3430,HH wealth,Top 3 quintiles,46,26,73,88,61,77,,73,76,86,60,63,75,59,55,67,,48,,Kenya,0,0,11
+7,KER7,1427,2018,3701,Residential area,Rural,44,20,62,83,41,68,,73,74,84,65,65,78,60,55,68,,47,,Kenya,0,0,11
+7,KER7,1427,2018,1970,Residential area,Urban,46,25,73,88,68,80,,74,79,91,53,60,73,57,54,65,,47,,Kenya,0,0,11
+8,KER8,1439,2019,9478,All,All,45,27,71,88,57,74,32,,,,,,,66,59,72,73,60,49,Kenya,1,1,11
+8,KER8,1439,2019,7105,By xheard_10,No,42,,,,,,,,,,,,,,,,,,,Kenya,1,1,11
+8,KER8,1439,2019,2373,By xheard_10,Yes,53,,,,,,,,,,,,,,,,,,,Kenya,1,1,11
+8,KER8,1439,2019,1432,By xheard_5,No,13,,,,,,,,,,,,,,,,,,,Kenya,1,1,11
+8,KER8,1439,2019,8046,By xheard_5,Yes,49,,,,,,,,,,,,,,,,,,,Kenya,1,1,11
+8,KER8,1439,2019,3149,By xheard_7,No,29,,,,,,,,,,,,,,,,,,,Kenya,1,1,11
+8,KER8,1439,2019,6329,By xheard_7,Yes,51,,,,,,,,,,,,,,,,,,,Kenya,1,1,11
+8,KER8,1439,2019,3020,By xheard_select5,No,24,,,,,,,,,,,,,,,,,,,Kenya,1,1,11
+8,KER8,1439,2019,6458,By xheard_select5,Yes,52,,,,,,,,,,,,,,,,,,,Kenya,1,1,11
+8,KER8,1439,2019,4735,By xheard_select6,No,36,,,,,,,,,,,,,,,,,,,Kenya,1,1,11
+8,KER8,1439,2019,4743,By xheard_select6,Yes,51,,,,,,,,,,,,,,,,,,,Kenya,1,1,11
+8,KER8,1439,2019,6701,By xinsurance,No,42,,,,,,,,,,,,,,,,,,,Kenya,1,1,11
+8,KER8,1439,2019,2773,By xinsurance,Yes,50,,,,,,,,,,,,,,,,,,,Kenya,1,1,11
+8,KER8,1439,2019,4689,Education,less than secondary,48,20,66,86,46,71,19,,,,,,,66,60,71,73,60,48,Kenya,1,1,11
+8,KER8,1439,2019,4789,Education,secondary or more,42,32,74,90,66,75,43,,,,,,,65,59,73,74,60,50,Kenya,1,1,11
+8,KER8,1439,2019,5482,HH wealth,Bottom 2 quintiles,43,22,65,85,42,66,18,,,,,,,65,60,72,73,60,48,Kenya,1,1,11
+8,KER8,1439,2019,3996,HH wealth,Top 3 quintiles,46,31,76,91,70,81,45,,,,,,,66,59,72,73,60,49,Kenya,1,1,11
+8,KER8,1439,2019,6133,Residential area,Rural,43,25,67,86,46,67,23,,,,,,,66,60,72,74,60,49,Kenya,1,1,11
+8,KER8,1439,2019,3345,Residential area,Urban,47,30,76,92,73,83,45,,,,,,,66,58,73,73,60,49,Kenya,1,1,11
+3,NGKanoR3,1397,2016,1684,All,All,5,5,23,41,8,21,,,,,,,,60,48,58,,41,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,1025,By SDPall_essential5_noso,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,1025,By SDPall_essential5_ready,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,1025,By SDPall_essential5_rnoso,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,1025,By SDPall_essential5ec_noso,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,1025,By SDPall_essential5ec_ready,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,1025,By SDPall_essential5ec_rnoso,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,1587,By xheard_10,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,97,By xheard_10,Yes,16,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,967,By xheard_5,No,2,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,717,By xheard_5,Yes,9,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,1284,By xheard_7,No,3,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,400,By xheard_7,Yes,11,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,1301,By xheard_select5,No,3,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,383,By xheard_select5,Yes,11,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,1546,By xheard_select6,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,138,By xheard_select6,Yes,12,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,1081,Education,less than secondary,3,2,14,30,4,11,,,,,,,,35,25,45,,25,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,603,Education,secondary or more,8,11,41,65,16,41,,,,,,,,78,66,67,,52,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,566,HH wealth,Bottom 2 quintiles,0,0,5,17,2,4,,,,,,,,100,0,0,,0,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,1118,HH wealth,Top 3 quintiles,7,8,33,55,12,31,,,,,,,,59,49,59,,41,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,911,Residential area,Rural,2,2,11,27,4,9,,,,,,,,66,46,39,,39,,"Nigeria, Kano",0,0,5
+3,NGKanoR3,1397,2016,773,Residential area,Urban,9,10,39,61,15,38,,,,,,,,58,49,63,,41,,"Nigeria, Kano",0,0,5
+4,NGKanoR4,1408,2017,1760,All,All,4,8,25,44,12,25,,,,,,,,64,54,71,,41,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,1760,By SDPall_essential5_noso,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,1760,By SDPall_essential5_ready,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,1760,By SDPall_essential5_rnoso,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,1760,By SDPall_essential5ec_noso,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,1760,By SDPall_essential5ec_ready,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,1760,By SDPall_essential5ec_rnoso,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,1595,By xheard_10,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,165,By xheard_10,Yes,10,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,965,By xheard_5,No,1,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,795,By xheard_5,Yes,9,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,1283,By xheard_7,No,2,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,477,By xheard_7,Yes,11,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,1296,By xheard_select5,No,2,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,464,By xheard_select5,Yes,13,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,1523,By xheard_select6,No,3,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,237,By xheard_select6,Yes,15,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,1106,Education,less than secondary,3,5,17,33,6,15,,,,,,,,79,66,60,,42,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,654,Education,secondary or more,8,15,41,64,24,43,,,,,,,,53,45,80,,40,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,607,HH wealth,Bottom 2 quintiles,1,2,8,18,2,5,,,,,,,,36,36,36,,36,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,1153,HH wealth,Top 3 quintiles,7,12,35,58,18,36,,,,,,,,65,55,73,,41,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,946,Residential area,Rural,1,3,11,26,3,9,,,,,,,,59,41,55,,23,,"Nigeria, Kano",0,0,4
+4,NGKanoR4,1408,2017,814,Residential area,Urban,9,16,44,67,24,46,,,,,,,,65,57,75,,45,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,1751,All,All,6,8,27,48,12,29,,,,,,,,70,67,80,,62,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,,,1,All,All,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,1,
+5,NGKanoR5,,,1,By SDPall_essential5_noso,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,1,
+5,NGKanoR5,1420,2018,1751,By SDPall_essential5_noso,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,,,1,By SDPall_essential5_ready,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,1,
+5,NGKanoR5,1420,2018,1751,By SDPall_essential5_ready,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,1751,By SDPall_essential5_rnoso,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,,,1,By SDPall_essential5_rnoso,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,1,
+5,NGKanoR5,,,1,By SDPall_essential5ec_noso,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,1,
+5,NGKanoR5,1420,2018,1751,By SDPall_essential5ec_noso,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,1751,By SDPall_essential5ec_ready,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,,,1,By SDPall_essential5ec_ready,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,1,
+5,NGKanoR5,1420,2018,1751,By SDPall_essential5ec_rnoso,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,,,1,By SDPall_essential5ec_rnoso,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,1,
+5,NGKanoR5,1420,2018,1578,By xheard_10,No,5,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,173,By xheard_10,Yes,15,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,872,By xheard_5,No,2,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,879,By xheard_5,Yes,9,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,1230,By xheard_7,No,3,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,521,By xheard_7,Yes,12,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,1221,By xheard_select5,No,3,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,530,By xheard_select5,Yes,13,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,1526,By xheard_select6,No,5,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,225,By xheard_select6,Yes,14,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,1036,Education,less than secondary,4,4,18,36,5,17,,,,,,,,66,66,75,,62,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,715,Education,secondary or more,9,16,43,68,22,47,,,,,,,,72,67,83,,61,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,598,HH wealth,Bottom 2 quintiles,1,1,8,22,2,6,,,,,,,,93,93,93,,93,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,1153,HH wealth,Top 3 quintiles,8,13,38,63,17,41,,,,,,,,68,64,79,,59,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,943,Residential area,Rural,2,2,11,28,3,9,,,,,,,,72,59,72,,59,,"Nigeria, Kano",0,0,4
+5,NGKanoR5,1420,2018,808,Residential area,Urban,10,17,49,75,23,54,,,,,,,,69,68,82,,62,,"Nigeria, Kano",0,0,4
+6,NGKanoR6,1440,2019,1122,All,All,9,8,31,53,15,33,3,,,,,,,78,75,83,74,73,58,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,1035,By xheard_10,No,8,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,87,By xheard_10,Yes,26,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,526,By xheard_5,No,2,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,596,By xheard_5,Yes,16,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,772,By xheard_7,No,4,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,350,By xheard_7,Yes,22,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,747,By xheard_select5,No,3,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,375,By xheard_select5,Yes,23,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,953,By xheard_select6,No,6,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,169,By xheard_select6,Yes,27,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,1084,By xinsurance,No,9,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,38,By xinsurance,Yes,26,,,,,,,,,,,,,,,,,,,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,682,Education,less than secondary,7,6,26,48,10,27,1,,,,,,,78,71,78,63,67,47,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,440,Education,secondary or more,13,10,39,61,24,44,8,,,,,,,79,77,88,82,77,67,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,414,HH wealth,Bottom 2 quintiles,4,4,15,35,6,15,0,,,,,,,73,73,60,47,60,33,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,708,HH wealth,Top 3 quintiles,13,10,41,64,20,44,5,,,,,,,79,75,87,78,75,62,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,620,Residential area,Rural,5,5,20,41,5,18,1,,,,,,,74,74,84,81,71,65,"Nigeria, Kano",1,1,12
+6,NGKanoR6,1440,2019,502,Residential area,Urban,15,12,45,68,27,52,6,,,,,,,80,75,83,71,73,55,"Nigeria, Kano",1,1,12
+3,NGLagosR3,1397,2016,1432,All,All,20,14,47,72,31,44,,,,,,,,36,27,42,,24,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,443,By SDPall_essential5_noso,No,18,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,989,By SDPall_essential5_noso,Yes,20,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,741,By SDPall_essential5_ready,No,19,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,691,By SDPall_essential5_ready,Yes,21,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,838,By SDPall_essential5_rnoso,No,19,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,594,By SDPall_essential5_rnoso,Yes,21,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,1045,By SDPall_essential5ec_noso,No,19,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,387,By SDPall_essential5ec_noso,Yes,21,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,1132,By SDPall_essential5ec_ready,No,19,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,300,By SDPall_essential5ec_ready,Yes,21,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,1164,By SDPall_essential5ec_rnoso,No,19,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,268,By SDPall_essential5ec_rnoso,Yes,21,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,1240,By xheard_10,No,18,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,192,By xheard_10,Yes,27,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,408,By xheard_5,No,12,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,1024,By xheard_5,Yes,23,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,774,By xheard_7,No,14,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,658,By xheard_7,Yes,26,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,820,By xheard_select5,No,14,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,612,By xheard_select5,Yes,27,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,1005,By xheard_select6,No,16,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,427,By xheard_select6,Yes,28,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,198,Education,less than secondary,15,6,36,64,25,39,,,,,,,,32,20,43,,16,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,1234,Education,secondary or more,20,16,49,73,32,44,,,,,,,,36,28,42,,25,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,550,HH wealth,Bottom 2 quintiles,16,7,33,61,20,33,,,,,,,,32,22,30,,16,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,882,HH wealth,Top 3 quintiles,21,19,55,78,37,49,,,,,,,,38,30,48,,27,,"Nigeria, Lagos",0,0,5
+3,NGLagosR3,1397,2016,1432,Residential area,Urban,20,14,47,72,31,44,,,,,,,,36,27,42,,24,,"Nigeria, Lagos",0,0,5
+4,NGLagosR4,1408,2017,1535,All,All,21,15,50,75,40,52,,,,,,,,41,30,45,,26,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,1503,By SDPall_essential5_noso,No,21,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,1503,By SDPall_essential5_ready,No,21,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,1503,By SDPall_essential5_rnoso,No,21,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,1503,By SDPall_essential5ec_noso,No,21,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,1503,By SDPall_essential5ec_ready,No,21,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,1503,By SDPall_essential5ec_rnoso,No,21,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,1305,By xheard_10,No,18,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,230,By xheard_10,Yes,35,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,391,By xheard_5,No,9,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,1144,By xheard_5,Yes,24,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,771,By xheard_7,No,14,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,764,By xheard_7,Yes,27,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,740,By xheard_select5,No,14,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,795,By xheard_select5,Yes,27,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,931,By xheard_select6,No,15,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,604,By xheard_select6,Yes,29,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,184,Education,less than secondary,19,10,42,72,25,42,,,,,,,,46,37,47,,29,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,1351,Education,secondary or more,21,16,51,75,42,54,,,,,,,,40,29,44,,26,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,594,HH wealth,Bottom 2 quintiles,17,9,40,68,32,44,,,,,,,,36,29,37,,23,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,941,HH wealth,Top 3 quintiles,23,19,57,80,45,58,,,,,,,,43,31,49,,28,,"Nigeria, Lagos",0,0,4
+4,NGLagosR4,1408,2017,1535,Residential area,Urban,21,15,50,75,40,52,,,,,,,,41,30,45,,26,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,1590,All,All,23,11,45,71,39,51,,,,,,,,31,27,41,,23,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,1523,By SDPall_essential5_noso,No,23,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,1523,By SDPall_essential5_ready,No,23,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,1523,By SDPall_essential5_rnoso,No,23,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,1523,By SDPall_essential5ec_noso,No,23,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,1523,By SDPall_essential5ec_ready,No,23,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,1523,By SDPall_essential5ec_rnoso,No,23,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,1415,By xheard_10,No,21,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,175,By xheard_10,Yes,36,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,465,By xheard_5,No,12,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,1125,By xheard_5,Yes,27,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,891,By xheard_7,No,17,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,699,By xheard_7,Yes,30,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,779,By xheard_select5,No,15,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,811,By xheard_select5,Yes,30,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,967,By xheard_select6,No,17,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,623,By xheard_select6,Yes,32,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,177,Education,less than secondary,15,4,33,66,30,48,,,,,,,,36,36,54,,31,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,1413,Education,secondary or more,24,12,46,72,40,51,,,,,,,,31,27,40,,22,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,549,HH wealth,Bottom 2 quintiles,20,6,36,64,30,45,,,,,,,,41,35,43,,30,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,1041,HH wealth,Top 3 quintiles,24,14,49,75,44,54,,,,,,,,27,24,40,,20,,"Nigeria, Lagos",0,0,4
+5,NGLagosR5,1420,2018,1590,Residential area,Urban,23,11,45,71,39,51,,,,,,,,31,27,41,,23,,"Nigeria, Lagos",0,0,4
+6,NGLagosR6,1440,2019,1456,All,All,25,15,52,75,44,53,9,,,,,,,44,36,50,47,38,30,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,1240,By xheard_10,No,23,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,216,By xheard_10,Yes,38,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,362,By xheard_5,No,16,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,1094,By xheard_5,Yes,29,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,704,By xheard_7,No,18,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,752,By xheard_7,Yes,32,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,678,By xheard_select5,No,18,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,778,By xheard_select5,Yes,32,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,821,By xheard_select6,No,19,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,635,By xheard_select6,Yes,34,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,1329,By xinsurance,No,25,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,126,By xinsurance,Yes,31,,,,,,,,,,,,,,,,,,,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,164,Education,less than secondary,23,9,44,71,35,51,2,,,,,,,51,43,59,57,46,38,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,1292,Education,secondary or more,26,16,53,76,45,54,10,,,,,,,43,35,49,46,37,29,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,542,HH wealth,Bottom 2 quintiles,25,9,42,68,36,48,3,,,,,,,41,34,45,40,36,27,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,914,HH wealth,Top 3 quintiles,26,18,57,79,48,57,12,,,,,,,45,37,53,52,39,32,"Nigeria, Lagos",1,1,12
+6,NGLagosR6,1440,2019,1456,Residential area,Urban,25,15,52,75,44,53,9,,,,,,,44,36,50,47,38,30,"Nigeria, Lagos",1,1,12
+3,UGR3,1389,2015,3690,All,All,26,17,63,80,32,64,,47,52,62,20,24,35,62,54,64,,49,,Uganda,0,0,9
+3,UGR3,1389,2015,1885,By SDPall_essential5_noso,No,25,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,1805,By SDPall_essential5_noso,Yes,26,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,1286,By SDPall_essential5_ready,No,23,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,2404,By SDPall_essential5_ready,Yes,27,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,2024,By SDPall_essential5_rnoso,No,24,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,1666,By SDPall_essential5_rnoso,Yes,28,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,2934,By SDPall_essential5ec_noso,No,25,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,756,By SDPall_essential5ec_noso,Yes,27,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,2449,By SDPall_essential5ec_ready,No,26,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,1241,By SDPall_essential5ec_ready,Yes,26,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,3100,By SDPall_essential5ec_rnoso,No,25,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,590,By SDPall_essential5ec_rnoso,Yes,27,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,3115,By xheard_10,No,23,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,575,By xheard_10,Yes,37,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,785,By xheard_5,No,10,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,2905,By xheard_5,Yes,30,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,1422,By xheard_7,No,15,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,2268,By xheard_7,Yes,32,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,1367,By xheard_select5,No,13,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,2323,By xheard_select5,Yes,32,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,2588,By xheard_select6,No,22,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,1102,By xheard_select6,Yes,33,,,,,,,,,,,,,,,,,,,Uganda,0,0,9
+3,UGR3,1389,2015,1142,Education,less than secondary,20,13,54,72,26,56,,47,53,61,19,23,37,59,54,60,,48,,Uganda,0,0,9
+3,UGR3,1389,2015,2548,Education,secondary or more,28,18,67,83,35,68,,47,52,62,20,25,35,63,54,65,,49,,Uganda,0,0,9
+3,UGR3,1389,2015,1337,HH wealth,Bottom 2 quintiles,18,12,51,68,25,51,,36,44,59,15,20,39,71,64,73,,56,,Uganda,0,0,9
+3,UGR3,1389,2015,2353,HH wealth,Top 3 quintiles,30,19,71,87,36,72,,54,57,63,22,27,34,59,50,61,,46,,Uganda,0,0,9
+3,UGR3,1389,2015,2694,Residential area,Rural,24,15,62,78,31,63,,47,54,59,19,22,36,63,55,66,,51,,Uganda,0,0,9
+3,UGR3,1389,2015,996,Residential area,Urban,32,21,69,85,37,69,,47,47,71,24,33,34,60,50,59,,44,,Uganda,0,0,9
+4,UGR4,1396,2016,3793,All,All,28,17,70,90,33,72,,22,35,37,8,8,9,63,54,65,,47,,Uganda,0,0,4
+4,UGR4,1396,2016,2586,By SDPall_essential5_noso,No,28,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,1207,By SDPall_essential5_noso,Yes,27,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,2206,By SDPall_essential5_ready,No,26,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,1587,By SDPall_essential5_ready,Yes,30,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,3001,By SDPall_essential5_rnoso,No,27,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,792,By SDPall_essential5_rnoso,Yes,28,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,3513,By SDPall_essential5ec_noso,No,28,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,280,By SDPall_essential5ec_noso,Yes,24,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,3469,By SDPall_essential5ec_ready,No,28,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,324,By SDPall_essential5ec_ready,Yes,26,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,3513,By SDPall_essential5ec_rnoso,No,28,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,280,By SDPall_essential5ec_rnoso,Yes,24,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,3198,By xheard_10,No,26,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,595,By xheard_10,Yes,37,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,447,By xheard_5,No,11,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,3346,By xheard_5,Yes,29,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,1205,By xheard_7,No,17,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,2588,By xheard_7,Yes,32,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,1084,By xheard_select5,No,16,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,2709,By xheard_select5,Yes,32,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,2584,By xheard_select6,No,24,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,1209,By xheard_select6,Yes,34,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+4,UGR4,1396,2016,1159,Education,less than secondary,24,12,64,87,27,70,,23,37,33,9,9,10,62,54,65,,45,,Uganda,0,0,4
+4,UGR4,1396,2016,2634,Education,secondary or more,29,18,72,91,36,73,,22,34,39,7,7,9,63,53,65,,47,,Uganda,0,0,4
+4,UGR4,1396,2016,1402,HH wealth,Bottom 2 quintiles,21,14,62,85,29,66,,22,38,33,10,10,10,68,61,68,,54,,Uganda,0,0,4
+4,UGR4,1396,2016,2391,HH wealth,Top 3 quintiles,31,18,75,92,35,76,,22,33,40,7,7,9,61,50,64,,44,,Uganda,0,0,4
+4,UGR4,1396,2016,2820,Residential area,Rural,26,15,69,89,30,71,,22,37,33,7,7,7,62,55,66,,48,,Uganda,0,0,4
+4,UGR4,1396,2016,973,Residential area,Urban,32,23,74,91,44,77,,23,28,56,14,14,17,65,49,63,,41,,Uganda,0,0,4
+5,UGR5,1408,2017,4119,All,All,29,17,73,92,34,76,,55,57,71,32,35,40,58,48,59,,41,,Uganda,0,0,4
+5,UGR5,1408,2017,1726,By SDPall_essential5_noso,No,30,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,2393,By SDPall_essential5_noso,Yes,27,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,1171,By SDPall_essential5_ready,No,29,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,2948,By SDPall_essential5_ready,Yes,28,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,1799,By SDPall_essential5_rnoso,No,30,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,2320,By SDPall_essential5_rnoso,Yes,28,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,2401,By SDPall_essential5ec_noso,No,29,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,1718,By SDPall_essential5ec_noso,Yes,27,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,2201,By SDPall_essential5ec_ready,No,29,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,1918,By SDPall_essential5ec_ready,Yes,27,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,2525,By SDPall_essential5ec_rnoso,No,29,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,1594,By SDPall_essential5ec_rnoso,Yes,27,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,3491,By xheard_10,No,27,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,628,By xheard_10,Yes,36,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,397,By xheard_5,No,7,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,3722,By xheard_5,Yes,30,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,1201,By xheard_7,No,16,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,2918,By xheard_7,Yes,33,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,1096,By xheard_select5,No,14,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,3023,By xheard_select5,Yes,33,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,2755,By xheard_select6,No,25,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,1364,By xheard_select6,Yes,34,,,,,,,,,,,,,,,,,,,Uganda,0,0,4
+5,UGR5,1408,2017,1131,Education,less than secondary,23,12,70,92,26,74,,55,57,73,32,36,42,69,62,64,,51,,Uganda,0,0,4
+5,UGR5,1408,2017,2988,Education,secondary or more,30,18,74,92,37,77,,56,57,71,32,35,39,55,45,58,,38,,Uganda,0,0,4
+5,UGR5,1408,2017,1750,HH wealth,Bottom 2 quintiles,23,13,67,90,27,70,,58,60,72,35,37,43,70,60,66,,50,,Uganda,0,0,4
+5,UGR5,1408,2017,2369,HH wealth,Top 3 quintiles,32,19,77,94,39,80,,54,55,71,30,34,38,52,43,56,,37,,Uganda,0,0,4
+5,UGR5,1408,2017,3023,Residential area,Rural,28,15,72,92,30,74,,51,52,69,27,31,35,60,52,62,,44,,Uganda,0,0,4
+5,UGR5,1408,2017,1096,Residential area,Urban,31,21,78,93,49,83,,71,74,81,49,51,58,51,37,50,,31,,Uganda,0,0,4
+6,UGR6,1420,2018,4227,All,All,30,20,80,94,36,80,,59,63,64,30,33,49,50,42,58,,36,,Uganda,1,0,4
+6,UGR6,1420,2018,1608,By SDPall_essential5_noso,No,32,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,2619,By SDPall_essential5_noso,Yes,29,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,1428,By SDPall_essential5_ready,No,32,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,2799,By SDPall_essential5_ready,Yes,29,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,1776,By SDPall_essential5_rnoso,No,32,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,2451,By SDPall_essential5_rnoso,Yes,29,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,2762,By SDPall_essential5ec_noso,No,31,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,1465,By SDPall_essential5ec_noso,Yes,28,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,2094,By SDPall_essential5ec_ready,No,30,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,2133,By SDPall_essential5ec_ready,Yes,31,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,2960,By SDPall_essential5ec_rnoso,No,31,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,1267,By SDPall_essential5ec_rnoso,Yes,28,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,3407,By xheard_10,No,29,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,820,By xheard_10,Yes,37,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,319,By xheard_5,No,11,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,3908,By xheard_5,Yes,32,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,939,By xheard_7,No,16,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,3288,By xheard_7,Yes,34,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,938,By xheard_select5,No,15,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,3289,By xheard_select5,Yes,34,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,2701,By xheard_select6,No,27,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,1526,By xheard_select6,Yes,37,,,,,,,,,,,,,,,,,,,Uganda,1,0,4
+6,UGR6,1420,2018,2781,Education,less than secondary,28,16,77,92,30,78,,61,66,65,32,36,49,51,44,58,,37,,Uganda,1,0,4
+6,UGR6,1420,2018,1446,Education,secondary or more,34,27,85,96,48,84,,54,59,61,25,28,51,49,40,59,,34,,Uganda,1,0,4
+6,UGR6,1420,2018,1786,HH wealth,Bottom 2 quintiles,24,15,75,91,29,75,,65,69,69,34,38,50,54,48,60,,39,,Uganda,1,0,4
+6,UGR6,1420,2018,2441,HH wealth,Top 3 quintiles,34,23,83,95,41,83,,55,60,60,27,31,49,48,40,57,,34,,Uganda,1,0,4
+6,UGR6,1420,2018,3084,Residential area,Rural,30,20,80,94,34,79,,59,65,61,32,36,47,51,44,61,,37,,Uganda,1,0,4
+6,UGR6,1420,2018,1143,Residential area,Urban,33,17,81,93,46,83,,60,60,72,20,25,59,46,36,48,,32,,Uganda,1,0,4
