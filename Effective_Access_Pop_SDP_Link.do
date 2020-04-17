@@ -3,7 +3,7 @@
 * 		=> save "$data/EAlevel_SDP_`survey'.dta", replace 
 * 		This is required to run some of the access variables in "Effective_Access_Indicators_IR.do" 
 * Summary dataset describing link quality 
-* 		=> save Access_summary.dta, replace	
+* 		=> save EA_SDP_Link_Summary.dta, replace	
 
 * Table of contents
 * A. SETTING
@@ -11,7 +11,7 @@
 * 	B.1 Get EA-level information from HHQFQ ===> EA_`survey'.dta
 * 	B.2 Reshape SDP to EA-SDP level LONG file ===> EASDP_`survey'.dta
 * 	B.3 Create EA-level data which has service environment characterisics based on linked SDPs ===> EAlevel_SDP_`survey'.dta
-* C. Create SURVEY-LEVEL summary dataset about link results ===> Access_summary.dta	
+* C. Create SURVEY-LEVEL summary dataset about link results ===> EA_SDP_Link_Summary.dta	
 * D. Analysis/assessment of the link reults 
 
 clear
@@ -279,7 +279,7 @@ use "$data/EA_ETR2.dta", clear
 	lab var nEA "Total number of EA in the survey" 
 	
 	sort xsurvey 
-	save Access_summary.dta, replace	
+	save EA_SDP_Link_Summary.dta, replace	
 		
 *** Number of SDP	
 use "$data/SR_ETR2.dta", clear
@@ -303,12 +303,12 @@ use "$data/SR_ETR2.dta", clear
 	lab var nSDPprivate "Total number of PRIVATE SDPs in the survey" 	
 		
 	sort xsurvey
-	merge xsurvey using Access_summary.dta
+	merge xsurvey using EA_SDP_Link_Summary.dta
 		tab _merge, m
 		keep if _merge==3 /*SHOULD BE ALL*/
 		drop _merge
 	sort xsurvey
-	save Access_summary.dta, replace	
+	save EA_SDP_Link_Summary.dta, replace	
 
 *** Number of EASDP	
 use "$data/EASDP_ETR2.dta", clear			
@@ -326,12 +326,12 @@ use "$data/EASDP_ETR2.dta", clear
 	lab var nEASDP "Total number of EA-SDP pairs in the survey" 		
 		
 	sort xsurvey
-	merge xsurvey using Access_summary.dta, 
+	merge xsurvey using EA_SDP_Link_Summary.dta, 
 		tab _merge, m
 		*keep if _merge==3 /*SHOULD BE ALL*/
 		drop _merge
 	sort xsurvey
-	save Access_summary.dta, replace	
+	save EA_SDP_Link_Summary.dta, replace	
 	
 *** Number of average, min, max SDP per EA
 use "$data/EAlevel_SDP_ETR2.dta", clear	
@@ -423,7 +423,7 @@ use "$data/EAlevel_SDP_ETR2.dta", clear
 		lab var noSDPlow "% EAs with no linked primary or secondary SDP"
 				
 	sort xsurvey
-	merge xsurvey using Access_summary.dta
+	merge xsurvey using EA_SDP_Link_Summary.dta
 		tab _merge, m
 		drop _merge
 		
@@ -431,9 +431,12 @@ use "$data/EAlevel_SDP_ETR2.dta", clear
 	
 	gen round=substr(xsurvey, -1, .)
 	
-	save Access_summary.dta, replace	
+	save EA_SDP_Link_Summary.dta, replace	
 	
-	export delimited using Access_summary.csv, replace
+	export delimited using EA_SDP_Link_Summary.csv, replace
+
+	
+erase temp.dta	
 *browse
 tab country round, m
 OKAY SURVEY-level summary data ready HERE
@@ -450,7 +453,7 @@ putdocx text ("EA-SDP link assessment"), linebreak bold
 putdocx text (""), linebreak
 putdocx text ("1. Basic background information: number of EAs, SDPs, and EA-SDP linked pairs"), linebreak bold  
 
-	use Access_summary.dta, clear	
+	use EA_SDP_Link_Summary.dta, clear	
 	
 putdocx paragraph
 putdocx table stable = (1,4), 
@@ -462,7 +465,7 @@ putdocx text ("Based on the survey design, each EA would have 3-6 SDPs, though s
 putdocx table stable = (1,5), 
 putdocx table table = data(xsurvey noSDPany noSDPpub noSDPpub12 noSDPlow) 
 	
-	use Access_summary.dta, clear	
+	use EA_SDP_Link_Summary.dta, clear	
 		
 		#delimit; 	
 		graph bar num_*, over(round)
@@ -512,7 +515,7 @@ putdocx table table = data(xsurvey noSDPany noSDPpub noSDPpub12 noSDPlow)
 		putdocx paragraph
 		putdocx image graph.png		
 			
-	use Access_summary.dta, clear		
+	use EA_SDP_Link_Summary.dta, clear		
 	
 		#delimit; 
 		graph bar noSDP*, over(round) 
