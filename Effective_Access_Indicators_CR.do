@@ -50,7 +50,7 @@ cd "C:\Users\YoonJoung Choi\Dropbox\0 Data\PMA\NonPublicFiles\"
 dir
 */
 ***** BFR7
-use "$data/NonPublicFiles/BFP1_CQ_Clean_Data_with_checks_23Mar2020.dta", clear
+use "$data/NonPublicFiles/BFP1_CQ_Clean_Data_with_checks_17Apr2020.dta", clear
 
 		gen round=7
 		gen phase=1

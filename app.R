@@ -17,6 +17,8 @@ date<-as.Date(Sys.time(	), format='%d%b%Y')
 # 0. Database update 
 #******************************
 
+#setwd("C:/Users/YoonJoung Choi/Dropbox/0 iSquared/iSquared_PMA/Effective Access")
+
 dtaIR<-data.frame(read_csv("summary_Access_Indicators_IR.csv"))%>%
     mutate(cmcdate = ISOdate(year, month, 15),
            cmcdate=substr(as.character(cmcdate),0,7),
@@ -53,10 +55,13 @@ dta<-rbind.fill(dtaIR, dtaCR)
     dim(dta)
     
 countrylist<-unique(as.vector(dta$country))
-    countrylist<-countrylist[!is.na(countrylist)]
+
+    #countrylist<-countrylist[!is.na(countrylist)]
+    #countrylist<-c("Burkina Faso", "Ethiopia", "Kenya", "Uganda")    
+
 surveylist<-unique(as.vector(dta$xsurvey))
 
-grouplistIR<-c("Education", "HH wealth", "Residential area")
+grouplistIR<-c("HH wealth", "Education", "Residential area", "Education x Residence", "Parity", "Union status")
 grouplistCR<-c("Education of clients", "Age of clients")
 
 #******************************
@@ -69,7 +74,7 @@ ui<-fluidPage(
     #headerPanel("Potential indicators for access"),
 
     # Title panel 
-    titlePanel("Interactive application to explore potential indicators for access"),
+    titlePanel("DO NOT CIRCULATE the link: application to internally explore potential indicators for access"),
 
     # Side panel: define input and output   
     sidebarLayout(
@@ -78,29 +83,31 @@ ui<-fluidPage(
         sidebarPanel(
             style = "position:fixed;width:inherit;", 
             width = 3,
-                        
-            h5(strong("Select input under each section in the element")),
             br(),
-            h5("For Sections A-D:"),
-            h5("Levels and trends of indicators"),
+            h5(strong("Provide input below")),                        
+            br(),
             selectInput("country", 
                         "Select a country",
                         choices = countrylist, 
-                        selected = "Kenya"),        
+                        selected = "Burkina Faso"),                  
             br(),
-            h5("For section C:"),
-            h5("Pattern of indicators"),
+            h5("Sections A: Levels of indicators"),
+            h5("(No input needed)"),
+            br(),
+            h5("Sections B: Trends of indicators"),    
+            h5("(No input needed)"),
+            br(),
+            h5("Section C: Pattern of indicators"),
             selectInput("groupIR", 
-                        "Select background characteristics to assess disparity among all women",
+                        "Select background characteristics to assess disparity among all women (all elements)",
                         choices = grouplistIR, 
                         selected = "Education"), 
             selectInput("groupCR", 
-                        "Select background characteristics to assess disparity among all FP clients",
+                        "Select background characteristics to assess disparity among all FP clients (only for service quality)",
                         choices = grouplistCR,
                         selected = "Education"),             
             br(),
-            h5("For section D:"),
-            h5("MCPR by indicators"),
+            h5("Section D: MCPR by indicators"),
             h5("(No input needed)")
             
         ),
@@ -113,18 +120,82 @@ ui<-fluidPage(
                "It also presents MCPR by status of each indicator."), 
             
             br(), 
-            h5("Potential indicators are organized by element of access: psychosocial, cognitive accessibility, geographic accessibility, affordability, and service quality.", 
-               "Under each element, there are four sections: A-D."), 
+            h5("Potential indicators are organized by element of access:"), 
+            h5("1. psychosocial"),
+            h5("2. cognitive accessibility,"), 
+            h5("3. geographic accessibility,"), 
+            h5("4. affordability, and"), 
+            h5("5. service quality."), 
+            h5("Under each element, there are four sections: A-D."), 
             h5(em("Provide inputs on the left panel.")), 
             h5(em("Hover over figures for estimates and other functions")), 
 
             br(),    
             h4(strong("1. Psychosocial accessibility")),
-                h5("Indicators for reproductive empowerment: agency and efficacy - under development"),
+                h5("For definitions and data sources, see", a("here.",href="https://drive.google.com/file/d/1ok1htfOAVQGzMxOCNwA4NqFV4JDVng3V/view?usp=sharing")),
+                h5("Three groups of indicators under exploration:"),
+                h5("--decision making for using/not using contraception (older PMA2020 surveys do not have this)"),    
+                h5("--exercise of choice for pregnancy (NEW, relevant for only Phase 1 surveys)"),
+                h5("--exercise of choice for contraception (NEW, relevant for only Phase 1 surveys)"),
+                h5("For the new empowerment indicators, two different definitions were used."),
+                h5("--",em("Strongly agree"), " vs. the rest"),
+                h5("--",em("Strongly agree or agree"), " vs. the rest"),
+            
+                h5(strong("1.A. Level of indicators in the latest survey: STRONGLY AGREE")),
+                plotlyOutput("plot_level_psychosocial"),  
+                h5(strong("1.A. Level of indicators in the latest survey: AGREE or STRONGLY AGREE")),    
+                plotlyOutput("plot_level_psychosocial2"),              
+                
+                h5(strong("1.B. Trends of indicators in the country")),
+                plotlyOutput("plot_trend_psychosocial"),   
+                
+                h5(strong("1.C. SES pattern of indicators in the latest survey: STRONGLY AGREE")),    
+                h5("For year of the latest survey, see 1.A."),
+                plotlyOutput("plot_pattern_psychosocial"),   
+
+                h5(strong("1.C. SES pattern of indicators in the latest survey: AGREE or STRONGLY AGREE")),    
+                h5("For year of the latest survey, see 1.A."),
+                plotlyOutput("plot_pattern_psychosocial2"),   
+            
+                h5(strong("1.D. MCPR by indicators in the latest survey: STRONGLY AGREE")),    
+                h5("For year of the latest survey, see 1.A."),    
+                plotlyOutput("plot_mcpr_psychosocial"),               
+            
+                h5(strong("1.D. MCPR by indicators in the latest survey: AGREE or STRONGLY AGREE")),    
+                h5("For year of the latest survey, see 1.A."),    
+                plotlyOutput("plot_mcpr_psychosocial2"),               
+
+            h4(strong("1.1. Psychosocial accessibility??")),
+                h5("--Opinion about FP (NEW, relevant for only Phase 1 surveys)"),
+                h5("For the FP opinion indicators, two different definitions were used."),
+                h5("--",em("Strongly agree/disagree"), " vs. the rest"),
+                h5("--",em("Strongly agree/disagree or agree/disagree"), " vs. the rest"),
+                h5("The higher, the more supportive/inclusive/favorable"),
+            
+                h5(strong("1.1.A. Level of indicators in the latest survey: STRONGLY DISAGREE/AGREE")),
+                plotlyOutput("plot_level_psychosocial3"),  
+                h5(strong("1.1.A. Level of indicators in the latest survey: DISAGREE/AGREE or STRONGLY DISAGREE/AGREE")),    
+                plotlyOutput("plot_level_psychosocial4"),              
+                
+                h5(strong("1.1.C. SES pattern of indicators in the latest survey: STRONGLY DISAGREE/AGREE")),    
+                h5("For year of the latest survey, see 1.A."),
+                plotlyOutput("plot_pattern_psychosocial3"),   
+
+                h5(strong("1.1.C. SES pattern of indicators in the latest survey: DISAGREE/AGREE or STRONGLY DISAGREE/AGREE")),    
+                h5("For year of the latest survey, see 1.A."),
+                plotlyOutput("plot_pattern_psychosocial4"),   
+            
+                h5(strong("1.1.D. MCPR by indicators in the latest survey: STRONGLY DISAGREE/AGREE")),    
+                h5("For year of the latest survey, see 1.A."),    
+                plotlyOutput("plot_mcpr_psychosocial3"),               
+            
+                h5(strong("1.1.D. MCPR by indicators in the latest survey: DISAGREE/AGREE or DISAGREE/STRONGLY AGREE")),    
+                h5("For year of the latest survey, see 1.A."),    
+                plotlyOutput("plot_mcpr_psychosocial4"),                             
             
             br(),                        
             h4(strong("2. Cognitive accessibility")),        
-                h5("For definitions and data sources, see", a("here.",href="https://drive.google.com/file/d/1a7lPpJUk2ArJjb7hr8zdxqKKKJeiCnqb/view?usp=sharing")),
+                h5("For definitions and data sources, see", a("here.",href="https://drive.google.com/file/d/1IgCkBOL_nTEv2KDsYl7Wweeak8RbmVeu/view?usp=sharing")),
                 h5("*Five specific modern methods: IUD, implant, injectables, pills, & male condom"),    
                 h5("**Six specific modern methods: IUD, implant, injectables, pills, male condom & EC"),    
                 h5(strong("2.A. Level of indicators in the latest survey")),
@@ -165,7 +236,7 @@ ui<-fluidPage(
             br(),                        
             h4(strong("5. Service quality")),    
             h4(strong("5.1. Service quality - from female survey")),    
-                h5("For definitions and data sources, see", a("here.",href="https://drive.google.com/file/d/1a7lPpJUk2ArJjb7hr8zdxqKKKJeiCnqb/view?usp=sharing")),
+                h5("For definitions and data sources, see", a("here.",href="https://drive.google.com/file/d/1IgCkBOL_nTEv2KDsYl7Wweeak8RbmVeu/view?usp=sharing")),
                 h5("*Five specific modern methods: IUD, implant, injectables, pills, & male condom"),    
                 h5("**Ready: having commodity, trained personnel, & equipment. Applicable only for IUD and implant"),    
                 h5(""),    
@@ -205,8 +276,8 @@ ui<-fluidPage(
                 plotlyOutput("plot_pattern_qualityCR2"),   
             
             hr(),
-            h6("See", a("GitHub",href="https://github.com/yoonjoung/Shiny_DesignEffect"),"for more information - especially calculation of ICC by select indicator."),
-            h6("Application last updated on April 14, 2020"),
+            h6("See", a("GitHub",href="https://drive.google.com/file/d/1IgCkBOL_nTEv2KDsYl7Wweeak8RbmVeu/view?usp=sharing"),"for more information."),
+            h6("Application last updated on April 28, 2020"),
             h6("For typos, errors, and questions:", a("contact me",href="https://www.isquared.global/YJ"))
         )
     )
@@ -218,8 +289,8 @@ ui<-fluidPage(
 
 server<-function(input, output) {
 
-    #################################### 
-    # text output of inputs
+    ##### text output of inputs #####
+    
     output$text_country <- renderText({
         paste(input$country) 
         })    
@@ -230,8 +301,534 @@ server<-function(input, output) {
         paste(input$groupCR) 
         })        
 
-    #################################### 
-    # output: Cognitive accessiblity 
+    
+    ##### output: Psychosocial accessiblity #####
+    
+    output$plot_level_psychosocial <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All")%>%
+            mutate(dummy=0)
+    
+        plot_ly(dtafig, x=~year, y=~xdec_users, type = 'bar', 
+                name = "decision by herself/jointly, among users", 
+                marker = list(color = 'rgb(171,217,233)'),
+                text = ~xdec_users, textposition = 'outside') %>%  
+            add_trace(y=~xdec_nonusers, 
+                name = "decision by herself/jointly, among non users", 
+                marker = list(color = 'rgb(253,174,97)'),
+                text = ~xdec_nonusers, textposition = 'outside') %>% 
+            add_trace(y=~xdec, 
+                name = "decision by herself/jointly, among all*", 
+                marker = list(color = 'rgb(189,189,189)'),
+                text = ~xdec, textposition = 'outside') %>%             
+            add_trace(y=~dummy, name = " ",
+                      marker = list(color = 'rgb(255,255,255)'))%>%
+            
+            add_trace(y = ~xwge_preg_exercise1, name = "can decide when to start having children (NEW)", 
+                     marker = list(color = 'rgb(140,150,198)'),
+                     text = ~xwge_preg_exercise1, textposition = 'outside') %>% 
+            add_trace(y = ~xwge_preg_exercise2, name = "can discuss when to start having children (NEW)", 
+                      marker = list(color = 'rgb(140,107,177)'),
+                      text = ~xwge_preg_exercise2, textposition = 'outside') %>% 
+            add_trace(y = ~xwge_preg_exercise3, name = "can negotiate when to stop having children (NEW)", 
+                      marker = list(color = 'rgb(136,65,157)'),
+                      text = ~xwge_preg_exercise3, textposition = 'outside') %>% 
+            add_trace(y = ~xwge_preg_exercise, name = "all three (NEW)", 
+                      marker = list(color = 'rgb(129,15,124)'),
+                      text = ~xwge_preg_exercise, textposition = 'outside') %>% 
+            add_trace(y=~dummy, name = " ",
+                      marker = list(color = 'rgb(255,255,255)'))%>%
+            
+            add_trace(y = ~xwge_fp_exercise1, name = "can switch a method (NEW)", 
+                      marker = list(color = 'rgb(203,201,226)'),
+                      text = ~xwge_fp_exercise1, textposition = 'outside') %>% 
+            add_trace(y = ~xwge_fp_exercise2, name = "can tell what's important (NEW)", 
+                      marker = list(color = 'rgb(158,154,200)'),
+                      text = ~xwge_fp_exercise2, textposition = 'outside') %>% 
+            add_trace(y = ~xwge_fp_exercise, name = "both (NEW)", 
+                      marker = list(color = 'rgb(117,107,177)'),
+                      text = ~xwge_fp_exercise, textposition = 'outside') %>%
+            add_trace(y=~dummy, name = " ",
+                      marker = list(color = 'rgb(255,255,255)'))%>%
+            
+            layout(
+                autosize = F, width = 800, height = 400, 
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = "Survey year"),
+                legend = list(orientation = 'v', font=list(size=10))
+            )
+        })
+    
+    output$plot_trend_psychosocial <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & group=="All")%>%
+            mutate(dummy=0)
+    
+        plot_ly(dtafig, x=~year, y=~xdec_users, type = 'scatter', mode = 'lines',
+                name = "decision by herself/jointly, among users", 
+                marker = list(color = 'rgb(171,217,233)'),
+                line = list(color = 'rgb(171,217,233)')) %>%  
+            add_trace(y=~xdec_nonusers, 
+                name = "decision by herself/jointly, among non users", 
+                marker = list(color = 'rgb(253,174,97)'),
+                line = list(color = 'rgb(253,174,97)')) %>% 
+            add_trace(y=~xdec, 
+                name = "decision by herself/jointly, among all*", 
+                marker = list(color = 'rgb(189,189,189)'),
+                line = list(color = 'rgb(189,189,189)')) %>%   
+            add_trace(y=~dummy, name = " ",
+                      marker = list(color = 'rgb(255,255,255)'),
+                      line = list(color = 'rgb(255,255,255)'))%>%
+            
+            add_trace(y = ~xwge_preg_exercise1, name = "can decide when to start having children (NEW)", 
+                     marker = list(color = 'rgb(140,150,198)'),
+                     line = list(color = 'rgb(140,150,198)')) %>% 
+            add_trace(y = ~xwge_preg_exercise2, name = "can discuss when to start having children (NEW)", 
+                      marker = list(color = 'rgb(140,107,177)'),
+                      line =  list(color = 'rgb(140,107,177)')) %>% 
+            add_trace(y = ~xwge_preg_exercise3, name = "can negotiate when to stop having children (NEW)", 
+                      marker = list(color = 'rgb(136,65,157)'),
+                      line = list(color = 'rgb(136,65,157)')) %>% 
+            add_trace(y = ~xwge_preg_exercise, name = "all three (NEW)", 
+                      marker = list(color = 'rgb(129,15,124)'),
+                      line = list(color = 'rgb(129,15,124)')) %>% 
+            add_trace(y=~dummy, name = " ",
+                      marker = list(color = 'rgb(255,255,255)'),
+                      line = list(color = 'rgb(255,255,255)'))%>%
+            
+            add_trace(y = ~xwge_fp_exercise1, name = "can switch a method (NEW)", 
+                      marker = list(color = 'rgb(203,201,226)'),
+                      line =  list(color = 'rgb(203,201,226)')) %>% 
+            add_trace(y = ~xwge_fp_exercise2, name = "can tell what's important (NEW)", 
+                      marker = list(color = 'rgb(158,154,200)'),
+                      line =  list(color = 'rgb(158,154,200)')) %>% 
+            add_trace(y = ~xwge_fp_exercise, name = "both (NEW)", 
+                      marker = list(color = 'rgb(117,107,177)'),
+                      line = list(color = 'rgb(117,107,177)')) %>%
+            
+            layout(
+                autosize = F, width = 800, height = 400, 
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = "Survey round"),
+                legend = list(orientation = 'v')
+            )
+        })
+
+    output$plot_pattern_psychosocial <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1)%>%
+            mutate(dummy=0)
+    
+        plot_ly(dtafig, x=~grouplabel, y=~xdec_users, type = 'bar', 
+                name = "decision by herself/jointly, among users", 
+                marker = list(color = 'rgb(171,217,233)'),
+                text = ~xdec_users, textposition = 'outside') %>%  
+            add_trace(y=~xdec_nonusers, 
+                name = "decision by herself/jointly, among non users", 
+                marker = list(color = 'rgb(253,174,97)'),
+                text = ~xdec_nonusers, textposition = 'outside') %>% 
+            add_trace(y=~xdec, 
+                name = "decision by herself/jointly, among all*", 
+                marker = list(color = 'rgb(189,189,189)'),
+                text = ~xdec, textposition = 'outside') %>%             
+            add_trace(y=~dummy, name = " ",
+                      marker = list(color = 'rgb(255,255,255)'))%>%
+            
+            add_trace(y = ~xwge_preg_exercise1, name = "can decide when to start having children (NEW)", 
+                     marker = list(color = 'rgb(140,150,198)'),
+                     text = ~xwge_preg_exercise1, textposition = 'outside') %>% 
+            add_trace(y = ~xwge_preg_exercise2, name = "can discuss when to start having children (NEW)", 
+                      marker = list(color = 'rgb(140,107,177)'),
+                      text = ~xwge_preg_exercise2, textposition = 'outside') %>% 
+            add_trace(y = ~xwge_preg_exercise3, name = "can negotiate when to stop having children (NEW)", 
+                      marker = list(color = 'rgb(136,65,157)'),
+                      text = ~xwge_preg_exercise3, textposition = 'outside') %>% 
+            add_trace(y = ~xwge_preg_exercise, name = "all three (NEW)", 
+                      marker = list(color = 'rgb(129,15,124)'),
+                      text = ~xwge_preg_exercise, textposition = 'outside') %>%
+            add_trace(y=~dummy, name = " ",
+                      marker = list(color = 'rgb(255,255,255)'))%>%
+            
+            add_trace(y = ~xwge_fp_exercise1, name = "can switch a method (NEW)", 
+                      marker = list(color = 'rgb(203,201,226)'),
+                      text = ~xwge_fp_exercise1, textposition = 'outside') %>% 
+            add_trace(y = ~xwge_fp_exercise2, name = "can tell what's important (NEW)", 
+                      marker = list(color = 'rgb(158,154,200)'),
+                      text = ~xwge_fp_exercise2, textposition = 'outside') %>% 
+            add_trace(y = ~xwge_fp_exercise, name = "both (NEW)", 
+                      marker = list(color = 'rgb(117,107,177)'),
+                      text = ~xwge_fp_exercise, textposition = 'outside') %>%
+            layout(
+                autosize = F, width = 1000, height = 400, 
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "v")
+            )
+        })
+    
+    output$plot_mcpr_psychosocial <- renderPlotly({
+
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1)%>%
+            select(xsurvey, mcp, group, grouplabel)%>%
+            filter(group=="By xwge_preg_exercise1"|group=="By xwge_preg_exercise2"|
+                group=="By xwge_preg_exercise3"|group=="By xwge_preg_exercise"|
+                group=="By xwge_fp_exercise1"|group=="By xwge_fp_exercise2"|group=="By xwge_fp_exercise")
+        
+        dtafig$group<-fct_relevel(factor(dtafig$group, levels = unique(dtafig$group)),
+                                  c("By xwge_preg_exercise1", "By xwge_preg_exercise2","By xwge_preg_exercise3", "By xwge_preg_exercise","By xwge_fp_exercise1", "By xwge_fp_exercise2", "By xwge_fp_exercise"))
+        
+        plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
+                color = ~grouplabel                )%>% 
+            add_annotations(text = ~mcp, textposition = 'auto',arrowhead = 0,
+                  arrowsize = 0 )%>%
+            layout(
+                yaxis = list(title = "Percent of women in the group",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "h", xanchor = "left", 
+                              x = 0, y = 1)
+            )                
+
+        })        
+    
+    ##### output: Psychosocial accessiblity 2 AGREE or STRONGLY AGREE #####
+
+    output$plot_level_psychosocial2 <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All")%>%
+            mutate(dummy=0)
+    
+        plot_ly(dtafig, x=~year, y=~xdec_users, type = 'bar', 
+                name = "decision by herself/jointly, among users", 
+                marker = list(color = 'rgb(171,217,233)'),
+                text = ~xdec_users, textposition = 'outside') %>%  
+            add_trace(y=~xdec_nonusers, 
+                name = "decision by herself/jointly, among non users", 
+                marker = list(color = 'rgb(253,174,97)'),
+                text = ~xdec_nonusers, textposition = 'outside') %>% 
+            add_trace(y=~xdec, 
+                name = "decision by herself/jointly, among all*", 
+                marker = list(color = 'rgb(189,189,189)'),
+                text = ~xdec, textposition = 'outside') %>%             
+            add_trace(y=~dummy, name = " ",
+                      marker = list(color = 'rgb(255,255,255)'))%>%
+    
+            add_trace(y = ~xxwge_preg_exercise1, name = "can decide when to start having children (NEW): AG + ST AG", 
+                     marker = list(color = 'rgb(140,150,198)'),
+                     text = ~xxwge_preg_exercise1, textposition = 'outside') %>% 
+            add_trace(y = ~xxwge_preg_exercise2, name = "can discuss when to start having children (NEW): AG + ST AG", 
+                      marker = list(color = 'rgb(140,107,177)'),
+                      text = ~xxwge_preg_exercise2, textposition = 'outside') %>% 
+            add_trace(y = ~xxwge_preg_exercise3, name = "can negotiate when to stop having children (NEW): AG + ST AG", 
+                      marker = list(color = 'rgb(136,65,157)'),
+                      text = ~xxwge_preg_exercise3, textposition = 'outside') %>% 
+            add_trace(y = ~xxwge_preg_exercise, name = "all three (NEW): AG + ST AG", 
+                      marker = list(color = 'rgb(129,15,124)'),
+                      text = ~xxwge_preg_exercise, textposition = 'outside') %>% 
+            add_trace(y=~dummy, name = " ",
+                      marker = list(color = 'rgb(255,255,255)'))%>%
+            
+            add_trace(y = ~xxwge_fp_exercise1, name = "can switch a method (NEW): AG + ST AG", 
+                      marker = list(color = 'rgb(203,201,226)'),
+                      text = ~xxwge_fp_exercise1, textposition = 'outside') %>% 
+            add_trace(y = ~xxwge_fp_exercise2, name = "can tell what's important (NEW): AG + ST AG", 
+                      marker = list(color = 'rgb(158,154,200)'),
+                      text = ~xxwge_fp_exercise2, textposition = 'outside') %>% 
+            add_trace(y = ~xxwge_fp_exercise, name = "both (NEW): AG + ST AG", 
+                      marker = list(color = 'rgb(117,107,177)'),
+                      text = ~xxwge_fp_exercise, textposition = 'outside') %>%            
+            
+            layout(
+                autosize = F, width = 850, height = 400, 
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = "Survey year"),
+                legend = list(orientation = 'v', font=list(size=10))
+            )
+        })
+    
+    output$plot_pattern_psychosocial2 <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1)%>%
+            mutate(dummy=0)
+    
+        plot_ly(dtafig, x=~grouplabel, y=~xdec_users, type = 'bar', 
+                name = "decision by herself/jointly, among users", 
+                marker = list(color = 'rgb(171,217,233)'),
+                text = ~xdec_users, textposition = 'outside') %>%  
+            add_trace(y=~xdec_nonusers, 
+                name = "decision by herself/jointly, among non users", 
+                marker = list(color = 'rgb(253,174,97)'),
+                text = ~xdec_nonusers, textposition = 'outside') %>% 
+            add_trace(y=~xdec, 
+                name = "decision by herself/jointly, among all*", 
+                marker = list(color = 'rgb(189,189,189)'),
+                text = ~xdec, textposition = 'outside') %>%             
+            add_trace(y=~dummy, name = " ",
+                      marker = list(color = 'rgb(255,255,255)'))%>%
+            
+            add_trace(y = ~xxwge_preg_exercise1, name = "can decide when to start having children (NEW): AG + ST AG", 
+                     marker = list(color = 'rgb(140,150,198)'),
+                     text = ~xxwge_preg_exercise1, textposition = 'outside') %>% 
+            add_trace(y = ~xxwge_preg_exercise2, name = "can discuss when to start having children (NEW): AG + ST AG", 
+                      marker = list(color = 'rgb(140,107,177)'),
+                      text = ~xxwge_preg_exercise2, textposition = 'outside') %>% 
+            add_trace(y = ~xxwge_preg_exercise3, name = "can negotiate when to stop having children (NEW): AG + ST AG", 
+                      marker = list(color = 'rgb(136,65,157)'),
+                      text = ~xxwge_preg_exercise3, textposition = 'outside') %>% 
+            add_trace(y = ~xxwge_preg_exercise, name = "all three (NEW): AG + ST AG", 
+                      marker = list(color = 'rgb(129,15,124)'),
+                      text = ~xxwge_preg_exercise, textposition = 'outside') %>%
+            add_trace(y=~dummy, name = " ",
+                      marker = list(color = 'rgb(255,255,255)'))%>%
+            
+            add_trace(y = ~xxwge_fp_exercise1, name = "can switch a method (NEW): AG + ST AG", 
+                      marker = list(color = 'rgb(203,201,226)'),
+                      text = ~xxwge_fp_exercise1, textposition = 'outside') %>% 
+            add_trace(y = ~xxwge_fp_exercise2, name = "can tell what's important (NEW): AG + ST AG", 
+                      marker = list(color = 'rgb(158,154,200)'),
+                      text = ~xxwge_fp_exercise2, textposition = 'outside') %>% 
+            add_trace(y = ~xxwge_fp_exercise, name = "both (NEW): AG + ST AG", 
+                      marker = list(color = 'rgb(117,107,177)'),
+                      text = ~xxwge_fp_exercise, textposition = 'outside') %>%
+            layout(
+                autosize = F, width = 1000, height = 400, 
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "v")
+            )
+        })
+    
+    output$plot_mcpr_psychosocial2 <- renderPlotly({
+
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1)%>%
+            select(xsurvey, mcp, group, grouplabel)%>%
+            filter(group=="By xxwge_preg_exercise1"|group=="By xxwge_preg_exercise2"|
+                group=="By xxwge_preg_exercise3"|group=="By xxwge_preg_exercise"|
+                group=="By xxwge_fp_exercise1"|group=="By xxwge_fp_exercise2"|group=="By xxwge_fp_exercise")
+        
+        dtafig$group<-fct_relevel(factor(dtafig$group, levels = unique(dtafig$group)),
+                                  c("By xxwge_preg_exercise1", "By xxwge_preg_exercise2","By xxwge_preg_exercise3", "By xxwge_preg_exercise","By xxwge_fp_exercise1", "By xxwge_fp_exercise2", "By xxwge_fp_exercise"))
+        
+        plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
+                color = ~grouplabel                )%>% 
+            add_annotations(text = ~mcp, textposition = 'auto',arrowhead = 0,
+                  arrowsize = 0 )%>%
+            layout(
+                yaxis = list(title = "Percent of women in the group",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "h", xanchor = "left", 
+                              x = 0, y = 1)
+            )                
+
+        })        
+    
+    
+    ##### output: Psychosocial accessiblity 3 OPINION STRONGLY AGREE #####
+
+    output$plot_level_psychosocial3 <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All")%>%
+            mutate(dummy=0)
+    
+        plot_ly(dtafig, x=~year, y=~xfp_self_pro, type = 'bar', 
+                name = "promiscuous adolescents (NEW): ST DISAG", 
+                marker = list(color = 'rgb(188,189,220)'),
+                text = ~xfp_self_pro, textposition = 'outside') %>% 
+            add_trace(y = ~xfp_self_mar, name = "only for married (NEW): ST DISAG", 
+                      marker = list(color = 'rgb(158,154,200)'),
+                      text = ~xfp_self_mar, textposition = 'outside') %>% 
+            add_trace(y = ~xfp_self_nul, name = "only for those without kids (NEW): ST DISAG", 
+                      marker = list(color = 'rgb(128,125,186)'),
+                      text = ~xfp_self_nul, textposition = 'outside') %>% 
+            add_trace(y = ~xfp_self3, name = "all three (NEW)", 
+                      marker = list(color = 'rgb(84,39,143)'),
+                      text = ~xfp_self3, textposition = 'outside') %>%     
+            add_trace(y = ~xfp_self_life, name = "better quality life (NEW): ST AG", 
+                      marker = list(color = 'rgb(106,81,163)'),
+                      text = ~xfp_self_life, textposition = 'outside') %>%          
+            add_trace(y = ~xfp_self4, name = "all four (NEW)", 
+                      marker = list(color = 'rgb(63,0,125)'),
+                      text = ~xfp_self4, textposition = 'outside') %>%          
+            
+            layout(
+                autosize = F, width = 850, height = 400, 
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = "Survey year"),
+                legend = list(orientation = 'v', font=list(size=10))
+            )
+        })
+    
+    output$plot_pattern_psychosocial3 <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1)%>%
+            mutate(dummy=0)
+    
+        plot_ly(dtafig, x=~grouplabel, y=~xfp_self_pro, type = 'bar', 
+                name = "promiscuous adolescents (NEW): ST DISAG", 
+                marker = list(color = 'rgb(188,189,220)'),
+                text = ~xfp_self_pro, textposition = 'outside') %>% 
+            add_trace(y = ~xfp_self_mar, name = "only for married (NEW): ST DISAG", 
+                      marker = list(color = 'rgb(158,154,200)'),
+                      text = ~xfp_self_mar, textposition = 'outside') %>% 
+            add_trace(y = ~xfp_self_nul, name = "only for those without kids (NEW): ST DISAG", 
+                      marker = list(color = 'rgb(128,125,186)'),
+                      text = ~xfp_self_nul, textposition = 'outside') %>% 
+            add_trace(y = ~xfp_self3, name = "all three (NEW)", 
+                      marker = list(color = 'rgb(84,39,143)'),
+                      text = ~xfp_self3, textposition = 'outside') %>%     
+            add_trace(y = ~xfp_self_life, name = "better quality life (NEW): ST AG", 
+                      marker = list(color = 'rgb(106,81,163)'),
+                      text = ~xfp_self_life, textposition = 'outside') %>%          
+            add_trace(y = ~xfp_self4, name = "all four (NEW)", 
+                      marker = list(color = 'rgb(63,0,125)'),
+                      text = ~xfp_self4, textposition = 'outside') %>%        
+            
+            layout(
+                autosize = F, width = 1000, height = 400, 
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "v")
+            )
+        })
+    
+    output$plot_mcpr_psychosocial3 <- renderPlotly({
+
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1)%>%
+            select(xsurvey, mcp, group, grouplabel)%>%
+            filter(group=="By xfp_self_pro"|group=="By xfp_self_mar"|
+                group=="By xfp_self_nul"|group=="By xfp_self_life"|
+                group=="By xfp_self3" | group=="By xfp_self4")
+        
+        dtafig$group<-fct_relevel(factor(dtafig$group, levels = unique(dtafig$group)),
+                                  c("By xfp_self_pro", "By xfp_self_mar","By xfp_self_nul", "By xfp_self3", "xfp_self_life", "By xfp_self4"))
+        
+        plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
+                color = ~grouplabel                )%>% 
+            add_annotations(text = ~mcp, textposition = 'auto',arrowhead = 0,
+                  arrowsize = 0 )%>%
+            layout(
+                yaxis = list(title = "Percent of women in the group",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "h", xanchor = "left", 
+                              x = 0, y = 1)
+            )                
+
+        })        
+    
+    ##### output: Psychosocial accessiblity 4 OPINION STRONGLY AGREE/DISAGREE or Agree/disagree #####
+
+    output$plot_level_psychosocial4 <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All")%>%
+            mutate(dummy=0)
+    
+        plot_ly(dtafig, x=~year, y=~xxfp_self_pro, type = 'bar', 
+                name = "promiscuous adolescents (NEW): ST DISAG + DISAG", 
+                marker = list(color = 'rgb(188,189,220)'),
+                text = ~xxfp_self_pro, textposition = 'outside') %>% 
+            add_trace(y = ~xxfp_self_mar, name = "only for married (NEW): ST DISAG + DISAG", 
+                      marker = list(color = 'rgb(158,154,200)'),
+                      text = ~xxfp_self_mar, textposition = 'outside') %>% 
+            add_trace(y = ~xxfp_self_nul, name = "only for those without kids (NEW): ST DISAG + DISAG", 
+                      marker = list(color = 'rgb(128,125,186)'),
+                      text = ~xxfp_self_nul, textposition = 'outside') %>% 
+            add_trace(y = ~xxfp_self3, name = "all three (NEW)", 
+                      marker = list(color = 'rgb(84,39,143)'),
+                      text = ~xxfp_self3, textposition = 'outside') %>%               
+            add_trace(y = ~xxfp_self_life, name = "better quality life (NEW): ST AG + AG", 
+                      marker = list(color = 'rgb(106,81,163)'),
+                      text = ~xxfp_self_life, textposition = 'outside') %>%          
+            add_trace(y = ~xxfp_self4, name = "all four (NEW)", 
+                      marker = list(color = 'rgb(63,0,125)'),
+                      text = ~xxfp_self4, textposition = 'outside') %>%          
+            
+            layout(
+                autosize = F, width = 850, height = 400, 
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = "Survey year"),
+                legend = list(orientation = 'v', font=list(size=10))
+            )
+        })
+    
+    output$plot_pattern_psychosocial4 <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1)%>%
+            mutate(dummy=0)
+    
+        plot_ly(dtafig, x=~grouplabel, y=~xxfp_self_pro, type = 'bar', 
+                name = "promiscuous adolescents (NEW): ST DISAG + DISAG", 
+                marker = list(color = 'rgb(188,189,220)'),
+                text = ~xxfp_self_pro, textposition = 'outside') %>% 
+            add_trace(y = ~xxfp_self_mar, name = "only for married (NEW): ST DISAG + DISAG", 
+                      marker = list(color = 'rgb(158,154,200)'),
+                      text = ~xxfp_self_mar, textposition = 'outside') %>% 
+            add_trace(y = ~xxfp_self_nul, name = "only for those without kids (NEW): ST DISAG + DISAG", 
+                      marker = list(color = 'rgb(128,125,186)'),
+                      text = ~xxfp_self_nul, textposition = 'outside') %>% 
+            add_trace(y = ~xxfp_self3, name = "all three (NEW)", 
+                      marker = list(color = 'rgb(84,39,143)'),
+                      text = ~xxfp_self3, textposition = 'outside') %>%               
+            add_trace(y = ~xxfp_self_life, name = "better quality life (NEW): ST AG + AG", 
+                      marker = list(color = 'rgb(106,81,163)'),
+                      text = ~xxfp_self_life, textposition = 'outside') %>%          
+            add_trace(y = ~xxfp_self4, name = "all four (NEW)", 
+                      marker = list(color = 'rgb(63,0,125)'),
+                      text = ~xxfp_self4, textposition = 'outside') %>%         
+            
+            layout(
+                autosize = F, width = 1000, height = 400, 
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "v")
+            )
+        })
+    
+    output$plot_mcpr_psychosocial4 <- renderPlotly({
+
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1)%>%
+            select(xsurvey, mcp, group, grouplabel)%>%
+            filter(group=="By xxfp_self_pro"|group=="By xxfp_self_mar"|
+                group=="By xxfp_self_nul"|group=="By xxfp_self_life"|
+                group=="By xxfp_self3"|group=="By xxfp_self4")
+        
+        dtafig$group<-fct_relevel(factor(dtafig$group, levels = unique(dtafig$group)),
+                                  c("By xxfp_self_pro", "By xxfp_self_mar","By xxfp_self_nul", "By xxfp_self3", "xxfp_self_life", "By xxfp_self4"))
+        
+        plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
+                color = ~grouplabel                )%>% 
+            add_annotations(text = ~mcp, textposition = 'auto',arrowhead = 0,
+                  arrowsize = 0 )%>%
+            layout(
+                yaxis = list(title = "Percent of women in the group",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "h", xanchor = "left", 
+                              x = 0, y = 1)
+            )                
+
+        })        
+    
+    ##### output: Cognitive accessiblity ##### 
+    
     output$plot_level_cognitive <- renderPlotly({
 
         dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All") 
@@ -311,13 +908,12 @@ server<-function(input, output) {
                       marker = list(color = 'rgb(174,1,126)'),
                       text = ~xheard_select6, textposition = 'outside') %>% 
             layout(
-                autosize = F, width = 800, height = 400, 
+                autosize = F, width = 1000, height = 400, 
                 yaxis = list(title = "Percent of all women",
                              range = c(0, 100)),
                 xaxis = list(title = " "),
                 legend = list(font=list(size=10), 
-                              orientation = "h", xanchor = "center", 
-                              x=0.5, y=-0.15)
+                              orientation = "v")
             )
         })
     
@@ -346,8 +942,8 @@ server<-function(input, output) {
 
         })    
     
-    #################################### 
-    # output: Affordability 
+    
+    ##### output: Affordability #####
     
     output$plot_level_affordability <- renderPlotly({
 
@@ -404,14 +1000,13 @@ server<-function(input, output) {
                              range = c(0, 100)),
                 xaxis = list(title = " "),
                 legend = list(font=list(size=10), 
-                              orientation = "h", xanchor = "left", 
-                              x = 0, y = 1)
+                              orientation = "v")
             )                
 
         })    
     
-    #################################### 
-    # output: Service quality: IR 
+    
+    ##### output: Service quality: IR #####
     
     output$plot_level_qualityIR <- renderPlotly({
 
@@ -595,18 +1190,20 @@ server<-function(input, output) {
             add_annotations(text = ~mcp, textposition = 'auto',arrowhead = 0,
                   arrowsize = 0 )%>%
             layout(
+                autosize = F, width = 1000, height = 400, 
                 yaxis = list(title = "Percent of women in the group",
                              range = c(0, 100)),
                 xaxis = list(title = " "),
                 legend = list(font=list(size=10), 
-                              orientation = "h", xanchor = "left", 
-                              x = 0, y = 1)
+                              orientation = "v")
+                
             )                
 
         })    
     
-    #################################### 
-    # output: Service quality: CR 
+    
+    
+    ##### output: Service quality: CR #####
     
     output$plot_level_qualityCR <- renderPlotly({
 
@@ -708,11 +1305,12 @@ server<-function(input, output) {
                       marker = list(color = 'rgb(35,139,69)'),
                       text = ~ydiscuss_all5 , textposition = 'outside' ) %>%  
             layout(
-                yaxis = list(title = "Percent of all women",
+                autosize = F, width = 1000, height = 400, 
+                yaxis = list(title = "Percent of all FP clients",
                              range = c(0, 100)),
                 xaxis = list(title = " "),
                 legend = list(font=list(size=10), 
-                              orientation = "h"), 
+                              orientation = "v"), 
                 showlegend=TRUE
             )
         
@@ -753,11 +1351,12 @@ server<-function(input, output) {
                       marker = list(color = 'rgb(8,48,107)'),
                       text = ~yreferreturn , textposition = 'outside' ) %>%
             layout(
-                yaxis = list(title = "Percent of all women",
+                autosize = F, width = 1000, height = 400, 
+                yaxis = list(title = "Percent of all FP clients",
                              range = c(0, 100)),
                 xaxis = list(title = " "),
                 legend = list(font=list(size=10), 
-                              orientation = "h"), 
+                              orientation = "v"), 
                 showlegend=TRUE
             )
         

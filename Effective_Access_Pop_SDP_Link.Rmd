@@ -1,0 +1,369 @@
+---
+output:
+  html_document:
+    toc: true
+    toc_depth: 5
+    toc_float: true
+---
+
+```{r intro, echo=FALSE, results="hide"}
+knitr::opts_chunk$set(echo=FALSE, 
+                      message=FALSE, 
+                      comment = "", 
+                      warning=FALSE, 
+                      results="hide") 
+knitr::opts_knit$set(root.dir = "C:/Users/YoonJoung Choi/Dropbox/0 iSquared/iSquared_PMA/Effective Access/")
+
+date<-as.Date(Sys.time(	), format='%d%b%Y')
+time<-Sys.time()
+
+suppressMessages(library(dplyr))
+suppressMessages(library(ggplot2))
+suppressWarnings(suppressMessages(library(tidyverse)))
+suppressWarnings(suppressMessages(library(readxl)))
+suppressMessages(library(plotly))
+suppressMessages(library(Matrix))
+suppressMessages(library(stringr))
+suppressMessages(library(stringi))
+
+```
+
+```{r dtaSurveyLevelSummary}
+#Survey-level link summary data, constructed from Stata
+dta<-read.csv("EA_SDP_Link_Summary.csv") 
+dta$HHQFQur<-as.character(dta$HHQFQur)
+#str(dta)
+
+dta<-dta%>%
+    mutate(
+        group="",
+        group=ifelse(HHQFQur=="", "all", group), 
+        group=ifelse(HHQFQur!="", "urban/rural", group), 
+        grouplabel=HHQFQur
+    )%>%
+    arrange(group)
+#str(dta)
+    
+    #dim(dta)
+    #colnames(dta)
+    #table(dta$xsurvey, dta$country)
+
+nsurveys<-dta%>%filter(group=="all")%>%nrow()
+ncountries<-length(unique(dta$country)) 
+```
+
+#####__EA-SDP link in PMA surveys__ 
+
+(Updated: `r date`)
+
+This presents results of "EA-SDP link" in PMA surveys. 
+
+* See list of questions/topics on the left panel.    
+* All surveys conducted in select `r ncountries` countries have been analyzed (n = `r nsurveys` surveys). All surveys are publicly accessible and downloaded from [PMAdata.org](www.PMAdata.org)
+
+```
+NOTE: WHY LINKING? 
+
+SDP surveys in PMA are designed to cover SDPs that are either geographically or administratively linked to sampled EAs for the household/female surveys. Thus, when SDP characteristics (e.g., readiness to provide FP service) are linked to the index EAs, we can assess 'population-level accessibility to quality services'.   
+
+It is possible to have other cluster-level aggregate service quality variables using information in female surveys (e.g., cluster mean of MII among users). However, such indicators are reported only among current users. Also, if individual factors determine utilization (e.g., individual demographic and socioeconomic characteristics), rather than cluster-level factors, aggregation of information from only users may be inappropriate to understand associations between service quality and utilization (and later causality using panel data). 
+```
+
+---
+
+####__1. Overview of the SDP surveys__
+
+#####__1.1. Data note__
+```{r, results='asis'}
+#table(dta$xsurvey)
+#as.data.frame(table(dta$xsurvey))[1]
+
+country<-c(
+    "Burina Faso", 
+    "Ethiopia", 
+    "Kenya",
+    "Nigeria, Kano",
+    "Nigeria, Lagos",
+    "Uganda")
+refresh_round<-c(
+    "5", 
+    "5", 
+    "3 and 5",
+    "no refresh",
+    "no refresh",
+    "5")
+note<-c(
+    "30 EAs added in R3.", 
+    "21 EAs added in R3 (in Oromia).", 
+    "31 EAs added in R5 (in Nairobi and two new counties: West Pokot and Kakamega)",
+    "-",
+    "-",
+    "-")
+
+refresh<-cbind(country, refresh_round, note)
+
+library(knitr)
+kable(refresh[,], caption = "")
+
+#(Source: https://www.pmadata.org/data/survey-methodology)
+```
+
+#####__1.2. Number of EAs and SDPs in each survey__ 
+
+The number of EAs and SDPs should be roughly stable, unless there was a change (see above). Note:   
+
+* Burkina Faso Round 6: _the number of SDPs decreased_. More details in the next section. 
+
+
+```{r plotobs, results='asis'}
+
+fig<-dta%>%
+    filter(group=="all")%>%
+    plot_ly(  y = ~nEA, type = "box", name = "Number of EAs", marker = list(color = '#88B41F'))%>%
+    add_trace(y = ~nSDP, type = "box", name = "Number of SDPs", marker = list(color = '#1F88B4'))%>%
+    layout(
+            title = c("Distribution of the number of EAs and SDPs per survey (n=29)"),
+            yaxis = list(title = "Number"),
+            showlegend = FALSE
+            )
+
+dta%>%
+    filter(group=="all")%>%
+    plot_ly(x = ~xsurvey, y = ~nEA, type = "bar", name="EAs", marker = list(color = '#88B41F') ) %>%
+    add_trace( y = ~nSDP, type = "bar", name="SDPs", 
+               marker = list(color = '#1F88B4')) %>%
+    layout(
+        title = c(""),
+        xaxis = list(titel = ""), 
+        yaxis = list(title = "Number")        ) 
+```
+
+#####__1.3. Distribution of SDPs by type in each survey__ 
+
+The public/private composition also should be roughly stable.   
+
+* Burkina Faso Round 6: It looks like the decrease is _primarily public facilities_, which should really remain stable.  
+
+```{r plotSDPcomposition, results='asis'}
+dta%>%
+    filter(group=="all")%>%
+    plot_ly(x = ~xsurvey, y = ~nSDPpub, type = "bar", name="Public", marker = list(color = '#1F88B4')) %>%
+    add_trace( y = ~nSDPprivate, type = "bar", name="Private", marker = list(color = '#70A8CF')) %>%
+    layout(
+        xaxis = list(titel = ""), 
+        yaxis = list(title = "Number of SDPs",
+                     titlefont=list(size=12)), 
+        legend = list(font=list(size=10)),
+        barmode = 'stack'
+        ) 
+```
+
+---
+
+####__2. EA-SDP linking methods__
+
+EA-SDP link was done using _Stata_ (see Do file in [GitHub](https://github.com/yoonjoung/PMA_Access)). Then a summary dataset describing link results was constructed and used for this report. 
+
+Briefly, see the following steps:  
+
+__A. Collapse HHQFQ dataset to EA-level__, including survey round, admin level 1, and urban/rural classification for each EA. 
+
+__B. Reshape SDP dataset to LONG file__, using "EAserved_" variables. Now the dataset has unique EA-SDP pairs. An EA should be paired with multiple SDPs, per survey design. A SDP can be paired with multiple EAs. 
+
+* Technically, all EAs in a survey should appear here, but in some surveys a few EAs are not listed. This is a main (if not the only) case for EAs not having linked SDPs. This problem can be due to various reasons:  
+(1) the EA truly does not have any SDPs that are "likable" (unlikely),   
+(2) it was not possible to survey any of the linked SDPs (due to security reasons, for example), or    
+(3) data entry/management errors in "EAserved_" variables.     
+
+__C. Collapse/Create EA-level SDP dataset__ which has service environment characteristics based on linked SDPs. For example, for each EA, the number of _any SDPs_ offering injectables, the number of _primary-level SDPs_ offering  injectables, the number of _public SDPs_ offering  injectables, etc. 
+
+__D. Merge with women datasets__ (though not relevant for this assessment). If there are missing EAs in above step 2 (and thus 3 too), women in those EAs will be categorized to not have 'population-level accessibility to quality services'. If the missing EAs are random and minimal, it's not a big problem.  
+
+---
+
+####__3. Results__
+
+#####__3.1. Number of linked SDPs per EA, by type and level of SDPs__
+
+Theoretically expected average number of SDPs linked to an EA:  
+
+* __Any/all SDPs__: between 3-6 (3 public + up to three private), but probably slightly above 3. This includes any kind of SDPs, including pharmacies.    
+* __Primary or secondary SDPs__: between 2-5, but unlikely 5. _This excludes pharmacies_.    
+* __Public SDPs__: 3, possibly 2 depending on health systems (e.g., Ethiopia). _This excludes pharmacies, based on design, since there are no public pharmacies_.    
+* __Primary or secondary public SDPs__: 2, possibly 1 depending on health systems (e.g., Ethiopia). _This excludes pharmacies, based on design, since there are no public pharmacies_.   
+
+More importantly, the average number should remain stable across all rounds, within a geography. Two potential problems (neither related with EA refresh):  
+
+* Burkina Faso Round 6    
+* Nigeria, Kano Round 3   
+
+```{r plotnumSDPperEA, results='asis'}
+dta%>%
+    filter(group=="all")%>%
+    plot_ly(x = ~xsurvey, y = ~num_SDPall, type = "bar", 
+        name = "Any SDPs", marker = list(color = '#FF7F0E'))%>%
+    add_trace(y = ~num_SDPlow, type = "bar", 
+              name = "Primary or secondary SDPs", marker = list(color = '#FFAD65'))%>%
+    add_trace(y = ~num_SDPpub, type = "bar", 
+              name = "Public SDPs", marker = list(color = '#1F88B4'))%>%
+    add_trace(y = ~num_SDPpub12, type = "bar", 
+              name = "Primary or secondary public SDPs", marker = list(color = '#70A8CF'))%>%
+    layout(
+            title = c(""),
+            xaxis = list(titel = ""),  
+            yaxis = list(title = "Average number of linked SDPs per EA"),
+            legend = list(orientation = 'h',x = 0.5, y = -0.25) 
+            )
+
+```
+
+#####__3.2. Percent of EAs with no linked SDPs__
+```{r}
+temp<-dta%>%filter(group=="all")
+
+nsurveys<-nrow(temp)
+mediananylow<-round(median(temp$noSDPlow), 1)
+medianpublow<-round(median(temp$noSDPpub12), 1)
+```
+
+Theoretically, this should be 0%. But, see: 
+
+* Burkina Faso Round 6    
+* Nigeria, Kano Round 3   
+
+Other than these two survey, EA-SDP linking looks 'okay' (i.e., <5 %) with __any SDPs__ (dark orange bars) and __any public SDPs__ (dark blue bars). For women in these SDP-missing-EAs, any 'population-level accessibility to quality services' will be automatically none/missing.   
+
+However, percent of EAs without linked primary or secondary SDPs is high. Median (among `r nsurveys` surveys): `r mediananylow` % for _any primary or secondary SDPs_ (light orange bars) and `r medianpublow` % for _public primary or secondary SDPs_ (light blue bars).   
+
+```{r plotEAnoSDPall, results='asis'}
+dtafig<-dta%>%filter(group=="all")
+
+dtafig%>%
+    plot_ly( x = ~xsurvey) %>%
+    add_trace(y = ~noSDPany, type = "bar", 
+              name = "Any SDPs", marker = list(color = '#FF7F0E'))%>%
+    add_trace(y = ~noSDPlow, type = "bar", 
+              name = "Primary/secondary SDPs", marker = list(color = '#FFAD65'))%>%
+    add_trace(y = ~noSDPpub, type = "bar", 
+              name = "Public SDPs", marker = list(color = '#1F88B4'))%>%
+    add_trace(y = ~noSDPpub12, type = "bar", 
+              name = "Primary/secondary public SDPs", marker = list(color = '#70A8CF'))%>%
+    add_segments(x = as.character("BFR1"), xend = as.character("UGR6"), 
+             y = 5, yend = 5,
+             marker = list(color = "gray",size = 2),
+             line= list(color = "gray", dash = 'dot'),
+             showlegend=FALSE)%>%    
+    layout(
+        title = c("Percent of EAs with no linked SDPs, by type and level of SDPs"),
+            xaxis = list(titel = ""),  
+            yaxis = list(title = "(%)"),
+            legend = list(orientation = 'h',x = 0.1, y = -0.25) 
+            )
+
+plot_ly(dtafig, x = ~xsurvey, y = ~noSDPany, type = "bar", 
+        name = "Any SDPs", marker = list(color = '#FF7F0E'))%>%
+    add_segments(x = as.character("BFR1"), xend = as.character("UGR6"), 
+             y = 5, yend = 5,
+             marker = list(color = "gray",size = 2),
+             line= list(color = "gray", dash = 'dot'),
+             showlegend=FALSE)%>%    
+    layout(
+            title = c("Percent of EAs without any linked SDPs"), 
+            xaxis = list(titel = ""),  
+            yaxis = list(title = "(%)"),
+            showlegend = FALSE 
+            )
+
+
+plot_ly(dtafig, x = ~xsurvey, y = ~noSDPpub, type = "bar", 
+        name = "Any SDPs", marker = list(color = '#1F88B4'))%>%
+    add_segments(x = as.character("BFR1"), xend = as.character("UGR6"), 
+             y = 5, yend = 5,
+             marker = list(color = "gray",size = 2),
+             line= list(color = "gray", dash = 'dot'),
+             showlegend=FALSE)%>%
+    layout(
+            title = c("Percent of EAs without any linked public SDPs"),
+            xaxis = list(titel = ""),  
+            yaxis = list(title = "(%)"),
+            showlegend = FALSE
+            )
+
+```
+
+#####__3.3. Percent of EAs with no linked SDPs by residential area__
+
+Overall, urban EAs tend to have more problems in linking.   
+
+```{r plotEAnoSDPur, results='asis'}
+
+dtafig<-dta%>%filter(group!="all")
+
+dtafig%>%
+    split(dtafig$grouplabel) %>%
+    lapply(function(x) {
+        plot_ly(data = x, 
+                x = ~xsurvey, 
+                y = ~noSDPany, type = "bar", 
+                name = "Any SDPs", marker = list(color = '#FF7F0E')
+                )%>%
+        add_annotations(
+            text = ~unique(grouplabel),
+            x = 0.5, y = 0.9, xref = "paper", yref = "paper",    
+            xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+            font = list(size = 12)
+            )%>%
+        add_segments(x = as.character("BFR1"), xend = as.character("UGR6"), 
+             y = 5, yend = 5,
+             marker = list(color = "gray",size = 2),
+             line= list(color = "gray", dash = 'dot'),
+             showlegend=FALSE)%>%                
+        layout(xaxis = list(title = ""))      
+    }) %>%
+    subplot(margin=0.05, shareX = TRUE, shareY = TRUE)%>%
+    layout(
+        title = c("EA-SDP link by residential area: Any SDP"),
+        xaxis = list(title = ""),  
+        yaxis = list(title = "Percent of EAs without any linked SDPs"), 
+        showlegend=FALSE
+        )
+
+dtafig%>%
+    split(dtafig$grouplabel) %>%
+    lapply(function(x) {
+        plot_ly(data = x, 
+                x = ~xsurvey, 
+                y = ~noSDPpub, type = "bar", 
+                name = "Public SDPs", marker = list(color = '#1F88B4')
+                )%>%
+        add_annotations(
+            text = ~unique(grouplabel),
+            x = 0.5, y = 0.9, xref = "paper", yref = "paper",    
+            xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+            font = list(size = 12)
+            )%>%
+        add_segments(x = as.character("BFR1"), xend = as.character("UGR6"), 
+             y = 5, yend = 5,
+             marker = list(color = "gray",size = 2),
+             line= list(color = "gray", dash = 'dot'),
+             showlegend=FALSE)%>%                            
+        layout(xaxis = list(title = ""))      
+    }) %>%
+    subplot(margin=0.05, shareX = TRUE, shareY = TRUE)%>%
+    layout(
+        title = c("EA-SDP link by residential area: Public SDP"),
+        xaxis = list(title = ""),  
+        yaxis = list(title = "Percent of EAs without any linked public SDPs"), 
+        showlegend=FALSE
+        )
+
+```
+
+---
+
+<p style="color:gray">
+See [GitHub](https://github.com/yoonjoung/PMA_Access) for data, code (for both Stata and R), and more information.   
+For typos, errors, and questions, contact me at [yj.choi@isquared.global]("yj.choi@isquared.global").</p>
+
+<p style="color:gray">
+_Making Data Delicious, One Byte at a Time_</p>

@@ -23,7 +23,7 @@
 * 	A. SETTING 
 *		(NOTE: earlier surveys do not have "ever heard of" questions) 
 * 	B. PREP create women-level access variables  
-*		1. Psycosocial 
+*		1. Psycosocial =>see at the end of the section
 *		2. Cognitive
 *		3. Geographic accessibility  
 *		4. Service quality 
@@ -31,7 +31,10 @@
 *		6. Affordability 	
 *		7. BASIC var
 *		8. MERGE with the EA-SDP data, created from "Effective_Access_Pop_SDP_`counry'.do". 
-*			ONLY USING PUBLIC DATA, thus set $surveylistEASDPLINK under SETTING 
+*			- ONLY USING PUBLIC DATA, thus set $surveylistEASDPLINK under SETTING 
+*		1. Psycosocial: var changed over time  
+*			- ONLY using $surveylistNEWER (later PMA2020 surveys)
+*			- ONLY using $surveylistNEW (PAM surveys)
 * 	C. Create summary dataset 
 * 	D. ANALYSIS using the summary dataset 
 
@@ -88,11 +91,12 @@ global surveylistEASDPLINK "
 	";
 	#delimit cr
 	
+
 ************************************************************************
 * B. PREP women-level access variables  
 ************************************************************************
 
-*****1. Psycosocial 
+*****1. Psycosocial => see at the end of this section, done in two different ways for newer vs. new surveys 
 	
 *****2. Cognitive
 
@@ -270,32 +274,69 @@ save IR_`survey'_Access_Indicators.dta, replace
 set more off
 foreach survey in $surveylist{
 	use "$data/IR_`survey'.dta", clear
-	sum round  wealthquintile ur school FQweight
-	tab school, m
+	sum round  wealthquintile ur school FQweight marital_status
 	}
+set more off
+foreach survey in $surveylist{
+	use "$data/IR_`survey'.dta", clear
+	tab school xsurvey, m
+	}
+set more off
 foreach survey in $surveylist{
 	use "$data/IR_`survey'.dta", clear
 	sum round
 	d EA_ID strata
 	}
-		
+set more off
+foreach survey in $surveylist{
+	use "$data/IR_`survey'.dta", clear	
+		capture confirm variable ever_birth
+			if !_rc {
+			*tab xsurvey /*surveys WITH this var*/
+			*sum why_not_decision partner_overall 
+			} 
+			else{
+				tab xsurvey /*surveys without this var*/
+				}
+	}
+	
 set more off
 foreach survey in $surveylist{
 	use IR_`survey'_Access_Indicators.dta, clear
 	
-		foreach var of varlist wealthquintile ur school {
+		foreach var of varlist wealthquintile ur school marital_status   {
 		replace `var'=. if `var'<0
 		}	
+		gen countrycode=substr(xsurvey, 1, length(xsurvey)-2)
 		
+		*gen byte xeverbirth=ever_birth==1
 		gen byte xwealth5=wealthquintile
 		gen byte xtop3=wealthquintile>=3 & wealthquintile!=.
 		gen byte xurban=ur==1
+		gen byte xinunion=marital_status==1 | marital_status==2
+				
 		gen byte xedu_never	=school==0
-		gen byte xedu_pri	=school==1
-		gen byte xedu_sec	=school>=2 & school!=.
-		gen byte xedu3=school
-			replace xedu3=2 if school>=2 & school!=.
-
+		gen xedu_pri=0
+			replace xedu_pri	=1 if school==1 & countrycode!="UG"
+			replace xedu_pri	=1 if (school==1|school==2) & countrycode=="UG"
+		gen xedu_sec=0
+			replace xedu_sec	=1 if school>=2 & countrycode!="UG"
+			replace xedu_sec	=1 if school>=3 & countrycode=="UG"		
+		gen byte xedu3=0
+			replace xedu3=1 if xedu_pri==1
+			replace xedu3=2 if xedu_sec==1
+		foreach var of varlist xedu*{
+			replace `var'=. if school<0 | school==.
+			}
+	
+		gen xedurban=.
+			replace xedurban=1 if xurban==0 & xedu_sec==0
+			replace xedurban=2 if xurban==1 & xedu_sec==0
+			replace xedurban=3 if xurban==0 & xedu_sec==1
+			replace xedurban=4 if xurban==1 & xedu_sec==1
+		lab define xedurban 1"R, <secondary" 2"U, <secondary" 3"R, >=secondary" 4"U, >=secondary" 
+		lab value xedurban xedurban
+		
 		gen temp = dofc(FQdoi_correctedSIF)
 		format %td temp
 		gen tempmonth = month(temp)
@@ -304,15 +345,15 @@ foreach survey in $surveylist{
 		
 		egen cmc = median(tempcmc)
 		egen year= mode(tempyear)
-	
+
+			drop temp*
+		
 		lab var xtop3 "poor (bottom two quintiles) vs. non-poor (1)"
 		lab var xurban "rural vs. urban (1) "
 		lab var xedu_sec "ever attended: none or primary vs. secondary or higher+ (1)"
 		
 		lab var cmc "Interviw date in CMC, median per survey round"
 		lab var year "Interviw year, mode per survey round"
-						
-	keep FQmetainstance FQweight EA_ID strata round year cmc mcp x* 
 	
 save IR_`survey'_Access_Indicators.dta, replace 	
 }
@@ -345,7 +386,6 @@ foreach survey  in $surveylistEASDPLINK{
 		*drop _merge
 		
 		drop SDPlow* /*low level regardless of sector*/
-		*drop SDPpub12_essential4* SDPall_essential4* SDPpub_essential4*
 		sum SDP*
 		
 		foreach var of varlist SDP*{
@@ -371,7 +411,8 @@ foreach survey  in $surveylistEASDPLINK{
 	
 	save IR_`survey'_Access_Indicators.dta, replace
 	}	
-
+	
+/*
 set more off
 foreach survey  in $surveylistEASDPLINK{
 	use IR_`survey'_Access_Indicators.dta, clear
@@ -383,6 +424,218 @@ foreach survey  in $surveylistEASDPLINK{
 	pwcorr SDPall_essential5_noso SDPall_essential5ec_noso SDPall_essential5_curav SDPall_essential5ec_curav, sig
 	pwcorr SDPpub_essential5_noso SDPpub_essential5ec_noso SDPpub_essential5_curav SDPpub_essential5ec_curav, sig
 	pwcorr SDPpub12_essential5_noso SDPpub12_essential5ec_noso SDPpub12_essential5_curav SDPpub12_essential5ec_curav, sig
+*/
+
+*****1. Psycosocial  - NEWER 2020 surveys 
+
+* check variables - find NEWER surveys
+set more off
+foreach survey in $surveylist{
+	use "$data/IR_`survey'.dta", clear	
+		capture confirm variable partner_overall
+			if !_rc {
+			tab xsurvey /*surveys WITH this var*/
+			sum why_not_decision partner_overall 
+			} 
+			else{
+				*tab xsurvey /*surveys without this var*/
+				}
+	}
+	
+* check variables 	
+#delimit;
+global surveylistNEWER " 
+	BFR4 BFR5 BFR6 
+	KER5 KER6 KER7 
+	NGLagosR4 NGLagosR5 
+	NGKanoR4  NGKanoR5  
+	UGR5 UGR6 
+	ETR5 ETR6 
+	";
+	#delimit cr
+	
+set more off
+foreach survey in $surveylistNEWER{
+	use "$data/IR_`survey'.dta", clear
+		sum partner_overall why_not_decision  
+	}
+	
+set more off
+foreach survey in $surveylistNEWER{
+	use IR_`survey'_Access_Indicators.dta, clear
+
+		gen byte xdec_users	= (partner_overall==1 | partner_overall==3)
+		gen byte xdec_nonusers	= (why_not_decision==1 | why_not_decision==3)
+		gen byte xdec = xdec_users==1 | xdec_nonusers ==1
+		
+		replace xdec_users=. if mcp==0
+		replace xdec_nonusers=. if mcp==1
+		
+		lab var xdec_users "using FP is my/joint decision"
+		lab var xdec_nonusers "NOT using FP is my/joint decision"
+		lab var xdec "using or not using FP is my/joint decision"
+		
+	save IR_`survey'_Access_Indicators.dta, replace
+	}	
+	
+*****1. Psycosocial  - NEW 2.0 surveys  
+
+#delimit;
+global surveylistNEW " 
+	BFR7 KER8 NGLagosR6 NGKanoR6
+	";
+	#delimit cr	
+	
+* check variables 
+set more off
+foreach survey in $surveylistNEW{
+	use "$data/IR_`survey'.dta", clear
+		codebook partner_overall why_not_decision  
+	}
+set more off
+foreach survey in $surveylistNEW{
+	use "$data/IR_`survey'.dta", clear
+		sum round wge* 
+	}
+set more off
+foreach survey in $surveylistNEW{
+	use "$data/IR_`survey'.dta", clear
+		/*
+		#delimit; 
+		foreach var of varlist 
+			fp_promiscuous_self fp_married_self fp_no_child_self fp_lifestyle_self 
+			fp_promiscuous_view fp_married_view fp_no_child_view fp_lifestyle_view {;
+			#delimit cr   
+		replace `var'=. if `var'<0	
+		}
+		*/
+		sum round fp_promiscuous_view - fp_lifestyle_self 
+	}
+	
+set more off
+foreach survey  in $surveylistNEW{
+	use IR_`survey'_Access_Indicators.dta, clear
+	
+		gen byte xeverbirth=ever_birth==1
+		
+		gen byte xdec_users	= (partner_overall==1 | partner_overall==3)
+		gen byte xdec_nonusers	= (why_not_decision==1 | why_not_decision==3)
+		gen byte xdec = xdec_users==1 | xdec_nonusers ==1
+		
+		replace xdec_users=. if mcp==0
+		replace xdec_nonusers=. if mcp==1
+		
+		lab var xdec_users "using FP is my/joint decision"
+		lab var xdec_nonusers "NOT using FP is my/joint decision"
+		lab var xdec "using or not using FP is my/joint decision"
+
+		/*
+		#delimit; 
+		foreach var of varlist 
+			fp_promiscuous_self fp_married_self fp_no_child_self fp_lifestyle_self 
+			fp_promiscuous_view fp_married_view fp_no_child_view fp_lifestyle_view {;
+			#delimit cr   
+			replace `var'=. if `var'<0	
+			}
+		*/
+		gen byte xfp_self_pro	=fp_promiscuous_self==1 
+		gen byte xfp_self_mar	=fp_married_self==1 
+		gen byte xfp_self_nul	=fp_no_child_self==1
+		gen byte xfp_self_life	=fp_lifestyle_self==4
+
+		egen temp=rowtotal(xfp_self_pro xfp_self_mar xfp_self_nul )
+		gen byte xfp_self3 = temp==3
+			drop temp
+			
+		egen temp=rowtotal(xfp_self_pro xfp_self_mar xfp_self_nul xfp_self_life)
+		gen byte xfp_self4 = temp==4
+			drop temp
+			
+		gen byte xxfp_self_pro	=fp_promiscuous_self==1 | fp_promiscuous_self==2
+		gen byte xxfp_self_mar	=fp_married_self==1 | fp_married_self==2
+		gen byte xxfp_self_nul	=fp_no_child_self==1 | fp_no_child_self==2 
+		gen byte xxfp_self_life	=fp_lifestyle_self==4 | fp_lifestyle_self==3
+	
+		egen temp=rowtotal(xxfp_self_pro xxfp_self_mar xxfp_self_nul )
+		gen byte xxfp_self3 = temp==3
+			drop temp
+			
+		egen temp=rowtotal(xxfp_self_pro xxfp_self_mar xxfp_self_nul xxfp_self_life)
+		gen byte xxfp_self4 = temp==4
+			drop temp			
+		
+		lab var xfp_self_pro "FP opinion, promiscuous: St disagree"
+		lab var xfp_self_mar "FP opinion, only for married: St disagree"
+		lab var xfp_self_nul "FP opinion, only for those with kids: St disagree"
+		lab var xfp_self_life "FP opinion, better quality life: St agree"
+		
+		lab var xxfp_self_pro "FP opinion, promiscuous: St disagree + disagree"
+		lab var xxfp_self_mar "FP opinion, only for married: St disagree + disagree"
+		lab var xxfp_self_nul "FP opinion, only for those with kids: St disagree + disagree"
+		lab var xxfp_self_life "FP opinion, better quality life: St agree + agree"		
+		
+		#delimit; 
+		gen byte xwge_preg_exercise1=	(wge_decide_start_none ==5) |
+										(wge_decide_start ==5); 
+		gen byte xwge_preg_exercise2=	(wge_partner_talk_start ==5) |
+										(wge_decide_another ==5) ; 
+		gen byte xwge_preg_exercise3=	(wge_negotiate_stop_none ==5) |
+										(wge_negotiate_stop ==5) ; 
+		#delimit cr
+		
+		egen temp=rowtotal(xwge_preg_*)
+		gen byte xwge_preg_exercise = temp==3
+			drop temp
+
+		gen byte xwge_fp_exercise1=(wge_switch_fp==5)
+		gen byte xwge_fp_exercise2=(wge_confident_switch==5)
+
+		egen temp=rowtotal(xwge_fp_*)
+		gen byte xwge_fp_exercise = temp==2
+			drop temp			
+		
+		lab var xwge_preg_exercise1 "WGE, pregancy: strongly agree: I can decide when to start/next" 
+		lab var xwge_preg_exercise2 "WGE, pregancy: strongly agree: I can discuss when to start/next"
+		lab var xwge_preg_exercise3 "WGE, pregancy: strongly agree: I can negotiate when to stop"	
+		lab var xwge_preg_exercise "WGE, pregancy: strongly agree: all three"	
+
+		lab var xwge_fp_exercise1 "WGE, FP: strongly agree: i can switch"
+		lab var xwge_fp_exercise2 "WGE, FP: strongly agree: i can talk to HW to switch"
+		lab var xwge_fp_exercise "WGE, FP: strongly agree: both"		
+		
+		
+		#delimit; 
+		gen byte xxwge_preg_exercise1=	(wge_decide_start_none ==5 | wge_decide_start_none ==4 ) |
+										(wge_decide_start ==5 | wge_decide_start ==4); 
+		gen byte xxwge_preg_exercise2=	(wge_partner_talk_start ==5 | wge_partner_talk_start ==4) |
+										(wge_decide_another ==5 | wge_decide_another ==4) ; 
+		gen byte xxwge_preg_exercise3=	(wge_negotiate_stop_none ==5 | wge_negotiate_stop_none ==4) |
+										(wge_negotiate_stop ==5 | wge_negotiate_stop ==4) ; 
+		#delimit cr
+		
+		egen temp=rowtotal(xxwge_preg_*)
+		gen byte xxwge_preg_exercise = temp==3
+			drop temp
+
+		gen byte xxwge_fp_exercise1=(wge_switch_fp==5 | wge_switch_fp==4)
+		gen byte xxwge_fp_exercise2=(wge_confident_switch==5 | wge_confident_switch==4)
+
+		egen temp=rowtotal(xxwge_fp_*)
+		gen byte xxwge_fp_exercise = temp==2
+			drop temp			
+		
+		lab var xxwge_preg_exercise1 "WGE, pregancy: >= agree: I can decide when to start/next" 
+		lab var xxwge_preg_exercise2 "WGE, pregancy: >= agree: I can discuss when to start/next"
+		lab var xxwge_preg_exercise3 "WGE, pregancy: >= agree: I can negotiate when to stop"	
+		lab var xxwge_preg_exercise "WGE, pregancy: >= agree: all three"	
+
+		lab var xxwge_fp_exercise1 "WGE, FP: >= agree: i can switch"
+		lab var xxwge_fp_exercise2 "WGE, FP: >= agree: i can talk to HW to switch"
+		lab var xxwge_fp_exercise "WGE, FP: >= agree: both"	
+	
+	save IR_`survey'_Access_Indicators.dta, replace
+	}	
+
 
 *OKAY DATA READY FOR ANALYSIS 
 */
@@ -394,6 +647,25 @@ foreach survey  in $surveylistEASDPLINK{
 
 #delimit; 
 global indicatorlist "
+	
+	xdec
+	xwge_preg_exercise1
+	xwge_preg_exercise2
+	xwge_preg_exercise3
+	xwge_preg_exercise
+	xwge_fp_exercise1
+	xwge_fp_exercise2
+	xwge_fp_exercise
+	xxwge_preg_exercise1
+	xxwge_preg_exercise2
+	xxwge_preg_exercise3
+	xxwge_preg_exercise
+	xxwge_fp_exercise1
+	xxwge_fp_exercise2
+	xxwge_fp_exercise	
+	xfp_self*
+	xxfp_self*
+	
 	xheard_10
 	xheard_7
 	xheard_5
@@ -411,6 +683,27 @@ global indicatorlist "
 	
 #delimit; 
 global indicatorlistall "
+
+	xdec_users
+	xdec_nonusers
+	xdec
+	xwge_preg_exercise1
+	xwge_preg_exercise2
+	xwge_preg_exercise3
+	xwge_preg_exercise
+	xwge_fp_exercise1
+	xwge_fp_exercise2
+	xwge_fp_exercise
+	xxwge_preg_exercise1
+	xxwge_preg_exercise2
+	xxwge_preg_exercise3
+	xxwge_preg_exercise
+	xxwge_fp_exercise1
+	xxwge_fp_exercise2
+	xxwge_fp_exercise	
+	xfp_self*
+	xxfp_self*
+	
 	xheard_10
 	xheard_7
 	xheard_5
@@ -432,7 +725,7 @@ global indicatorlistall "
 	";
 	#delimit cr	
 
-global covlist "xtop3 xurban xedu_sec"
+global covlist "xeverbirth xtop3 xurban xedu_sec xinunion"
 
 
 use IR_BFR2_Access_Indicators.dta, clear
@@ -493,6 +786,53 @@ foreach survey in $surveylistEASDPLINK{
 		append using summary_Access_Indicators_IR.dta, 	
 		save summary_Access_Indicators_IR.dta, replace 	
 	}
+	
+	use temp.dta, clear
+	foreach cov of varlist xedurban{
+	use temp.dta, clear
+	keep if `cov'==1	
+		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round year cmc)
+			foreach var of varlist mcp $indicatorlistall {
+				replace `var'=round(`var'*100, 1)
+				}					
+			gen group="By `cov'"	
+			gen grouplabel="1"
+		append using summary_Access_Indicators_IR.dta, 	
+		save summary_Access_Indicators_IR.dta, replace 	
+		
+	use temp.dta, clear
+	keep if `cov'==2	
+		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round year cmc)
+			foreach var of varlist mcp $indicatorlistall {
+				replace `var'=round(`var'*100, 1)
+				}					
+			gen group="By `cov'"	
+			gen grouplabel="2"
+		append using summary_Access_Indicators_IR.dta, 	
+		save summary_Access_Indicators_IR.dta, replace 	
+		
+	use temp.dta, clear
+	keep if `cov'==3	
+		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round year cmc)
+			foreach var of varlist mcp $indicatorlistall {
+				replace `var'=round(`var'*100, 1)
+				}					
+			gen group="By `cov'"	
+			gen grouplabel="3"
+		append using summary_Access_Indicators_IR.dta, 	
+		save summary_Access_Indicators_IR.dta, replace 	
+		
+	use temp.dta, clear
+	keep if `cov'==4	
+		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round year cmc)
+			foreach var of varlist mcp $indicatorlistall {
+				replace `var'=round(`var'*100, 1)
+				}					
+			gen group="By `cov'"	
+			gen grouplabel="4"
+		append using summary_Access_Indicators_IR.dta, 	
+		save summary_Access_Indicators_IR.dta, replace 			
+	}	
 				
 	use temp.dta, clear				
 	foreach indicator of varlist $indicatorlist{
@@ -547,6 +887,41 @@ foreach survey in $surveylistEASDPLINK{
 		append using summary_Access_Indicators_IR_obs.dta, 	
 		save summary_Access_Indicators_IR_obs.dta, replace 	
 	}
+	
+	use temp.dta, clear
+	foreach cov of varlist xedurban{
+	use temp.dta, clear
+	keep if `cov'==1	
+		collapse (count) obs , by(xsurvey round year cmc)
+			gen group="By `cov'"	
+			gen grouplabel="1"
+		append using summary_Access_Indicators_IR_obs.dta, 	
+		save summary_Access_Indicators_IR_obs.dta, replace 	
+		
+	use temp.dta, clear
+	keep if `cov'==2	
+		collapse (count) obs , by(xsurvey round year cmc)
+			gen group="By `cov'"	
+			gen grouplabel="2"
+		append using summary_Access_Indicators_IR_obs.dta, 	
+		save summary_Access_Indicators_IR_obs.dta, replace 	
+		
+	use temp.dta, clear
+	keep if `cov'==3	
+		collapse (count) obs , by(xsurvey round year cmc)
+			gen group="By `cov'"	
+			gen grouplabel="3"
+		append using summary_Access_Indicators_IR_obs.dta, 	
+		save summary_Access_Indicators_IR_obs.dta, replace 	
+		
+	use temp.dta, clear
+	keep if `cov'==4	
+		collapse (count) obs , by(xsurvey round year cmc)
+			gen group="By `cov'"	
+			gen grouplabel="4"
+		append using summary_Access_Indicators_IR_obs.dta, 	
+		save summary_Access_Indicators_IR_obs.dta, replace 			
+	}	
 				
 	use temp.dta, clear				
 	foreach indicator of varlist $indicatorlist{
@@ -585,7 +960,11 @@ use summary_Access_Indicators_IR_obs.dta, clear
 		lab	var	SDPall_essential5ec_noso	"SDPall_essential5ec_noso"
 		lab	var	SDPall_essential5ec_ready	"SDPall_essential5ec_ready"
 		lab	var	SDPall_essential5ec_rnoso	"SDPall_essential5ec_rnoso"
-	
+
+	    replace grouplabel="currently NOT in union" 		if group=="By xinunion" & grouplabel=="No"
+        replace grouplabel="currently in union" 		if group=="By xinunion" & grouplabel=="Yes" 			
+	    replace grouplabel="NEVER given birth" 		if group=="By xeverbirth" & grouplabel=="No"
+        replace grouplabel="EVER given birth" 		if group=="By xeverbirth" & grouplabel=="Yes" 	
 	    replace grouplabel="less than secondary" 	if group=="By xedu_sec" & grouplabel=="No"
         replace grouplabel="secondary or more" 		if group=="By xedu_sec" & grouplabel=="Yes" 
         replace grouplabel="Bottom 2 quintiles"	if group=="By xtop3" & grouplabel=="No" 
@@ -593,9 +972,17 @@ use summary_Access_Indicators_IR_obs.dta, clear
         replace grouplabel="Rural"	if group=="By xurban" & grouplabel=="No"
         replace grouplabel="Urban" 	if group=="By xurban" & grouplabel=="Yes" 
 		
+		replace grouplabel="Rural, <secondary" 	if group=="By xedurban" & grouplabel=="1" 
+		replace grouplabel="Urban, <secondary" 	if group=="By xedurban" & grouplabel=="2" 
+		replace grouplabel="Rural, >=secondary" 	if group=="By xedurban" & grouplabel=="3" 
+		replace grouplabel="Urban, >=secondary" 	if group=="By xedurban" & grouplabel=="4" 
+				
 		replace group="Education" if group=="By xedu_sec" 
 		replace group="HH wealth" if group=="By xtop3"
 		replace group="Residential area" if group=="By xurban"
+		replace group="Parity" if group=="By xeverbirth"
+		replace group="Education x Residence" if group=="By xedurban"
+		replace group="Union status" if group=="By xinunion"
 	
 	gen country=substr(xsurvey, 1, length(xsurvey)-2)
 		replace country="Burkina Faso" if country=="BF"
@@ -617,13 +1004,13 @@ use summary_Access_Indicators_IR_obs.dta, clear
 		
 	*PROBLEMATIC surveys with EA_SDP link
 	foreach var of varlist SDPall* {
-		replace `var'=. if (country=="Nigeria, Kano" | country=="Nigeria, Lagos" | xsurvey=="ETR6"| xsurvey=="BFR6")
+		replace `var'=. if (xsurvey=="NGKanoR3" | xsurvey=="BFR6")
 		}		
 				
 	* CHECK small n : SHOULD NOT BE an issue in IR , just a process
 	sum obs	
 	list xsurvey group grouplabel obs if obs<=20
-	foreach var of varlist xheard_10 - xmii4 {
+	foreach var of varlist xdec_users - xmii4 {
 		replace `var'=. if obs<=20
 		}
 	
@@ -639,509 +1026,3 @@ OKAY Summary DATA READY FOR ANALYSIS and Shiny App
 
 */
 
-
-
-************************************************************************
-* D. ANALYSIS using the summary dataset 
-************************************************************************
-		
-capture putdocx clear 
-putdocx begin
-
-putdocx paragraph
-putdocx text ("Potential access variables"), linebreak bold 
-putdocx text ("(Updated on $date)"), linebreak 
-putdocx text (""), linebreak
-putdocx text ("1. Access variables using female survey data"), linebreak bold 
-putdocx text ("(Note: three indicators are available only in new/2.0 surveys)"), linebreak
-putdocx text ("1.1 Cognitive accessibility (among all women)"), linebreak bold
-putdocx text ("--xheard_10       : ever heard of 10 or more modern methods"), linebreak
-putdocx text ("--xheard_7        : ever heard of 7 or more modern methods"), linebreak
-putdocx text ("--xheard_5        : ever heard of 5 or more modern methods"), linebreak
-putdocx text ("--xheard_select5  : heard of all of the select 5 methods: IUD, implant, injectable, pills, male condom"), linebreak
-putdocx text ("--xheard_select6  : heard of all of the select 6 methods: IUD, implant, injectable, pills, male condom, EC"), linebreak
-putdocx text ("1.2 Affordability (among all women)"), linebreak bold
-putdocx text ("--xinsurance(NEW) : have health insurance"), linebreak
-putdocx text ("1.3 Service quality"), linebreak bold
-putdocx text ("(among all women){EA-LEVEL, only Uganda)"), linebreak bold
-putdocx text ("--SDPall_essential5_rnoso: EA with 1+ linked SDP with all five eseential methods (ready AND noso)"), linebreak
-putdocx text ("--SDPall_essential5_noso: EA with 1+ linked SDP with all five eseential methods (AND without 3-mo stockout)"), linebreak
-putdocx text ("--SDPall_essential5_ready: EA with 1+ linked SDP with all five eseential methods (AND ready)"), linebreak
-putdocx text ("--SDPall_essential5ec_rnoso: EA with 1+ linked SDP with all five eseential methods+EC (ready AND noso)"), linebreak
-putdocx text ("--SDPall_essential5ec_noso: EA with 1+ linked SDP with all five eseential methods+EC (AND without 3-mo stockout)"), linebreak
-putdocx text ("--SDPall_essential5ec_ready: EA with 1+ linked SDP with all five eseential methods+EC (AND ready)"), linebreak
-putdocx text ("(among only modern method (minus LAM) users)"), linebreak bold
-putdocx text ("--xmii_side       : MII: told about side effect"), linebreak
-putdocx text ("--xmii_sidewhat   : MII: told about what to do for side effect"), linebreak
-putdocx text ("--xmii_other      : MII: told about other methods"), linebreak
-putdocx text ("--xmii_switch(NEW): MII: told about switching"), linebreak
-putdocx text ("--xmii3           : told about all three MII elements"), linebreak
-putdocx text ("--xmii4(NEW)      : told about all three MII elements plus switching"), linebreak
-putdocx text (""), linebreak
-putdocx text ("List of figures"), linebreak bold
-putdocx text ("Figure 1. Level of potential indicators, latest survey"), linebreak 
-putdocx text ("Figure 2. Trends of potential indicators"), linebreak 	
-putdocx text ("Figure 3. Level of potential indicators by background, latest survey"), linebreak
-putdocx text ("Figure 4. MCPR by potential indicators, latest survey"), linebreak		
-putdocx text (""), linebreak
-putdocx text ("Summary"), linebreak bold
-putdocx text ("1. Cognitive indicators tend to correlated with SES in both Kenya & Uganda."), linebreak  
-putdocx text ("2. MII/quality indicator (which is measured only among current modern method users) do not vary by SES as clearly."), linebreak 
-putdocx text ("3. MCP does vary by cognitive indicators in both countries (and insurance in the case of Kenya)."), linebreak 
-putdocx text ("4. In terms of trends, nothing notable in Kenya. In Uganda, cognitive indicators increased - specifically ever heard of 5+ methods and ever heard of specific 5 methods). EA-level method availability measures fluctuate."), linebreak  
-
-putdocx pagebreak 
-putdocx paragraph
-putdocx text ("Figure 1. Level of potential indicators, latest survey"), linebreak bold 			
-	
-	use summary_Access_Indicators_IR.dta, clear
-
-		#delimit; 
-		global option "
-			blabel(bar)			
-			legend(pos(3) col(1) size(small)
-				label(1 "MCPR")
-				label(2 "Heard of 10+ methods")		
-				label(3 "Heard of 7+ methods")		
-				label(4 "Heard of 5+ methods")		
-				label(5 "Heard of specific 6 methods")		
-				label(6 "Heard of specific 5* methods")			
-				label(7 "have insurance")
-				label(8  "Linked SDP ready & noso: 5*")	
-				label(9  "Linked SDP noso: 5*")
-				label(10 "Linked SDP ready: 5*")	
-				label(11 "Linked SDP ready & noso: 5*&EC")
-				label(12 "Linked SDP noso: 5*&EC")
-				label(13 "Linked SDP ready: 5*&EC")
-				label(14 "MII: side effects")
-				label(15 "MII: SE what to do")
-				label(16 "MII: other method")
-				label(17 "MII: switching")
-				label(18 "MII: all 3")
-				label(19 "MII: all 4")
-				)
-			bar(1, bcolor(gray*0.8))
-			bar(2, bcolor(maroon*1.0))
-			bar(3, bcolor(maroon*0.8))
-			bar(4, bcolor(maroon*0.6))
-			bar(5, bcolor(cranberry*1.0))
-			bar(6, bcolor(cranberry*0.8))
-			bar(7, bcolor(dkorange*1.0))
-			bar(8,  bcolor(blue*1.0))
-			bar(9,  bcolor(blue*0.8))
-			bar(10, bcolor(blue*0.6))
-			bar(11, bcolor(navy*1.0))
-			bar(12, bcolor(navy*0.8))
-			bar(13, bcolor(navy*0.6))
-			bar(14, bcolor(dkgreen*1.0))
-			bar(15, bcolor(dkgreen*0.8))
-			bar(16, bcolor(dkgreen*0.6))
-			bar(17, bcolor(dkgreen*0.4))			
-			bar(18, bcolor(green*1.0))
-			bar(19, bcolor(green*0.8))
-			ylab(0 (20) 100, angle(0) labsize(small))  
-			xsize(8) ysize(4)
-			";
-			#delimit cr
-			
-		#delimit; 
-		graph bar mcp $indicatorlistall  if xsurvey=="KER8" & group=="All", 
-			$option 
-			title("Kenya Phase 1 (2019)")
-			; 
-			#delimit cr
-		gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy	
-		graph export graph.png, replace	
-		
-putdocx paragraph
-putdocx image graph.png				
-
-	use summary_Access_Indicators_IR.dta, clear
-
-		#delimit; 
-		graph bar mcp $indicatorlistall  if xsurvey=="UGR6" & group=="All", 
-			$option 
-			title("Uganda Round 6 (2018)")
-			; 
-			#delimit cr
-		gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy	
-		graph export graph.png, replace	
-		
-putdocx paragraph
-putdocx image graph.png		
-
-putdocx pagebreak
-putdocx paragraph
-putdocx text ("Figure 2. Trends of potential indicators"), linebreak bold 			
-
-	use summary_Access_Indicators_IR.dta, clear
-
-		#delimit; 
-		global option "
-			legend(pos(3) col(1) size(small)
-				label(1 "MCPR")
-				label(2 "Heard of 10+ methods")		
-				label(3 "Heard of 7+ methods")		
-				label(4 "Heard of 5+ methods")		
-				label(5 "Heard of specific 6 methods")		
-				label(6 "Heard of specific 5* methods")			
-				label(7 "have insurance")
-				label(8  "Linked SDP ready & noso: 5*")	
-				label(9  "Linked SDP noso: 5*")
-				label(10 "Linked SDP ready: 5*")	
-				label(11 "Linked SDP ready & noso: 5*&EC")
-				label(12 "Linked SDP noso: 5*&EC")
-				label(13 "Linked SDP ready: 5*&EC")
-				label(14 "MII: side effects")
-				label(15 "MII: SE what to do")
-				label(16 "MII: other method")
-				label(17 "MII: switching")
-				label(18 "MII: all 3")
-				label(19 "MII: all 4")
-				)
-			lcolor(
-				gray*0.8
-				maroon*1.0
-				maroon*0.8
-				maroon*0.6
-				cranberry*1.0
-				cranberry*0.8
-				dkorange*1.0				
-				blue*1.0
-				blue*0.8
-				blue*0.6
-				navy*1.0
-				navy*0.8
-				navy*0.6
-				dkgreen*1.0
-				dkgreen*0.8
-				dkgreen*0.6
-				dkgreen*0.4
-				green*1.0
-				green*0.8
-				)
-			ylab(0 (20) 100, angle(0) labsize(small))  
-			xtitle("Year")
-			xsize(8) ysize(4)
-			"; 
-			#delimit cr
-			
-		#delimit; 
-		twoway line mcp $indicatorlistall year if xcountry=="KE" & group=="All", 
-			$option
-			title("Kenya")
-			; 
-			#delimit cr
-		gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy	
-		graph export graph.png, replace	
-			
-putdocx paragraph
-putdocx image graph.png				
-
-		#delimit; 
-		twoway line mcp $indicatorlistall year if xcountry=="UG" & group=="All", 
-			$option
-			title("Uganda")	
-			; 
-			#delimit cr
-		gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy	
-		graph export graph.png, replace	
-			
-putdocx paragraph
-putdocx image graph.png			
-
-putdocx pagebreak			
-putdocx paragraph
-putdocx text ("Figure 3. Level of potential indicators by background, latest survey"), linebreak bold 			
-	
-	use summary_Access_Indicators_IR.dta, clear	
-	
-	foreach country in KE UG{
-	foreach cov of varlist $covlist{
-		#delimit; 
-		graph bar mcp xheard_10 xheard_7 xheard_5 xheard_select6 xheard_select5 if xcountry=="`country'" & xlatest==1 & (`cov'==0 | `cov'==1), 
-			by(`cov', row(1) legend(pos(3) size(small)) )
-			blabel(bar)			
-			legend(pos(3) col(1) size(small)
-				label(1 "MCPR")
-				label(2 "Heard of 10+ methods")		
-				label(3 "Heard of 7+ methods")		
-				label(4 "Heard of 5+ methods")		
-				label(5 "Heard of specific 6 methods")		
-				label(6 "Heard of specific 5 methods")			
-				)
-			bar(1, bcolor(gray*0.8))
-			bar(2, bcolor(maroon*1.0))
-			bar(3, bcolor(maroon*0.8))
-			bar(4, bcolor(maroon*0.6))
-			bar(5, bcolor(cranberry*1.0))
-			bar(6, bcolor(cranberry*0.8))
-			ylab(0 (20) 100, angle(0) labsize(small))  
-			xsize(8) ysize(4)
-			note(, size(small))
-			; 
-			#delimit cr
-		gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy	
-		graph export graph.png, replace	
-		
-putdocx paragraph
-putdocx text ("`country', by `cov'"), linebreak bold 				
-putdocx image graph.png				
-}
-}
-
-	foreach country in KE{
-	foreach cov of varlist $covlist{
-		#delimit; 
-		graph bar mcp xinsurance if xcountry=="`country'" & xlatest==1 & (`cov'==0 | `cov'==1), 
-			by(`cov', row(1) legend(pos(3) size(small)) )
-			blabel(bar)			
-			legend(pos(3) col(1) size(small)
-				label(1 "MCPR")
-				label(2 "have insurance")
-				)
-			bar(1, bcolor(gray*0.8))
-			bar(2, bcolor(dkorange*1.0))
-			ylab(0 (20) 100, angle(0) labsize(small))  
-			xsize(8) ysize(4)
-			; 
-			#delimit cr
-		gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy	
-		graph export graph.png, replace	
-		
-putdocx paragraph
-putdocx text ("`country', by `cov'"), linebreak bold 			
-putdocx image graph.png				
-}
-}
-
-	foreach country in UG{
-	foreach cov of varlist $covlist{
-		#delimit; 
-		graph bar mcp 
-				SDPall_essential5_rnoso
-				SDPall_essential5_noso 
-				SDPall_essential5_ready
-				SDPall_essential5ec_rnoso
-				SDPall_essential5ec_noso 		
-				SDPall_essential5ec_ready	 if xcountry=="`country'" & xlatest==1 & (`cov'==0 | `cov'==1), 
-			by(`cov', row(1) legend(pos(3) size(small)) )
-			blabel(bar)			
-			legend(pos(3) col(1) size(small)
-				label(1 "MCPR")
-				label(2 "Linked SDP ready & noso: 5*")	
-				label(3 "Linked SDP noso: 5*")
-				label(4 "Linked SDP ready: 5*")	
-				label(5 "Linked SDP ready & noso: 5*&EC")
-				label(6 "Linked SDP noso: 5*&EC")
-				label(7 "Linked SDP ready: 5*&EC")
-				)
-			bar(1, bcolor(gray*0.8))
-			bar(2, bcolor(blue*1.0))
-			bar(3, bcolor(blue*0.8))
-			bar(4, bcolor(blue*0.6))
-			bar(5, bcolor(navy*1.0))
-			bar(6, bcolor(navy*0.8))
-			bar(7, bcolor(navy*0.6))
-			ylab(0 (20) 100, angle(0) labsize(small))  
-			xsize(8) ysize(4)
-			; 
-			#delimit cr
-		gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy	
-		graph export graph.png, replace	
-	
-putdocx paragraph
-putdocx text ("`country', by `cov'"), linebreak bold 			
-putdocx image graph.png				
-}
-}
-
-	foreach country in KE UG{
-	foreach cov of varlist $covlist{
-		#delimit; 
-		graph bar mcp xmii* if xcountry=="`country'" & xlatest==1 & (`cov'==0 | `cov'==1), 
-			by(`cov', row(1) legend(pos(3) size(small)) )
-			blabel(bar)			
-			legend(pos(3) col(1) size(small)
-				label(1 "MCPR")
-				label(2 "MII: side effects")
-				label(3 "MII: SE what to do")
-				label(4 "MII: other method")
-				label(5 "MII: switching")
-				label(6 "MII: all 3")
-				label(7 "MII: all 4")
-				)
-			bar(1, bcolor(gray*0.8))
-			bar(2, bcolor(dkgreen*1.0))
-			bar(3, bcolor(dkgreen*0.8))
-			bar(4, bcolor(dkgreen*0.6))
-			bar(5, bcolor(dkgreen*0.4))			
-			bar(6, bcolor(green*1.0))
-			bar(7, bcolor(green*0.8))
-			ylab(0 (20) 100, angle(0) labsize(small))  
-			xsize(8) ysize(4)
-			; 
-			#delimit cr
-		gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy	
-		graph export graph.png, replace	
-		
-putdocx paragraph
-putdocx text ("`country', by `cov'"), linebreak bold 				
-putdocx image graph.png				
-}
-}
-
-putdocx pagebreak			
-putdocx paragraph
-putdocx text ("Figure 4. MCPR by potential indicators, latest survey"), linebreak bold 			
-
-	use summary_Access_Indicators_IR.dta, clear	
-
-	#delimit; 
-	global indicatorlistKE "
-		xheard_10
-		xheard_7
-		xheard_5
-		xheard_select6
-		xheard_select5
-		xinsurance
-		";
-		#delimit cr		
-	
-	foreach country in KE {	
-	foreach indicator of varlist $indicatorlistKE{
-		#delimit; 
-		graph bar mcp if xcountry=="`country'" & xlatest==1 & (`indicator'==0 | `indicator'==1) , 
-			by(`indicator', row(1) legend(off) )
-			blabel(bar)			
-			bar(1, bcolor(gray*0.8))
-			ylab(0 (20) 100, angle(0) labsize(small))  
-			ytitle("MCPR (%)")
-			xsize(4) ysize(4)
-			; 
-			#delimit cr
-		gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy		
-		graph save graph_`indicator'.gph, replace	
-}
-	#delimit; 
-	global graphlistKE "
-		graph_xheard_10.gph
-		graph_xheard_7.gph
-		graph_xheard_5.gph
-		graph_xheard_select6.gph
-		graph_xheard_select5.gph
-		graph_xinsurance.gph
-		";
-		#delimit cr
-
-	gr combine $graphlistKE , col(2) xsize(8) ysize(10)
-	gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy
-	graph export graph.png, replace	
-	
-putdocx paragraph
-putdocx text ("`country'"), linebreak bold 			
-putdocx image graph.png				
-}
-
-	#delimit; 
-	global indicatorlistUG1 "
-		xheard_10
-		xheard_7
-		xheard_5
-		xheard_select6
-		xheard_select5	
-		";
-		#delimit cr	
-		
-	#delimit; 
-	global indicatorlistUG2 "
-		SDPall_essential5_rnoso
-		SDPall_essential5_noso 
-		SDPall_essential5_ready
-		SDPall_essential5ec_rnoso
-		SDPall_essential5ec_noso 		
-		SDPall_essential5ec_ready	
-		";
-		#delimit cr			
-		
-	foreach country in UG{	
-		
-		foreach indicator of varlist $indicatorlistUG1{
-			#delimit; 
-			graph bar mcp if xcountry=="`country'" & xlatest==1 & (`indicator'==0 | `indicator'==1) , 
-				by(`indicator', row(1) legend(off) )
-				blabel(bar)			
-				bar(1, bcolor(gray*0.8))
-				ylab(0 (20) 100, angle(0) labsize(small))  
-				ytitle("MCPR (%)")
-				xsize(4) ysize(4)
-				; 
-				#delimit cr
-			gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy		
-			graph save graph_`indicator'.gph, replace	
-		}
-		
-		#delimit; 
-		global graphlistUG1 "
-			graph_xheard_10.gph
-			graph_xheard_7.gph
-			graph_xheard_5.gph
-			graph_xheard_select6.gph
-			graph_xheard_select5.gph
-			";
-			#delimit cr
-
-		gr combine $graphlistUG1 , col(2) xsize(8) ysize(10)
-		gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy
-		graph export graph.png, replace	
-		
-		putdocx paragraph
-		putdocx text ("`country'"), linebreak bold 				
-		putdocx image graph.png				
-		
-	foreach indicator of varlist $indicatorlistUG2{
-			#delimit; 
-			graph bar mcp if xcountry=="`country'" & xlatest==1 & (`indicator'==0 | `indicator'==1) , 
-				by(`indicator', row(1) legend(off) )
-				blabel(bar)			
-				bar(1, bcolor(gray*0.8))
-				ylab(0 (20) 100, angle(0) labsize(small))  
-				ytitle("MCPR (%)")
-				xsize(4) ysize(4)
-				; 
-				#delimit cr
-			gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy		
-			graph save graph_`indicator'.gph, replace	
-		}
-		
-		#delimit; 
-		global graphlistUG2 "
-			graph_SDPall_essential5_rnoso.gph
-			graph_SDPall_essential5_noso.gph 
-			graph_SDPall_essential5_ready.gph
-			graph_SDPall_essential5ec_rnoso.gph
-			graph_SDPall_essential5ec_noso.gph 		
-			graph_SDPall_essential5ec_ready.gph
-			";
-			#delimit cr
-
-		gr combine $graphlistUG2 , col(2) xsize(8) ysize(10)
-		gr_edit .style.editstyle boxstyle(linestyle(color(black))) editcopy
-		graph export graph.png, replace	
-		
-		putdocx paragraph
-		putdocx text ("`country'"), linebreak bold 				
-		putdocx image graph.png				
-		
-}
-		
-putdocx save Access_Potential_Indicators_IR_$date.docx, replace	
-
-erase graph.png
-
-erase graph_xinsurance.gph
-foreach graph in $graphlistUG{
-	erase `graph'
-	}
-	
-END OF DO FILE	
