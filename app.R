@@ -4,6 +4,7 @@ library(plyr)
 library(dplyr)
 library(tidyverse)
 library(plotly)
+library(lubridate)
 
 date<-as.Date(Sys.time(	), format='%d%b%Y')
 
@@ -20,36 +21,45 @@ date<-as.Date(Sys.time(	), format='%d%b%Y')
 #setwd("C:/Users/YoonJoung Choi/Dropbox/0 iSquared/iSquared_PMA/Effective Access")
 
 dtaIR<-data.frame(read_csv("summary_Access_Indicators_IR.csv"))%>%
-    mutate(cmcdate = ISOdate(year, month, 15),
-           cmcdate=substr(as.character(cmcdate),0,7),
+    mutate(yearmonth = ISOdate(year, month, 15),
+           #yearmonth = as.POSIXct(as.numeric(yearmonth), origin="1970-01-01"), 
+           #yearmonth = substr(as.character(yearmonth),0,7), 
            latestIRLINK=latestIR,
            latestIRLINK=ifelse(xsurvey=="BFR5", 1, latestIRLINK),
            latestIRLINK=ifelse(xsurvey=="BFR6", 0, latestIRLINK),
-           latestIRLINK=ifelse(xsurvey=="ETR5", 1, latestIRLINK),
-           latestIRLINK=ifelse(xsurvey=="ETR6", 0, latestIRLINK),
+           latestIRLINK=ifelse(xsurvey=="BFR7", 0, latestIRLINK),
            latestIRLINK=ifelse(xsurvey=="KER7", 1, latestIRLINK),
-           latestIRLINK=ifelse(xsurvey=="KER8", 0, latestIRLINK)
+           latestIRLINK=ifelse(xsurvey=="KER8", 0, latestIRLINK), 
+           
+           Nigeria=(country=="Nigeria, Kano" | country=="Nigeria, Lagos")
+           #SDPall_essential5_rnoso=ifelse(Nigeria==1, NA, SDPall_essential5_rnoso), 
+           #SDPall_essential5_noso=ifelse(Nigeria==1, NA, SDPall_essential5_noso), 
+           #SDPall_essential5_ready=ifelse(Nigeria==1, NA, SDPall_essential5_ready), 
+           #SDPall_essential5ec_rnoso=ifelse(Nigeria==1, NA, SDPall_essential5_rnoso), 
+           #SDPall_essential5ec_noso=ifelse(Nigeria==1, NA, SDPall_essential5_noso), 
+           #SDPall_essential5ec_ready=ifelse(Nigeria==1, NA, SDPall_essential5_ready) 
+           
     )
 
 dtaCR<-data.frame(read_csv("summary_Access_Indicators_CR.csv"))%>%
-    mutate(cmcdate = ISOdate(year, month, 15),
-           cmcdate=substr(as.character(cmcdate),0,7)
+    mutate(yearmonth = ISOdate(year, month, 15)
+           #yearmonth = substr(as.character(yearmonth),0,7)
     )
 
+    table(dtaIR$xsurvey)
+    table(dtaCR$xsurvey)
+    
     table(dtaIR$group)
     table(dtaCR$group)
     
     table(dtaIR$grouplabel)
     table(dtaCR$grouplabel)    
 
-    table(dtaIR$xsurvey)
-    table(dtaCR$xsurvey)
-
-    table(dtaIR$cmcdate)
-    table(dtaCR$cmcdate)
+    table(dtaIR$yearmonth)
+    table(dtaCR$yearmonth)
 
 dta<-rbind.fill(dtaIR, dtaCR)
-    
+
     dim(dtaIR)
     dim(dtaCR)    
     dim(dta)
@@ -74,7 +84,7 @@ ui<-fluidPage(
     #headerPanel("Potential indicators for access"),
 
     # Title panel 
-    titlePanel("DO NOT CIRCULATE the link: application to internally explore potential indicators for access"),
+    titlePanel("Application to internally explore potential indicators for access (DO NOT CIRCULATE the link since it has non-public survey data)"),
 
     # Side panel: define input and output   
     sidebarLayout(
@@ -172,26 +182,28 @@ ui<-fluidPage(
                 h5("--",em("Strongly agree/disagree or agree/disagree"), " vs. the rest"),
                 h5("The higher, the more supportive/inclusive/favorable"),
             
+                h5("This is really odd for SES and MCPR patterns..."),
+            
                 h5(strong("1.1.A. Level of indicators in the latest survey: STRONGLY DISAGREE/AGREE")),
                 plotlyOutput("plot_level_psychosocial3"),  
                 h5(strong("1.1.A. Level of indicators in the latest survey: DISAGREE/AGREE or STRONGLY DISAGREE/AGREE")),    
                 plotlyOutput("plot_level_psychosocial4"),              
                 
-                h5(strong("1.1.C. SES pattern of indicators in the latest survey: STRONGLY DISAGREE/AGREE")),    
-                h5("For year of the latest survey, see 1.A."),
-                plotlyOutput("plot_pattern_psychosocial3"),   
+                #h5(strong("1.1.C. SES pattern of indicators in the latest survey: STRONGLY DISAGREE/AGREE")),    
+                #h5("For year of the latest survey, see 1.A."),
+                #plotlyOutput("plot_pattern_psychosocial3"),   
 
-                h5(strong("1.1.C. SES pattern of indicators in the latest survey: DISAGREE/AGREE or STRONGLY DISAGREE/AGREE")),    
-                h5("For year of the latest survey, see 1.A."),
-                plotlyOutput("plot_pattern_psychosocial4"),   
+                #h5(strong("1.1.C. SES pattern of indicators in the latest survey: DISAGREE/AGREE or STRONGLY DISAGREE/AGREE")),    
+                #h5("For year of the latest survey, see 1.A."),
+                #plotlyOutput("plot_pattern_psychosocial4"),   
             
-                h5(strong("1.1.D. MCPR by indicators in the latest survey: STRONGLY DISAGREE/AGREE")),    
-                h5("For year of the latest survey, see 1.A."),    
-                plotlyOutput("plot_mcpr_psychosocial3"),               
+                #h5(strong("1.1.D. MCPR by indicators in the latest survey: STRONGLY DISAGREE/AGREE")),    
+                #h5("For year of the latest survey, see 1.A."),    
+                #plotlyOutput("plot_mcpr_psychosocial3"),               
             
-                h5(strong("1.1.D. MCPR by indicators in the latest survey: DISAGREE/AGREE or DISAGREE/STRONGLY AGREE")),    
-                h5("For year of the latest survey, see 1.A."),    
-                plotlyOutput("plot_mcpr_psychosocial4"),                             
+                #h5(strong("1.1.D. MCPR by indicators in the latest survey: DISAGREE/AGREE or DISAGREE/STRONGLY AGREE")),    
+                #h5("For year of the latest survey, see 1.A."),    
+                #plotlyOutput("plot_mcpr_psychosocial4"),                             
             
             br(),                        
             h4(strong("2. Cognitive accessibility")),        
@@ -200,17 +212,21 @@ ui<-fluidPage(
                 h5("**Six specific modern methods: IUD, implant, injectables, pills, male condom & EC"),    
                 h5(strong("2.A. Level of indicators in the latest survey")),
                 plotlyOutput("plot_level_cognitive"),   
+                plotlyOutput("plot_level_cognitive_demand"),   
                 
                 h5(strong("2.B. Trends of indicators in the country")),
                 plotlyOutput("plot_trend_cognitive"),   
+                plotlyOutput("plot_trend_cognitive_demand"),   
                 
                 h5(strong("2.C. SES pattern of indicators in the latest survey")),    
                 h5("For year of the latest survey, see 2.A."),
                 plotlyOutput("plot_pattern_cognitive"),   
+                plotlyOutput("plot_pattern_cognitive_demand"),    
             
                 h5(strong("2.D. MCPR by indicators in the latest survey")),    
                 h5("For year of the latest survey, see 2.A."),    
                 plotlyOutput("plot_mcpr_cognitive"),   
+                plotlyOutput("plot_mcpr_cognitive_demand"),   
             
             br(),                        
             h4(strong("3. Geographic accessibility")),    
@@ -237,28 +253,37 @@ ui<-fluidPage(
             h4(strong("5. Service quality")),    
             h4(strong("5.1. Service quality - from female survey")),    
                 h5("For definitions and data sources, see", a("here.",href="https://drive.google.com/file/d/1IgCkBOL_nTEv2KDsYl7Wweeak8RbmVeu/view?usp=sharing")),
-                h5("*Five specific modern methods: IUD, implant, injectables, pills, & male condom"),    
+                h5("*Five specific modern methods: IUD, implant, injectables, pills, & male condom (except in India, where implant is not yet widely available)"),    
                 h5("**Ready: having commodity, trained personnel, & equipment. Applicable only for IUD and implant"),    
                 h5(""),    
                 h5("***Percent of all women with one or more linked SDPs meeting the service environment criteria (geographic and administrative access to methods/readiness)"),  
-                h5(strong("(Note"),": For these cluster-level service environment indicators, linked-EA variables are required. The linked-EA variables are being created for Phase 1 surveys currently, and thus all phase 1 surveys are not included for the indicators. Additionally, several surveys (i.e., BFR6, ETR6, Nigeria states) are being further assessed for EA-SDP linkage results, and are excluded here.",
+                h5(strong("(Note"),": For these cluster-level service environment indicators, linked-EA variables are required. The linked-EA variables are being created for Phase 1 surveys currently, and thus all phase 1 surveys are not included for the indicators.", 
+                   "Additionally, several surveys (i.e., BFR6, KanoR3, NiameyR5) are being further assessed for EA-SDP linkage results (", 
+                   a("see here", href="https://rpubs.com/YJ_Choi/PMA_EA_SDP_Link"), "), and are excluded in this report.",
                    strong("Thus, latest surveys for MII indicators (green bars) and EA-level service-environment indicators (blue bars) can be different in a country"),".)"),  
             
                 h5(strong("5.1.A. Level of indicators in the latest survey")),
                 plotlyOutput("plot_level_qualityIR"),   
+                #plotlyOutput("plot_level_qualityIR_demand"),   
                 
                 h5(strong("5.1.B. Trends of indicators in the country")),
                 plotlyOutput("plot_trend_qualityIR"),   
-                
+                #plotlyOutput("plot_trend_qualityIR_demand"),   
+            
                 h5(strong("5.1.C. SES pattern of indicators in the latest survey")),    
                 h5("As we discussed earlier, there is not much typical differences by individual SES background, partially because these are either among current users (green bars) or cluster-level service environment (blue bars)."),      
                 h5("For year of the latest survey, see 5.1.A."),    
                 plotlyOutput("plot_pattern_qualityIR1"),   
+                #plotlyOutput("plot_pattern_qualityIR1_demand"),       
                 plotlyOutput("plot_pattern_qualityIR2"), 
+                #plotlyOutput("plot_pattern_qualityIR2_demand"), 
             
                 h5(strong("5.1.D. MCPR by indicators in the latest survey")),   
+                h5(strong("Question 1"),": reverse causality?"), 
+                h5(strong("Question 2"),": Quality as rights, then do we care for any association here?"), 
                 h5("For year of the latest survey, see 5.1.A."),    
                 plotlyOutput("plot_mcpr_qualityIR"),   
+                #plotlyOutput("plot_mcpr_qualityIR_demand"),   
 
             br(),                        
             h4(strong("5.2. Service quality - from client exit survey")),    
@@ -306,7 +331,7 @@ server<-function(input, output) {
     
     output$plot_level_psychosocial <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All")%>%
+        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All" & groupdemand==0)%>%
             mutate(dummy=0)
     
         plot_ly(dtafig, x=~year, y=~xdec_users, type = 'bar', 
@@ -356,16 +381,16 @@ server<-function(input, output) {
                 yaxis = list(title = "Percent of all women",
                              range = c(0, 100)),
                 xaxis = list(title = "Survey year"),
-                legend = list(orientation = 'v', font=list(size=10))
+                legend = list(orientation = 'v', font=list(size=10), x=100)
             )
         })
     
     output$plot_trend_psychosocial <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & group=="All")%>%
+        dtafig<-filter(dta, country==input$country & group=="All" & groupdemand==0)%>%
             mutate(dummy=0)
     
-        plot_ly(dtafig, x=~year, y=~xdec_users, type = 'scatter', mode = 'lines',
+        plot_ly(dtafig, x=~yearmonth, y=~xdec_users, type = 'scatter', mode = 'lines',
                 name = "decision by herself/jointly, among users", 
                 marker = list(color = 'rgb(171,217,233)'),
                 line = list(color = 'rgb(171,217,233)')) %>%  
@@ -411,14 +436,14 @@ server<-function(input, output) {
                 autosize = F, width = 800, height = 400, 
                 yaxis = list(title = "Percent of all women",
                              range = c(0, 100)),
-                xaxis = list(title = "Survey round"),
+                xaxis = list(title = "Survey year/month"),
                 legend = list(orientation = 'v')
             )
         })
 
     output$plot_pattern_psychosocial <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1)%>%
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1 & groupdemand==0)%>%
             mutate(dummy=0)
     
         plot_ly(dtafig, x=~grouplabel, y=~xdec_users, type = 'bar', 
@@ -465,14 +490,14 @@ server<-function(input, output) {
                 yaxis = list(title = "Percent of all women",
                              range = c(0, 100)),
                 xaxis = list(title = " "),
-                legend = list(font=list(size=10), 
-                              orientation = "v")
+                legend = list(font=list(size=8), 
+                              orientation = "v", x=1.05, xanchor = "left")
             )
         })
     
     output$plot_mcpr_psychosocial <- renderPlotly({
 
-        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1)%>%
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1 & groupdemand==0)%>%
             select(xsurvey, mcp, group, grouplabel)%>%
             filter(group=="By xwge_preg_exercise1"|group=="By xwge_preg_exercise2"|
                 group=="By xwge_preg_exercise3"|group=="By xwge_preg_exercise"|
@@ -483,7 +508,7 @@ server<-function(input, output) {
         
         plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
                 color = ~grouplabel                )%>% 
-            add_annotations(text = ~mcp, textposition = 'auto',arrowhead = 0,
+            add_annotations(text = ~mcp, textposition = 'outside',arrowhead = 0,
                   arrowsize = 0 )%>%
             layout(
                 yaxis = list(title = "Percent of women in the group",
@@ -496,11 +521,12 @@ server<-function(input, output) {
 
         })        
     
+    
     ##### output: Psychosocial accessiblity 2 AGREE or STRONGLY AGREE #####
 
     output$plot_level_psychosocial2 <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All")%>%
+        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All" & groupdemand==0)%>%
             mutate(dummy=0)
     
         plot_ly(dtafig, x=~year, y=~xdec_users, type = 'bar', 
@@ -548,13 +574,13 @@ server<-function(input, output) {
                 yaxis = list(title = "Percent of all women",
                              range = c(0, 100)),
                 xaxis = list(title = "Survey year"),
-                legend = list(orientation = 'v', font=list(size=10))
+                legend = list(orientation = 'v', font=list(size=10), x=100)
             )
         })
     
     output$plot_pattern_psychosocial2 <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1)%>%
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1 & groupdemand==0)%>%
             mutate(dummy=0)
     
         plot_ly(dtafig, x=~grouplabel, y=~xdec_users, type = 'bar', 
@@ -601,14 +627,14 @@ server<-function(input, output) {
                 yaxis = list(title = "Percent of all women",
                              range = c(0, 100)),
                 xaxis = list(title = " "),
-                legend = list(font=list(size=10), 
-                              orientation = "v")
+                legend = list(font=list(size=8), 
+                              orientation = "v", x=1.05, xanchor = "left")
             )
         })
     
     output$plot_mcpr_psychosocial2 <- renderPlotly({
 
-        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1)%>%
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1 & groupdemand==0)%>%
             select(xsurvey, mcp, group, grouplabel)%>%
             filter(group=="By xxwge_preg_exercise1"|group=="By xxwge_preg_exercise2"|
                 group=="By xxwge_preg_exercise3"|group=="By xxwge_preg_exercise"|
@@ -619,7 +645,7 @@ server<-function(input, output) {
         
         plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
                 color = ~grouplabel                )%>% 
-            add_annotations(text = ~mcp, textposition = 'auto',arrowhead = 0,
+            add_annotations(text = ~mcp, textposition = 'top',arrowhead = 0,
                   arrowsize = 0 )%>%
             layout(
                 yaxis = list(title = "Percent of women in the group",
@@ -637,7 +663,7 @@ server<-function(input, output) {
 
     output$plot_level_psychosocial3 <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All")%>%
+        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All" & groupdemand==0)%>%
             mutate(dummy=0)
     
         plot_ly(dtafig, x=~year, y=~xfp_self_pro, type = 'bar', 
@@ -671,7 +697,7 @@ server<-function(input, output) {
     
     output$plot_pattern_psychosocial3 <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1)%>%
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1 & groupdemand==0)%>%
             mutate(dummy=0)
     
         plot_ly(dtafig, x=~grouplabel, y=~xfp_self_pro, type = 'bar', 
@@ -699,14 +725,14 @@ server<-function(input, output) {
                 yaxis = list(title = "Percent of all women",
                              range = c(0, 100)),
                 xaxis = list(title = " "),
-                legend = list(font=list(size=10), 
-                              orientation = "v")
+                legend = list(font=list(size=8), 
+                              orientation = "v", x=1.05, xanchor = "left")
             )
         })
     
     output$plot_mcpr_psychosocial3 <- renderPlotly({
 
-        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1)%>%
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1 & groupdemand==0)%>%
             select(xsurvey, mcp, group, grouplabel)%>%
             filter(group=="By xfp_self_pro"|group=="By xfp_self_mar"|
                 group=="By xfp_self_nul"|group=="By xfp_self_life"|
@@ -717,7 +743,7 @@ server<-function(input, output) {
         
         plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
                 color = ~grouplabel                )%>% 
-            add_annotations(text = ~mcp, textposition = 'auto',arrowhead = 0,
+            add_annotations(text = ~mcp, textposition = 'top',arrowhead = 0,
                   arrowsize = 0 )%>%
             layout(
                 yaxis = list(title = "Percent of women in the group",
@@ -730,11 +756,12 @@ server<-function(input, output) {
 
         })        
     
+    
     ##### output: Psychosocial accessiblity 4 OPINION STRONGLY AGREE/DISAGREE or Agree/disagree #####
 
     output$plot_level_psychosocial4 <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All")%>%
+        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All" & groupdemand==0)%>%
             mutate(dummy=0)
     
         plot_ly(dtafig, x=~year, y=~xxfp_self_pro, type = 'bar', 
@@ -768,7 +795,7 @@ server<-function(input, output) {
     
     output$plot_pattern_psychosocial4 <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1)%>%
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1 & groupdemand==0)%>%
             mutate(dummy=0)
     
         plot_ly(dtafig, x=~grouplabel, y=~xxfp_self_pro, type = 'bar', 
@@ -803,7 +830,7 @@ server<-function(input, output) {
     
     output$plot_mcpr_psychosocial4 <- renderPlotly({
 
-        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1)%>%
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1 & groupdemand==0)%>%
             select(xsurvey, mcp, group, grouplabel)%>%
             filter(group=="By xxfp_self_pro"|group=="By xxfp_self_mar"|
                 group=="By xxfp_self_nul"|group=="By xxfp_self_life"|
@@ -814,7 +841,7 @@ server<-function(input, output) {
         
         plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
                 color = ~grouplabel                )%>% 
-            add_annotations(text = ~mcp, textposition = 'auto',arrowhead = 0,
+            add_annotations(text = ~mcp, textposition = 'top',arrowhead = 0,
                   arrowsize = 0 )%>%
             layout(
                 yaxis = list(title = "Percent of women in the group",
@@ -827,11 +854,12 @@ server<-function(input, output) {
 
         })        
     
+    
     ##### output: Cognitive accessiblity ##### 
     
     output$plot_level_cognitive <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All") 
+        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All" & groupdemand==0) 
     
         plot_ly(dtafig, x=~year, y=~xheard_5, type = 'bar', 
                 name = "heard of 5+ any modern methods", marker = list(color = 'rgb(252,174,145)'),
@@ -859,9 +887,9 @@ server<-function(input, output) {
     
     output$plot_trend_cognitive <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & group=="All") 
+        dtafig<-filter(dta, country==input$country & group=="All" & groupdemand==0) 
     
-        plot_ly(dtafig, x=~round, y=~xheard_5, type = 'scatter', mode = 'lines',
+        plot_ly(dtafig, x=~yearmonth, y=~xheard_5, type = 'scatter', mode = 'lines',
                 name = "heard of 5+ any modern methods", 
                 marker = list(color = 'rgb(252,174,145)'),
                 line = list(color = 'rgb(252,174,145)')) %>%
@@ -881,14 +909,14 @@ server<-function(input, output) {
                 autosize = F, width = 800, height = 400, 
                 yaxis = list(title = "Percent of all women",
                              range = c(0, 100)),
-                xaxis = list(title = "Survey round"),
+                xaxis = list(title = "Survey year/month"),
                 legend = list(orientation = 'v')
             )
         })
 
     output$plot_pattern_cognitive <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1) 
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1 & groupdemand==0) 
         #dtafig<-filter(dta, country=="Kenya" & group=="Residential area" & latestIR==1) 
 
         plot_ly(dtafig, x=~grouplabel, y=~xheard_5, type = 'bar', 
@@ -919,7 +947,7 @@ server<-function(input, output) {
     
     output$plot_mcpr_cognitive <- renderPlotly({
 
-        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1)%>%
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1 & groupdemand==0)%>%
             select(xsurvey, mcp, group, grouplabel)%>%
             filter(group=="By xheard_5"|group=="By xheard_7"|group=="By xheard_10"|
                        group=="By xheard_select5"|group=="By xheard_select6")
@@ -929,9 +957,127 @@ server<-function(input, output) {
         
         plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
                 color = ~grouplabel                )%>% 
-            add_annotations(text = ~mcp, textposition = 'auto',arrowhead = 0,
+            add_annotations(text = ~mcp, textposition = 'top',arrowhead = 0,
                   arrowsize = 0 )%>%
             layout(
+                yaxis = list(title = "Percent of women in the group",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "h", xanchor = "left", 
+                              x = 0, y = 1)
+            )                
+
+        })    
+    
+    
+    output$plot_level_cognitive_demand <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All" & groupdemand==1) 
+    
+        plot_ly(dtafig, x=~year, y=~xheard_5, type = 'bar', 
+                name = "heard of 5+ any modern methods", marker = list(color = 'rgb(252,174,145)'),
+                text = ~xheard_5, textposition = 'outside') %>%
+            add_trace(y = ~xheard_7, name = "heard of 7+ any modern methods", 
+                      marker = list(color = 'rgb(251,106,74)'),
+                      text = ~xheard_7, textposition = 'outside') %>% 
+            add_trace(y = ~xheard_10, name = "heard of 10+ any modern methods", 
+                      marker = list(color = 'rgb(222,45,38)'),
+                      text = ~xheard_10, textposition = 'outside') %>% 
+            add_trace(y = ~xheard_select5, name = "heard of 5 specific modern methods*", 
+                      marker = list(color = 'rgb(221,52,151)'),
+                      text = ~xheard_select5, textposition = 'outside') %>% 
+            add_trace(y = ~xheard_select6, name = "heard of 6 specific modern methods**", 
+                      marker = list(color = 'rgb(174,1,126)'),
+                      text = ~xheard_select6, textposition = 'outside') %>% 
+            layout(
+                title=c("Only among women with demand for FP"), 
+                autosize = F, width = 800, height = 400, 
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = "Survey year"),
+                legend = list(orientation = 'v')
+            )
+        })
+    
+    output$plot_trend_cognitive_demand <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & group=="All" & groupdemand==1) 
+    
+        plot_ly(dtafig, x=~yearmonth, y=~xheard_5, type = 'scatter', mode = 'lines',
+                name = "heard of 5+ any modern methods", 
+                marker = list(color = 'rgb(252,174,145)'),
+                line = list(color = 'rgb(252,174,145)')) %>%
+            add_trace(y = ~xheard_7, name = "heard of 7+ any modern methods", 
+                      marker = list(color = 'rgb(251,106,74)'),
+                      line = list(color = 'rgb(251,106,74)')) %>% 
+            add_trace(y = ~xheard_10, name = "heard of 10+ any modern methods", 
+                      marker = list(color = 'rgb(222,45,38)'),
+                      line = list(color = 'rgb(222,45,38)')) %>% 
+            add_trace(y = ~xheard_select5, name = "heard of 5 specific modern methods*", 
+                      marker = list(color = 'rgb(221,52,151)'),
+                      line = list(color = 'rgb(221,52,151)')) %>% 
+            add_trace(y = ~xheard_select6, name = "heard of 6 specific modern methods**", 
+                      marker = list(color = 'rgb(174,1,126)'),
+                      line = list(color = 'rgb(174,1,126)')) %>% 
+            layout(
+                title=c("Only among women with demand for FP"),
+                autosize = F, width = 800, height = 400, 
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = "Survey year/month"),
+                legend = list(orientation = 'v')
+            )
+        })
+
+    output$plot_pattern_cognitive_demand <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1 & groupdemand==1) 
+        #dtafig<-filter(dta, country=="Kenya" & group=="Residential area" & latestIR==1) 
+
+        plot_ly(dtafig, x=~grouplabel, y=~xheard_5, type = 'bar', 
+                name = "heard of 5+ any modern methods", 
+                marker = list(color = 'rgb(252,174,145)'),
+                text = ~xheard_5, textposition = 'outside') %>%
+            add_trace(y = ~xheard_7, name = "heard of 7+ any modern methods", 
+                      marker = list(color = 'rgb(251,106,74)'),
+                      text = ~xheard_7, textposition = 'outside') %>% 
+            add_trace(y = ~xheard_10, name = "heard of 10+ any modern methods", 
+                      marker = list(color = 'rgb(222,45,38)'),
+                      text = ~xheard_10, textposition = 'outside') %>% 
+            add_trace(y = ~xheard_select5, name = "heard of 5 specific modern methods*", 
+                      marker = list(color = 'rgb(221,52,151)'),
+                      text = ~xheard_select5, textposition = 'outside') %>% 
+            add_trace(y = ~xheard_select6, name = "heard of 6 specific modern methods**", 
+                      marker = list(color = 'rgb(174,1,126)'),
+                      text = ~xheard_select6, textposition = 'outside') %>% 
+            layout(
+                title=c("Only among women with demand for FP"),
+                autosize = F, width = 1000, height = 400, 
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "v")
+            )
+        })
+    
+    output$plot_mcpr_cognitive_demand <- renderPlotly({
+
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1 & groupdemand==1)%>%
+            select(xsurvey, mcp, group, grouplabel)%>%
+            filter(group=="By xheard_5"|group=="By xheard_7"|group=="By xheard_10"|
+                       group=="By xheard_select5"|group=="By xheard_select6")
+        
+        dtafig$group<-fct_relevel(factor(dtafig$group, levels = unique(dtafig$group)),
+                                  c("By xheard_5", "By xheard_7", "By xheard_10", "By xheard_select5","By xheard_select6"))
+        
+        plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
+                color = ~grouplabel                )%>% 
+            add_annotations(text = ~mcp, textposition = 'top',arrowhead = 0,
+                  arrowsize = 0 )%>%
+            layout(
+                title=c("Only among women with demand for FP"),
                 yaxis = list(title = "Percent of women in the group",
                              range = c(0, 100)),
                 xaxis = list(title = " "),
@@ -947,8 +1093,8 @@ server<-function(input, output) {
     
     output$plot_level_affordability <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All") 
-        #dtafig<-filter(dta, country=="Kenya" & latestIR==1 & group=="All") 
+        #dtafig<-filter(dta, country==input$country & latestIR==1 & group=="All" & groupdemand==0) 
+        dtafig<-filter(dta, country=="Kenya" & latestIR==1 & group=="All" & groupdemand==0) 
 
         plot_ly(dtafig, x=~year, y=~xinsurance, type = 'bar', 
                 name = "Have health insurance (NEW)", 
@@ -967,7 +1113,7 @@ server<-function(input, output) {
     
     output$plot_pattern_affordability <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1) 
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1 & groupdemand==0) 
         #dtafig<-filter(dta, country=="Kenya" & group=="Residential area" & latestIR==1) 
     
         plot_ly(dtafig, x=~grouplabel, y=~xinsurance, type = 'bar', 
@@ -987,13 +1133,13 @@ server<-function(input, output) {
 
     output$plot_mcpr_affordability <- renderPlotly({
 
-        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1)%>%
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & latestIR==1 & groupdemand==0)%>%
             select(xsurvey, mcp, group, grouplabel)%>%
             filter(group=="By xinsurance")
 
         plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
                 color = ~grouplabel                )%>% 
-            add_annotations(text = ~mcp, textposition = 'auto',arrowhead = 0,
+            add_annotations(text = ~mcp, textposition = 'top',arrowhead = 0,
                   arrowsize = 0 )%>%
             layout(
                 yaxis = list(title = "Percent of women in the group",
@@ -1010,7 +1156,7 @@ server<-function(input, output) {
     
     output$plot_level_qualityIR <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & is.na(xmii_side)==FALSE & group=="All")%>%    
+        dtafig<-filter(dta, country==input$country & is.na(xmii_side)==FALSE & group=="All" & groupdemand==0)%>%    
             filter(round==max(round))
     
         fig1<-plot_ly(dtafig, x=~year, y=~xmii_side, type = 'bar', 
@@ -1037,7 +1183,7 @@ server<-function(input, output) {
                 xaxis = list(title = "Survey year")
             )
         
-        dtafig<-filter(dta, country==input$country & is.na(SDPall_essential5_noso)==FALSE & group=="All")%>%
+        dtafig<-filter(dta, country==input$country & is.na(SDPall_essential5_noso)==FALSE & group=="All" & groupdemand==0)%>%
             filter(round==max(round))
         
         fig2<-plot_ly(dtafig, x=~year, y=~SDPall_essential5_noso, type = 'bar', 
@@ -1063,9 +1209,9 @@ server<-function(input, output) {
     
     output$plot_trend_qualityIR <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & group=="All")
+        dtafig<-filter(dta, country==input$country & group=="All" & groupdemand==0)
     
-        fig1<-plot_ly(dtafig, x=~round, y=~xmii_side, type = 'scatter', mode = 'lines',
+        fig1<-plot_ly(dtafig, x=~yearmonth, y=~xmii_side, type = 'scatter', mode = 'lines',
                 name = "MII: side effect", 
                 marker = list(color = 'rgb(199,233,192)'),
                 line = list(color = 'rgb(199,233,192)')) %>%
@@ -1087,12 +1233,12 @@ server<-function(input, output) {
             layout(
                 yaxis = list(title = "Percent of modern method (except LAM) users",
                              range = c(0, 100)),
-                xaxis = list(title = "Survey round")
+                xaxis = list(title = "Survey year/month")
                 )
         
-        dtafig<-filter(dta, country==input$country & group=="All")
+        dtafig<-filter(dta, country==input$country & group=="All" & groupdemand==0)
 
-        fig2<-plot_ly(dtafig, x=~round, y=~SDPall_essential5_noso, type = 'scatter', mode = 'lines',
+        fig2<-plot_ly(dtafig, x=~yearmonth, y=~SDPall_essential5_noso, type = 'scatter', mode = 'lines',
                 name = "5 specific methods* available currently/3-month", 
                 marker = list(color = 'rgb(158,202,225)'),
                 line = list(color = 'rgb(158,202,225)')) %>%
@@ -1105,7 +1251,7 @@ server<-function(input, output) {
             layout(
                 yaxis = list(title = "Percent of all women with service environment***",
                              range = c(0, 100)),
-                xaxis = list(title = "Survey year")
+                xaxis = list(title = "Survey year/month")
             )
         
         subplot(fig1, fig2, nrows=1, titleY = TRUE) %>%
@@ -1116,7 +1262,7 @@ server<-function(input, output) {
 
     output$plot_pattern_qualityIR1 <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1) 
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1 & groupdemand==0) 
     
         plot_ly(dtafig, x=~grouplabel, y=~xmii_side, type = 'bar', 
                 name = "MII: side effect", marker = list(color = 'rgb(199,233,192)'),
@@ -1149,7 +1295,7 @@ server<-function(input, output) {
 
     output$plot_pattern_qualityIR2 <- renderPlotly({
 
-        dtafig<-filter(dta, country==input$country & is.na(SDPall_essential5_noso)==FALSE & group==input$groupIR)%>%
+        dtafig<-filter(dta, country==input$country & is.na(SDPall_essential5_noso)==FALSE & group==input$groupIR & groupdemand==0)%>%
             filter(round==max(round))
 
         plot_ly(dtafig, x=~grouplabel, y=~SDPall_essential5_noso, type = 'bar', 
@@ -1175,8 +1321,7 @@ server<-function(input, output) {
 
     output$plot_mcpr_qualityIR <- renderPlotly({
 
-        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") & 
-                                 latestIRLINK==1)%>%
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") &  groupdemand==0 & latestIRLINK==1)%>%
             select(xsurvey, mcp, group, grouplabel)%>%
             filter(group=="By SDPall_essential5_noso"|
                        group=="By SDPall_essential5_ready"|
@@ -1187,9 +1332,207 @@ server<-function(input, output) {
         
         plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
                 color = ~grouplabel                )%>% 
-            add_annotations(text = ~mcp, textposition = 'auto',arrowhead = 0,
+            add_annotations(text = ~mcp, textposition = 'top',arrowhead = 0,
                   arrowsize = 0 )%>%
             layout(
+                autosize = F, width = 1000, height = 400, 
+                yaxis = list(title = "Percent of women in the group",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "v")
+                
+            )                
+
+        })    
+    
+    
+    output$plot_level_qualityIR_demand <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & is.na(xmii_side)==FALSE & group=="All" & groupdemand==1)%>%    
+            filter(round==max(round))
+    
+        fig1<-plot_ly(dtafig, x=~year, y=~xmii_side, type = 'bar', 
+                name = "MII: side effect", marker = list(color = 'rgb(199,233,192)'),
+                text = ~xmii_side, textposition = 'outside') %>%
+            add_trace(y = ~xmii_sidewhat, name = "MII: what to do", 
+                      marker = list(color = 'rgb(161,217,155)'),
+                      text = ~xmii_sidewhat, textposition = 'outside') %>% 
+            add_trace(y = ~xmii_other, name = "MII: other methods", 
+                      marker = list(color = 'rgb(116,196,118)'),
+                      text = ~xmii_other, textposition = 'outside') %>% 
+            add_trace(y = ~xmii_switch, name = "MII: switch (NEW)", 
+                      marker = list(color = 'rgb(65,171,93)'),
+                      text = ~xmii_switch, textposition = 'outside') %>% 
+            add_trace(y = ~xmii3, name = "MII: all three items", 
+                      marker = list(color = 'rgb(35,139,69)'),
+                      text = ~xmii3, textposition = 'outside') %>% 
+            add_trace(y = ~xmii4, name = "MII: all four items (NEW)", 
+                      marker = list(color = 'rgb(0,109,44)'),
+                      text = ~xmii4, textposition = 'outside') %>% 
+            layout(
+                yaxis = list(title = "Percent of modern method (except LAM) users",
+                             range = c(0, 100)),
+                xaxis = list(title = "Survey year")
+            )
+        
+        dtafig<-filter(dta, country==input$country & is.na(SDPall_essential5_noso)==FALSE & group=="All" & groupdemand==1)%>%
+            filter(round==max(round))
+        
+        fig2<-plot_ly(dtafig, x=~year, y=~SDPall_essential5_noso, type = 'bar', 
+                name = "5 specific methods* available currently/3-month", marker = list(color = 'rgb(158,202,225)'),
+                text = ~SDPall_essential5_noso, textposition = 'outside') %>%
+            add_trace(y = ~SDPall_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+                      marker = list(color = 'rgb(107,174,214)'),
+                      text = ~SDPall_essential5_ready, textposition = 'outside') %>% 
+            add_trace(y = ~SDPall_essential5_rnoso, name = "Meeting both conditions", 
+                      marker = list(color = 'rgb(33,113,181)'),
+                      text = ~SDPall_essential5_rnoso, textposition = 'outside') %>% 
+            layout(
+                yaxis = list(title = "Percent of all women with service environment***",
+                             range = c(0, 100)),
+                xaxis = list(title = "Survey year")
+            )
+        
+        subplot(fig1, fig2, nrows=1, titleY = TRUE) %>%
+        layout( title=c("Only among women with demand for FP"), 
+                legend=list(orientation = 'v'), 
+                yaxis = list(range = c(0, 100)) )
+        
+        })
+    
+    output$plot_trend_qualityIR_demand <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & group=="All" & groupdemand==1)
+    
+        fig1<-plot_ly(dtafig, x=~yearmonth, y=~xmii_side, type = 'scatter', mode = 'lines',
+                name = "MII: side effect", 
+                marker = list(color = 'rgb(199,233,192)'),
+                line = list(color = 'rgb(199,233,192)')) %>%
+            add_trace(y = ~xmii_sidewhat, name = "MII: what to do", 
+                      marker = list(color = 'rgb(161,217,155)'),
+                      line = list(color = 'rgb(161,217,155)')) %>% 
+            add_trace(y = ~xmii_other, name = "MII: other methods", 
+                      marker = list(color = 'rgb(116,196,118)'),
+                      line = list(color = 'rgb(116,196,118)')) %>% 
+            add_trace(y = ~xmii_switch, name = "MII: switch (NEW)", 
+                      marker = list(color = 'rgb(65,171,93)'),
+                      line = list(color = 'rgb(65,171,93)')) %>% 
+            add_trace(y = ~xmii3, name = "MII: all three items", 
+                      marker = list(color = 'rgb(35,139,69)'),
+                      line = list(color = 'rgb(35,139,69)')) %>% 
+            add_trace(y = ~xmii4, name = "MII: all four items (NEW)", 
+                      marker = list(color = 'rgb(0,109,44)'),
+                      line = list(color = 'rgb(0,109,44)')) %>% 
+            layout(
+                yaxis = list(title = "Percent of modern method (except LAM) users",
+                             range = c(0, 100)),
+                xaxis = list(title = "Survey year/month")
+                )
+        
+        dtafig<-filter(dta, country==input$country & group=="All" & groupdemand==1)
+
+        fig2<-plot_ly(dtafig, x=~yearmonth, y=~SDPall_essential5_noso, type = 'scatter', mode = 'lines',
+                name = "5 specific methods* available currently/3-month", 
+                marker = list(color = 'rgb(158,202,225)'),
+                line = list(color = 'rgb(158,202,225)')) %>%
+            add_trace(y = ~SDPall_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+                      marker = list(color = 'rgb(107,174,214)'),
+                      line = list(color = 'rgb(107,174,214)')) %>% 
+            add_trace(y = ~SDPall_essential5_rnoso, name = "Meeting both conditions", 
+                      marker = list(color = 'rgb(33,113,181)'),
+                      line = list(color = 'rgb(33,113,181)')) %>% 
+            layout(
+                yaxis = list(title = "Percent of all women with service environment***",
+                             range = c(0, 100)),
+                xaxis = list(title = "Survey year/month")
+            )
+        
+        subplot(fig1, fig2, nrows=1, titleY = TRUE) %>%
+        layout( title=c("Only among women with demand for FP"),
+                legend=list(orientation = 'v')
+                )
+        
+        })
+
+    output$plot_pattern_qualityIR1_demand <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1 & groupdemand==1) 
+    
+        plot_ly(dtafig, x=~grouplabel, y=~xmii_side, type = 'bar', 
+                name = "MII: side effect", marker = list(color = 'rgb(199,233,192)'),
+                text = ~xmii_side, textposition = 'outside') %>%
+            add_trace(y = ~xmii_sidewhat, name = "MII: what to do", 
+                      marker = list(color = 'rgb(161,217,155)'),
+                      text = ~xmii_sidewhat, textposition = 'outside') %>% 
+            add_trace(y = ~xmii_other, name = "MII: other methods", 
+                      marker = list(color = 'rgb(116,196,118)'),
+                      text = ~xmii_other, textposition = 'outside') %>% 
+            add_trace(y = ~xmii_switch, name = "MII: switch (NEW)", 
+                      marker = list(color = 'rgb(65,171,93)'),
+                      text = ~xmii_switch, textposition = 'outside') %>% 
+            add_trace(y = ~xmii3, name = "MII: all three items", 
+                      marker = list(color = 'rgb(35,139,69)'),
+                      text = ~xmii3, textposition = 'outside') %>% 
+            add_trace(y = ~xmii4, name = "MII: all four items (NEW)", 
+                      marker = list(color = 'rgb(0,109,44)'),
+                      text = ~xmii4, textposition = 'outside') %>% 
+            layout(
+                title=c("Only among women with demand for FP"),
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "v"), 
+                showlegend=TRUE
+            )
+        
+        })
+
+    output$plot_pattern_qualityIR2_demand <- renderPlotly({
+
+        dtafig<-filter(dta, country==input$country & is.na(SDPall_essential5_noso)==FALSE & group==input$groupIR & groupdemand==1)%>%
+            filter(round==max(round))
+
+        plot_ly(dtafig, x=~grouplabel, y=~SDPall_essential5_noso, type = 'bar', 
+                name = "5 specific methods* available currently/3-month", 
+                marker = list(color = 'rgb(158,202,225)'),
+                text = ~SDPall_essential5_noso, textposition = 'outside') %>%
+            add_trace(y = ~SDPall_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+                      marker = list(color = 'rgb(107,174,214)'),
+                      text = ~SDPall_essential5_ready, textposition = 'outside') %>% 
+            add_trace(y = ~SDPall_essential5_rnoso, name = "Meeting both conditions", 
+                      marker = list(color = 'rgb(33,113,181)'),
+                      text = ~SDPall_essential5_rnoso, textposition = 'outside') %>% 
+            layout(
+                title=c("Only among women with demand for FP"),
+                yaxis = list(title = "Percent of all women",
+                             range = c(0, 100)),
+                xaxis = list(title = " "),
+                legend = list(font=list(size=10), 
+                              orientation = "v"), 
+                showlegend=TRUE
+            )
+        
+        })       
+
+    output$plot_mcpr_qualityIR_demand <- renderPlotly({
+
+        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") &  groupdemand==1 & latestIRLINK==1)%>%
+            select(xsurvey, mcp, group, grouplabel)%>%
+            filter(group=="By SDPall_essential5_noso"|
+                       group=="By SDPall_essential5_ready"|
+                       group=="By SDPall_essential5_rnoso")
+        
+        dtafig$group<-fct_relevel(factor(dtafig$group, levels = unique(dtafig$group)),
+                                  c("By SDPall_essential5_noso", "By SDPall_essential5_ready", "By SDPall_essential5_rnoso"))
+        
+        plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
+                color = ~grouplabel                )%>% 
+            add_annotations(text = ~mcp, textposition = 'top',arrowhead = 0,
+                  arrowsize = 0 )%>%
+            layout(
+                title=c("Only among women with demand for FP"),
                 autosize = F, width = 1000, height = 400, 
                 yaxis = list(title = "Percent of women in the group",
                              range = c(0, 100)),

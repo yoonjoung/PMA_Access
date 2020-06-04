@@ -80,22 +80,34 @@ It is possible to have other cluster-level aggregate service quality variables u
 
 country<-c(
     "Burina Faso", 
+    "Cote d'Ivoire",
+    "DRC",
     "Ethiopia", 
+    "India, Rajasthan",
     "Kenya",
+    "Niger", 
     "Nigeria, Kano",
     "Nigeria, Lagos",
     "Uganda")
 refresh_round<-c(
     "5", 
+    "none", 
+    "NONE?", 
     "5", 
+    "NONE?", 
     "3 and 5",
+    "NONE?", 
     "no refresh",
     "no refresh",
     "5")
 note<-c(
     "30 EAs added in R3.", 
+    "-",
+    "2 EAs dropped in Kinshasa in R2",
     "21 EAs added in R3 (in Oromia).", 
+    "R2: expanded private SDP sample (up-to 3 SDPs in each contiguous urban EAs and from non-selected rural segments or contiguous rural EAs)", 
     "31 EAs added in R5 (in Nairobi and two new counties: West Pokot and Kakamega)",
+    "-",
     "-",
     "-",
     "-")
@@ -116,17 +128,6 @@ The number of EAs and SDPs should be roughly stable, unless there was a change (
 
 
 ```{r plotobs, results='asis'}
-
-fig<-dta%>%
-    filter(group=="all")%>%
-    plot_ly(  y = ~nEA, type = "box", name = "Number of EAs", marker = list(color = '#88B41F'))%>%
-    add_trace(y = ~nSDP, type = "box", name = "Number of SDPs", marker = list(color = '#1F88B4'))%>%
-    layout(
-            title = c("Distribution of the number of EAs and SDPs per survey (n=29)"),
-            yaxis = list(title = "Number"),
-            showlegend = FALSE
-            )
-
 dta%>%
     filter(group=="all")%>%
     plot_ly(x = ~xsurvey, y = ~nEA, type = "bar", name="EAs", marker = list(color = '#88B41F') ) %>%
@@ -134,8 +135,10 @@ dta%>%
                marker = list(color = '#1F88B4')) %>%
     layout(
         title = c(""),
-        xaxis = list(titel = ""), 
-        yaxis = list(title = "Number")        ) 
+        xaxis = list(title = "", tickfont = list(size=8)), 
+        yaxis = list(title = "Number", tickfont = list(size=8))   ,
+        legend = list(orientation = 'v',x = 0.1, y = 0.9, size=10)
+        ) 
 ```
 
 #####__1.3. Distribution of SDPs by type in each survey__ 
@@ -150,10 +153,12 @@ dta%>%
     plot_ly(x = ~xsurvey, y = ~nSDPpub, type = "bar", name="Public", marker = list(color = '#1F88B4')) %>%
     add_trace( y = ~nSDPprivate, type = "bar", name="Private", marker = list(color = '#70A8CF')) %>%
     layout(
-        xaxis = list(titel = ""), 
+        xaxis = list(title = "",
+                     tickfont = list(size=8)), 
         yaxis = list(title = "Number of SDPs",
-                     titlefont=list(size=12)), 
-        legend = list(font=list(size=10)),
+                     titlefont=list(size=12),
+                     tickfont = list(size=8)), 
+        legend = list(orientation = 'v',x = 0.1, y = 0.9, size=10),
         barmode = 'stack'
         ) 
 ```
@@ -162,7 +167,7 @@ dta%>%
 
 ####__2. EA-SDP linking methods__
 
-EA-SDP link was done using _Stata_ (see Do file in [GitHub](https://github.com/yoonjoung/PMA_Access)). Then a summary dataset describing link results was constructed and used for this report. 
+EA-SDP link was done using _Stata_ (see the do file in [GitHub](https://github.com/yoonjoung/PMA_Access)). Then a summary dataset describing link results was constructed and used for this report. 
 
 Briefly, see the following steps:  
 
@@ -170,14 +175,14 @@ __A. Collapse HHQFQ dataset to EA-level__, including survey round, admin level 1
 
 __B. Reshape SDP dataset to LONG file__, using "EAserved_" variables. Now the dataset has unique EA-SDP pairs. An EA should be paired with multiple SDPs, per survey design. A SDP can be paired with multiple EAs. 
 
-* Technically, all EAs in a survey should appear here, but in some surveys a few EAs are not listed. This is a main (if not the only) case for EAs not having linked SDPs. This problem can be due to various reasons:  
-(1) the EA truly does not have any SDPs that are "likable" (unlikely),   
-(2) it was not possible to survey any of the linked SDPs (due to security reasons, for example), or    
-(3) data entry/management errors in "EAserved_" variables.     
+* Technically, all EAs in a survey should appear here, but in some surveys a few EAs are not listed. This is a main (if not the only) reason for EAs not having linked SDPs. This can be caused by various reasons:  
+(1) The EA truly does not have any SDPs that are "linkable" (unlikely),   
+(2) It was not possible to survey any of the linked SDPs (due to security reasons, for example), or    
+(3) Data entry/management errors in "EAserved_" variables in the SDP surveys.     
 
 __C. Collapse/Create EA-level SDP dataset__ which has service environment characteristics based on linked SDPs. For example, for each EA, the number of _any SDPs_ offering injectables, the number of _primary-level SDPs_ offering  injectables, the number of _public SDPs_ offering  injectables, etc. 
 
-__D. Merge with women datasets__ (though not relevant for this assessment). If there are missing EAs in above step 2 (and thus 3 too), women in those EAs will be categorized to not have 'population-level accessibility to quality services'. If the missing EAs are random and minimal, it's not a big problem.  
+__D. Merge with women datasets__ (though not necessary for this assessment). If there are missing EAs in above step 2 (and thus 3 too), women in those EAs will be categorized to not have 'population-level accessibility to quality services'. If the missing EAs are random and minimal, it's not a big problem.  
 
 ---
 
@@ -188,31 +193,32 @@ __D. Merge with women datasets__ (though not relevant for this assessment). If t
 Theoretically expected average number of SDPs linked to an EA:  
 
 * __Any/all SDPs__: between 3-6 (3 public + up to three private), but probably slightly above 3. This includes any kind of SDPs, including pharmacies.    
-* __Primary or secondary SDPs__: between 2-5, but unlikely 5. _This excludes pharmacies_.    
+* __Primary or secondary SDPs__: between 2-5, but probably slightly above 2. _This excludes pharmacies_.    
 * __Public SDPs__: 3, possibly 2 depending on health systems (e.g., Ethiopia). _This excludes pharmacies, based on design, since there are no public pharmacies_.    
 * __Primary or secondary public SDPs__: 2, possibly 1 depending on health systems (e.g., Ethiopia). _This excludes pharmacies, based on design, since there are no public pharmacies_.   
 
 More importantly, the average number should remain stable across all rounds, within a geography. Two potential problems (neither related with EA refresh):  
 
 * Burkina Faso Round 6    
+* Niger, Niamey Round 5   
 * Nigeria, Kano Round 3   
 
-```{r plotnumSDPperEA, results='asis'}
+```{r plotnumSDPperEA, results='asis', fig.align="left", out.width="900px"}
 dta%>%
     filter(group=="all")%>%
     plot_ly(x = ~xsurvey, y = ~num_SDPall, type = "bar", 
         name = "Any SDPs", marker = list(color = '#FF7F0E'))%>%
     add_trace(y = ~num_SDPlow, type = "bar", 
-              name = "Primary or secondary SDPs", marker = list(color = '#FFAD65'))%>%
+              name = "Primary or secondary SDPs", marker = list(color = '#FFBD84'))%>%
     add_trace(y = ~num_SDPpub, type = "bar", 
               name = "Public SDPs", marker = list(color = '#1F88B4'))%>%
     add_trace(y = ~num_SDPpub12, type = "bar", 
-              name = "Primary or secondary public SDPs", marker = list(color = '#70A8CF'))%>%
+              name = "Primary or secondary public SDPs", marker = list(color = '#8DC2D9'))%>%
     layout(
             title = c(""),
             xaxis = list(titel = ""),  
             yaxis = list(title = "Average number of linked SDPs per EA"),
-            legend = list(orientation = 'h',x = 0.5, y = -0.25) 
+            legend = list(orientation = 'h',x = 0.5, y = 1.05, xanchor = "center", yanchor = "center", size=8)
             )
 
 ```
@@ -229,39 +235,44 @@ medianpublow<-round(median(temp$noSDPpub12), 1)
 Theoretically, this should be 0%. But, see: 
 
 * Burkina Faso Round 6    
+* Niger, Niamey Round 5
 * Nigeria, Kano Round 3   
 
 Other than these two survey, EA-SDP linking looks 'okay' (i.e., <5 %) with __any SDPs__ (dark orange bars) and __any public SDPs__ (dark blue bars). For women in these SDP-missing-EAs, any 'population-level accessibility to quality services' will be automatically none/missing.   
 
 However, percent of EAs without linked primary or secondary SDPs is high. Median (among `r nsurveys` surveys): `r mediananylow` % for _any primary or secondary SDPs_ (light orange bars) and `r medianpublow` % for _public primary or secondary SDPs_ (light blue bars).   
 
-```{r plotEAnoSDPall, results='asis'}
-dtafig<-dta%>%filter(group=="all")
+```{r plotEAnoSDPall, results='asis', fig.align="left", out.width="900px"}
+dtafig<-dta%>%filter(group=="all")%>%
+    mutate(noSDPany=round(noSDPany, 1), 
+           noSDPpub=round(noSDPpub, 1))
 
 dtafig%>%
     plot_ly( x = ~xsurvey) %>%
     add_trace(y = ~noSDPany, type = "bar", 
               name = "Any SDPs", marker = list(color = '#FF7F0E'))%>%
     add_trace(y = ~noSDPlow, type = "bar", 
-              name = "Primary/secondary SDPs", marker = list(color = '#FFAD65'))%>%
+              name = "Primary/secondary SDPs", marker = list(color = '#FFBD84'))%>%
     add_trace(y = ~noSDPpub, type = "bar", 
               name = "Public SDPs", marker = list(color = '#1F88B4'))%>%
     add_trace(y = ~noSDPpub12, type = "bar", 
-              name = "Primary/secondary public SDPs", marker = list(color = '#70A8CF'))%>%
+              name = "Primary/secondary public SDPs", marker = list(color = '#8DC2D9'))%>%
     add_segments(x = as.character("BFR1"), xend = as.character("UGR6"), 
              y = 5, yend = 5,
              marker = list(color = "gray",size = 2),
              line= list(color = "gray", dash = 'dot'),
              showlegend=FALSE)%>%    
     layout(
-        title = c("Percent of EAs with no linked SDPs, by type and level of SDPs"),
+        title = c(""),
             xaxis = list(titel = ""),  
             yaxis = list(title = "(%)"),
-            legend = list(orientation = 'h',x = 0.1, y = -0.25) 
+            legend = list(orientation = 'h',x = 0.5, y = 1.05, xanchor = "center", yanchor = "center", size=8)
             )
 
 plot_ly(dtafig, x = ~xsurvey, y = ~noSDPany, type = "bar", 
-        name = "Any SDPs", marker = list(color = '#FF7F0E'))%>%
+        name = "Any SDPs", marker = list(color = '#FF7F0E', size=1)
+        )%>%
+    add_text(text=~noSDPany, textposition = 'top', textfont=list(size=10, color="black"))%>%
     add_segments(x = as.character("BFR1"), xend = as.character("UGR6"), 
              y = 5, yend = 5,
              marker = list(color = "gray",size = 2),
@@ -276,7 +287,9 @@ plot_ly(dtafig, x = ~xsurvey, y = ~noSDPany, type = "bar",
 
 
 plot_ly(dtafig, x = ~xsurvey, y = ~noSDPpub, type = "bar", 
-        name = "Any SDPs", marker = list(color = '#1F88B4'))%>%
+        name = "Any SDPs", marker = list(color = '#1F88B4', size=1)
+        )%>%
+    add_text(text=~noSDPpub, textposition = 'top', textfont=list(size=10, color="black"))%>%
     add_segments(x = as.character("BFR1"), xend = as.character("UGR6"), 
              y = 5, yend = 5,
              marker = list(color = "gray",size = 2),
@@ -295,7 +308,7 @@ plot_ly(dtafig, x = ~xsurvey, y = ~noSDPpub, type = "bar",
 
 Overall, urban EAs tend to have more problems in linking.   
 
-```{r plotEAnoSDPur, results='asis'}
+```{r plotEAnoSDPur, results='asis', fig.align="left", out.width="900px"}
 
 dtafig<-dta%>%filter(group!="all")
 
