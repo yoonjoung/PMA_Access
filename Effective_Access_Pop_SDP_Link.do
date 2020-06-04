@@ -37,8 +37,14 @@ global date=subinstr("`c_today'", " ", "",.)
 #delimit;
 global datalist " 
 	BFR1 BFR2 BFR3 BFR4 BFR5 BFR6 
+	CIR1 CIR2
+	CDKinshasaR3 CDKinshasaR4 CDKinshasaR5 CDKinshasaR6 CDKinshasaR7
+	CDKongoCentralR4 CDKongoCentralR5 CDKongoCentralR6 CDKongoCentralR7
 	ETR2 ETR3 ETR4 ETR5 ETR6
+	INRajasthanR1 INRajasthanR2 INRajasthanR3 INRajasthanR4 
 	KER2 KER3 KER4 KER5 KER6 KER7 
+	NENiameyR1 NENiameyR2 NENiameyR3 NENiameyR4 NENiameyR5
+	NER2 NER4 
 	NGLagosR2 NGLagosR3 NGLagosR4 NGLagosR5 
 	NGKanoR3  NGKanoR4  NGKanoR5  
 	UGR2 UGR3 UGR4 UGR5 UGR6
@@ -48,8 +54,14 @@ global datalist "
 #delimit;
 global datalistminusone " 
 	BFR2 BFR3 BFR4 BFR5 BFR6 
+	CIR1 CIR2
+	CDKinshasaR3 CDKinshasaR4 CDKinshasaR5 CDKinshasaR6 CDKinshasaR7
+	CDKongoCentralR4 CDKongoCentralR5 CDKongoCentralR6 CDKongoCentralR7
 	ETR2 ETR3 ETR4 ETR5 ETR6
+	INRajasthanR1 INRajasthanR2 INRajasthanR3 INRajasthanR4 
 	KER2 KER3 KER4 KER5 KER6 KER7 
+	NENiameyR1 NENiameyR2 NENiameyR3 NENiameyR4 NENiameyR5
+	NER2 NER4 
 	NGLagosR2 NGLagosR3 NGLagosR4 NGLagosR5 
 	NGKanoR3  NGKanoR4  NGKanoR5  
 	UGR2 UGR3 UGR4 UGR5 UGR6
@@ -60,7 +72,7 @@ global datalistminusone "
 *************************************************************************************************
 * B.1 Get EA-level information from HHQFQ 
 *************************************************************************************************
- 
+	
 set more off
 foreach survey  in $datalist{
 *foreach survey  in BFR6{
@@ -69,6 +81,12 @@ foreach survey  in $datalist{
 		sort EA_ID
 		keep if EA_ID!=EA_ID[_n-1]
 		
+		
+			capture confirm variable country
+			if !_rc {
+				gen India=1 if country=="India_Rajasthan"
+			}		
+
 			*create "region" as an admin level-1 variable
 			capture confirm variable region
 			if !_rc {
@@ -84,7 +102,13 @@ foreach survey  in $datalist{
 					if !_rc {
 						gen region=state
 						}
-					}			
+					}
+					else{
+						capture confirm variable province
+						if !_rc {
+							gen region=province
+							}
+						}
 			
 		keep round region ur EA_ID 
 		foreach x of varlist round region ur  {
@@ -135,6 +159,14 @@ foreach survey  in $datalist{
 	tab facility_type managing_authority, m
 	codebook facility_type 
 	}
+	
+***** CHECK all surveys for date var
+foreach survey  in $datalist{
+	use "$data/SR_`survey'.dta", clear	
+	tab xsurvey
+	lookfor todaySIF
+	}
+	
 */
 	
 set more off
@@ -143,6 +175,11 @@ foreach survey  in $datalist{
 	use "$data/SR_`survey'.dta", clear	
 
 	replace country=substr(xsurvey, 1,2)
+	
+			capture confirm variable ur
+			if !_rc {
+				drop ur
+			}	
 	
 	* SDP characteristics 
 	gen SDPall			= 1
@@ -153,19 +190,31 @@ foreach survey  in $datalist{
 
 	replace SDPpub12	=1 if country=="BF" & managing_authority==1 & (facility_type>=4 & facility_type<=7) /*primary & secondary*/
 	replace SDPlow		=1 if country=="BF" & (facility_type>=4 & facility_type<=7) /*primary & secondary level, both sectors*/
+
+	replace SDPpub12	=1 if country=="CI" & managing_authority==1 & (facility_type>=5 & facility_type<=15) /*primary & secondary*/
+	replace SDPlow		=1 if country=="CI" & (facility_type>=5 & facility_type<=15) /*primary & secondary level, both sectors*/
+
+	replace SDPpub12	=1 if country=="CD" & managing_authority==1 & (facility_type>=2 & facility_type<=4) /*primary & secondary*/
+	replace SDPlow		=1 if country=="CD" & (facility_type>=2 & facility_type<=4) /*primary & secondary level, both sectors*/
 	
 	replace SDPpub12	=1 if country=="ET" & managing_authority==1 & (facility_type>=2 & facility_type<=4) /*primary & secondary*/
 	replace SDPlow		=1 if country=="ET" & (facility_type>=2 & facility_type<=4) /*primary & secondary level, both sectors*/
 	
+	replace SDPpub12	=1 if country=="IN" & managing_authority==1 & (facility_type>=2 & facility_type<=6) /*primary & secondary*/
+	replace SDPlow		=1 if country=="IN" & (facility_type>=2 & facility_type<=6) /*primary & secondary level, both sectors*/
+	
 	replace SDPpub12	=1 if country=="KE" & managing_authority==1 & (facility_type>=2 & facility_type<=4) /*primary & secondary*/
 	replace SDPlow		=1 if country=="KE" & (facility_type>=2 & facility_type<=4) /*primary & secondary level, both sectors*/
+
+	replace SDPpub12	=1 if country=="NE" & managing_authority==1 & (facility_type>=4 & facility_type<=11) /*primary & secondary*/
+	replace SDPlow		=1 if country=="NE" & (facility_type>=4 & facility_type<=11) /*primary & secondary level, both sectors*/	
 	
 	replace SDPpub12	=1 if country=="NG" & managing_authority==1 & (facility_type>=2 & facility_type<=4) /*primary & secondary*/
 	replace SDPlow		=1 if country=="NG" & (facility_type>=2 & facility_type<=4) /*primary & secondary level, both sectors*/
 
 	replace SDPpub12	=1 if country=="UG" & managing_authority==1 & (facility_type>=3 & facility_type<=5) /*primary & secondary*/
 	replace SDPlow		=1 if country=="UG" & (facility_type>=3 & facility_type<=5) /*primary & secondary level, both sectors*/
-
+	
 	* reshape SDP to EA-SDP level long file. After this, some SDPs will be linked to multiple EAs. 	
 	* codebook EAserved1  EAserved2 EAserved3 EAserved4 EAserved5 EAserved6 EAserved7 EAserved8 EAserved9 EAserved10
 	* sum EAserved1  EAserved2 EAserved3 EAserved4 EAserved5 EAserved6 EAserved7 EAserved8 EAserved9 EAserved10
@@ -201,7 +250,7 @@ foreach survey  in $datalist{
 	tab xsurvey
 	save "$data/EASDP_`survey'.dta", replace	
 	}
-
+	
 **** Bring in urban/rural variable from EA_`survey'.dta: This is to check link quality 
 set more off
 foreach survey  in $datalist{
@@ -225,9 +274,25 @@ foreach survey  in $datalist{
 
 log close
 
+/*
+set more off
+foreach survey  in $datalist{
+	use "$data/EASDP_`survey'.dta", clear	
+		tab xsurvey 
+		sum SDPall SDPpub SDPpub12 SDPlow
+	}
+	
+set more off
+foreach survey  in $datalist{
+	use "$data/EASDP_`survey'.dta", clear
+		tab  HHQFQur, m
+	}
+*/
+
 *************************************************************************************************
 * B.3 Create EA-level data which has service environment characterisics based on linked SDPs
 *************************************************************************************************
+
 
 set more off
 foreach survey  in $datalist{
@@ -236,9 +301,10 @@ foreach survey  in $datalist{
 *1. MERGE EA_level information from HHQFQ 
 	sort EA_ID
 	merge EA_ID using "$data/EA_`survey'.dta"
-	tab _merge, m 
+	tab _merge xsurvey, m 
+
 		/*
-		RED FLAG
+		RED FLAG 1
 		check EAs with no SDP (i.e., _merge==2 or round==.) 
 		check SDPs with no EA (i.e., _merge==1) 
 		This should be none, but not necessarily in reality. WHY???
@@ -248,6 +314,9 @@ foreach survey  in $datalist{
 			tab EA_ID if _merge==2 
 		*keep if _merge==3
 		*drop _merge
+		
+		gen ur=HHQFQur
+		
 	save temp.dta, replace
 	
 *2. CREATE number of SDPs by type - per EA
@@ -257,12 +326,15 @@ foreach survey  in $datalist{
 			rename `x' num_`x'
 			lab var num_`x' "Numbe of `x' per EA"
 			}
-			
+		
+		*sum num_SDP*		
+		
 		sort EA_ID
 		merge EA_ID using "$data/EA_`survey'.dta"
 			tab _merge, m 
 			drop _merge
-		
+			
+	
 		gen byte noSDPany 	=num_SDPall==0
 		gen byte noSDPpub 	=num_SDPpub==0
 		gen byte noSDPpub12 =num_SDPpub12==0
@@ -276,13 +348,16 @@ foreach survey  in $datalist{
 		sort EA_ID
 		save "$data/EAlevel_SDP_`survey'.dta", replace
 
+		
 *3. CREATE number of SDPs by type that have offer/have/ready for methods - per EA
 *THIS section is not necessarily about linking. It requires variables constructed in the SDP Recode file.
+
 	use temp.dta, replace
 	foreach x of varlist SDPall SDPpub SDPpub12 SDPlow {
 	use temp.dta, replace
 		*preserve
 		keep if `x'==1
+
 		collapse (mean)`x'  (sum)  essential* ready*, by(xsurvey round ur EA_ID )
 		foreach var of varlist essential* ready*{
 			rename `var' `x'_`var'
@@ -302,25 +377,39 @@ foreach survey  in $datalist{
 		
 		sort EA_ID		
 		save "$data/EAlevel_SDP_`survey'.dta", replace
-	}
-	
-	
+				
+}			
+			
+/*	
 set more off
 foreach survey  in $datalist{
-*foreach survey  in BFR6{
 	use "$data/EAlevel_SDP_`survey'.dta", clear
 		bysort ur: sum round noSDP* 
 		list xsurvey EA_ID noSDP* if noSDPany==1
 		*list xsurvey EA_ID noSDP* if noSDPpub==1
 		*list xsurvey EA_ID noSDP* if noSDPpub12==1			
 	}
+	
+set more off
+foreach survey  in INR1 INR2 INR3 INR4{
+	use "$data/EAlevel_SDP_`survey'.dta", clear
+		tab xsurvey 
+		sum round num_SDP* SDPall_essential*
+	}	
 
+set more off
+foreach survey  in INR1 INR2 INR3 INR4{	
+	use "$data/EASDP_`survey'.dta", clear	
+		tab xsurvey 
+		sum round SDPall SDPpub SDPpub12 SDPlow 
+	}
+*/	
 	
 *************************************************************************************************	
 * C. Create dataset summarizing the link results 
 *************************************************************************************************
 
-*** Number of EA	
+*** 1. Number of EA	
 use "$data/EA_BFR1.dta", clear			
 		egen nEA=group(EA_ID)
 		collapse (count) nEA, by(xsurvey)
@@ -350,7 +439,7 @@ use "$data/EA_BFR1.dta", clear
 	sort xsurvey HHQFQur
 	save EA_SDP_Link_Summary.dta, replace	
 		
-*** Number of SDP	
+*** 2. Number of SDP	
 use "$data/SR_BFR1.dta", clear
 		gen nSDP	= 1
 		gen nSDPpub	=1 if managing_authority==1
@@ -382,7 +471,7 @@ use "$data/SR_BFR1.dta", clear
 	sort xsurvey HHQFQur
 	save EA_SDP_Link_Summary.dta, replace
 
-*** Number of EASDP	
+*** 3. Number of EASDP	
 use "$data/EASDP_BFR1.dta", clear			
 		egen nEASDP=group(EASDP_ID)
 		collapse (count) nEASDP, by(xsurvey)
@@ -421,7 +510,7 @@ use "$data/EASDP_BFR1.dta", clear
 	sort xsurvey HHQFQur
 	save EA_SDP_Link_Summary.dta, replace	
 	
-*** Number of average, min, max SDP per EA
+*** 4. Number of average, min, max SDP per EA
 use "$data/EAlevel_SDP_BFR1.dta", clear	
 		gen 	min_num_SDPall 	=num_SDPall 
 		gen		min_num_SDPpub	=num_SDPpub
@@ -516,6 +605,116 @@ use "$data/EAlevel_SDP_BFR1.dta", clear
 	
 	export delimited using EA_SDP_Link_Summary.csv, replace
 
+*************************************************************************************************	
+* D. Create dataset summarizing the SDP level results 
+*************************************************************************************************
+
+*** 1. Number of SDP	
+use "$data/SR_BFR1.dta", clear
+		gen nSDP	= 1
+		gen nSDPpub	=1 if managing_authority==1
+		gen nSDPprivate	=1 if managing_authority>1	
+		
+			gen temp = dofc(todaySIF)
+			format %td temp
+			gen tempmonth = month(temp)
+			gen tempyear = year(temp)
+			gen tempcmc 	= 12*(tempyear - 1900) + tempmonth
+			
+		egen cmc = median(tempcmc)
+		gen year = 1900 + int(cmc/12) 
+		gen month= cmc-12*(year - 1900)		
+	
+		collapse (count) nSDP* (mean) year month cmc, by(xsurvey)	
+		save temp.dta, replace
+
+	foreach survey  in $datalistminusone{
+	use "$data/SR_`survey'.dta", clear
+		gen nSDP	= 1
+		gen nSDPpub	=1 if managing_authority==1
+		gen nSDPprivate	=1 if managing_authority>1	
+		
+			gen temp = dofc(todaySIF)
+			format %td temp
+			gen tempmonth = month(temp)
+			gen tempyear = year(temp)
+			gen tempcmc 	= 12*(tempyear - 1900) + tempmonth
+			
+		egen cmc = median(tempcmc)
+		gen year = 1900 + int(cmc/12) 
+		gen month= cmc-12*(year - 1900)				
+		
+		collapse (count) nSDP* (mean) year month cmc, by(xsurvey)	
+		append using temp.dta, 
+		save temp.dta, replace
+		
+		}
+		
+	lab var nSDP "Total number of SDPs in the survey" 	
+	lab var nSDPpub "Total number of PUBLIC SDPs in the survey" 	
+	lab var nSDPprivate "Total number of PRIVATE SDPs in the survey" 	
+		
+	sort xsurvey 
+	save "summary_Access_Indicators_SR.dta", replace
+	
+*** 2. Percent of SDPs with the essential 5 methods 
+
+use "$data/SR_BFR1.dta", clear	
+		collapse (mean) essential5_* , by(xsurvey)
+		save temp.dta, replace
+	/*
+	use "$data/SR_BFR1.dta", clear	
+		collapse (mean) essential5_* , by(xsurvey managingauthority)
+		append using temp.dta, 
+		save temp.dta, replace		
+	*/	
+	
+	foreach survey  in $datalistminusone{
+	use "$data/SR_`survey'.dta", clear	
+		collapse (mean) essential5_* , by(xsurvey)
+		append using temp.dta, 
+		save temp.dta, replace		
+	/*
+	use "$data/SR_`survey'.dta", clear	
+		collapse (mean) essential5_* , by(xsurvey managingauthority)
+		append using temp.dta, 
+		save temp.dta, replace			
+	*/	
+	}
+
+		foreach var of varlist essential5_*{
+			replace `var' = `var'*100
+			format `var' %4.1f
+		}
+	
+	sort xsurvey 
+	merge xsurvey using "summary_Access_Indicators_SR.dta", 
+		tab _merge, m
+		
+		keep if _merge==3 /*all*/
+		drop _merge
+		
+	gen country=substr(xsurvey, 1, length(xsurvey)-2)
+	gen countrycode=substr(xsurvey, 1, 2)
+	gen round=substr(xsurvey, -1, .)
+			
+		replace country="Burkina Faso" if country=="BF"
+		replace country="Cote d'Ivoire" if country=="CI"
+		replace country="DRC, Kinshasa" if country=="CDKinshasa"
+		replace country="DRC, Kongo Central" if country=="CDKongoCentral"
+		replace country="Ethiopia" if country=="ET"
+		replace country="India, Rajasthan" if country=="INRajasthan"
+		replace country="Kenya" if country=="KE"
+		replace country="Niger" if country=="NE"
+		replace country="Niger, Niamey" if country=="NENiamey"
+		replace country="Nigeria, Kano" if country=="NGKano"
+		replace country="Nigeria, Lagos" if country=="NGLagos"
+		replace country="Uganda" if country=="UG"	
+	
+	save "summary_Access_Indicators_SR.dta", replace
+	
+	export delimited using summary_Access_Indicators_SR.csv, replace
+	
 	
 erase temp.dta	
 *browse
@@ -524,7 +723,7 @@ OKAY SURVEY-level summary data ready HERE
 */
 
 *************************************************************************************************	
-* D. Analysis/assessment of the link reults 
+* E. Analysis/assessment of the link reults 
 *************************************************************************************************
 
 capture putdocx clear 

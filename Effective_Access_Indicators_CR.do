@@ -491,6 +491,10 @@ global covlist "yedu4 yagegroup10"
 	save summary_Access_Indicators_CR.dta, replace 	
 	
 	export delimited using summary_Access_Indicators_CR.csv, replace
+	* save in additional folders for apps
+	export delimited using ShinyAppPopAccessToMethods/summary_Access_Indicators_CR.csv, replace
+	export delimited using ShinyAppPsychosocial/summary_Access_Indicators_CR.csv, replace
+		
 	
 OKAY Summary DATA READY FOR ANALYSIS and Shiny App
 
