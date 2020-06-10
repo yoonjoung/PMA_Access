@@ -50,7 +50,7 @@ cd "C:\Users\YoonJoung Choi\Dropbox\0 Data\PMA\NonPublicFiles\"
 dir
 */
 ***** BFR7
-use "$data/NonPublicFiles/BFP1_CQ_Clean_Data_with_checks_17Apr2020.dta", clear
+use "$data/NonPublicFiles/BFP1_CQ_Clean_Data_with_checks_26May2020.dta", clear
 
 		gen round=7
 		gen phase=1
@@ -492,6 +492,7 @@ global covlist "yedu4 yagegroup10"
 	
 	export delimited using summary_Access_Indicators_CR.csv, replace
 	* save in additional folders for apps
+	export delimited using ShinyAppEffectiveAccess/summary_Access_Indicators_CR.csv, replace
 	export delimited using ShinyAppPopAccessToMethods/summary_Access_Indicators_CR.csv, replace
 	export delimited using ShinyAppPsychosocial/summary_Access_Indicators_CR.csv, replace
 		

@@ -1284,7 +1284,7 @@ save temp.dta, replace
 		drop temp
 
 	foreach var of varlist xinsurance xmii_switch xmii4{	
-		replace `var'=. if year<2019 
+		replace `var'=. if year<2019 & xsurvey!="BFR6"
 		}
 		
 	*PROBLEMATIC surveys with EA_SDP link
@@ -1306,6 +1306,7 @@ save temp.dta, replace
 	
 	export delimited using summary_Access_Indicators_IR.csv, replace
 	* save in additional folders for apps
+	export delimited using ShinyAppEffectiveAccess/summary_Access_Indicators_IR.csv, replace
 	export delimited using ShinyAppPopAccessToMethods/summary_Access_Indicators_IR.csv, replace
 	export delimited using ShinyAppPsychosocial/summary_Access_Indicators_IR.csv, replace
 		
