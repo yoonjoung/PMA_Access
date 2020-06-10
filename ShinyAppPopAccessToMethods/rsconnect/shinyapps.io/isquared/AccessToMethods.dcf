@@ -1,0 +1,12 @@
+name: AccessToMethods
+title: AccessToMethods
+username:
+account: isquared
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2403421
+bundleId: 3248674
+url: https://isquared.shinyapps.io/AccessToMethods/
+when: 1591731462.67116
+asMultiple: FALSE
+asStatic: FALSE

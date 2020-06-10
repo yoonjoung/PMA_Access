@@ -1,0 +1,12 @@
+name: AccessToMethods
+title: AccessToMethods
+username:
+account: yj-choi
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2402215
+bundleId: 3223726
+url: https://yj-choi.shinyapps.io/AccessToMethods/
+when: 1591198491.0966
+asMultiple: FALSE
+asStatic: FALSE

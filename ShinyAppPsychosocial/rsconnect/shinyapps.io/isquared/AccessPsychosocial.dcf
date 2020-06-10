@@ -1,0 +1,12 @@
+name: AccessPsychosocial
+title: AccessPsychosocial
+username:
+account: isquared
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2403457
+bundleId: 3249194
+url: https://isquared.shinyapps.io/AccessPsychosocial/
+when: 1591741429.05338
+asMultiple: FALSE
+asStatic: FALSE
