@@ -1313,6 +1313,11 @@ save temp.dta, replace
 erase temp.dta		
 erase summary_Access_Indicators_IR_obs.dta
 
+set more off
+foreach survey in $surveylist{
+	erase IR_`survey'_Access_Indicators.dta 
+}
+
 OKAY Summary DATA READY FOR ANALYSIS and Shiny App
 
 */
