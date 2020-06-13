@@ -9,8 +9,9 @@
 * A. SETTING
 * B. Link EA-SDP-IR  
 * 	B.1 Get EA-level information from HHQFQ ===> EA_`survey'.dta
-* 	B.2 Reshape SDP to EA-SDP level LONG file ===> EASDP_`survey'.dta
-* 	B.3 Create EA-level data which has service environment characterisics based on linked SDPs ===> EAlevel_SDP_`survey'.dta
+* 	B.2 Gen SDP type variables in the SDP file. 
+* 	B.3 Reshape SDP to EA-SDP level LONG file ===> EASDP_`survey'.dta
+* 	B.4 Create EA-level data which has service environment characterisics based on linked SDPs ===> EAlevel_SDP_`survey'.dta
 * C. Create SURVEY-LEVEL summary dataset about link results ===> EA_SDP_Link_Summary.dta	
 * D. Analysis/assessment of the link reults 
 
@@ -133,25 +134,11 @@ foreach survey  in $datalist{
 	sort EA_ID
 	save "$data/EA_`survey'.dta", replace		
 	}
-	
+
 *************************************************************************************************
-* B.2 Reshape SDP to EA-SDP level LONG file 
+* B.2 Gen SDP type variables 
 *************************************************************************************************
 /*
-**** CHECK if SDP has duplicates => NONE confirmed
-foreach survey  in $datalist{
-	use "$data/SR_`survey'.dta", clear	
-	tab xsurvey
-	duplicates report
-	}
-
-***** CHECK all surveys have "EAserved..."
-foreach survey  in $datalist{
-	use "$data/SR_`survey'.dta", clear	
-	lookfor EAserved
-	sum EAserved*
-	}
-	
 ***** CHECK all surveys for their facility type classification 
 foreach survey  in $datalist{
 	use "$data/SR_`survey'.dta", clear	
@@ -160,13 +147,10 @@ foreach survey  in $datalist{
 	codebook facility_type 
 	}
 	
-***** CHECK all surveys for date var
 foreach survey  in $datalist{
 	use "$data/SR_`survey'.dta", clear	
-	tab xsurvey
-	lookfor todaySIF
-	}
-	
+	sum round facility_type
+	}	
 */
 	
 set more off
@@ -188,6 +172,7 @@ foreach survey  in $datalist{
 	gen SDPpub12=0
 	gen SDPlow=0
 
+	/*
 	replace SDPpub12	=1 if country=="BF" & managing_authority==1 & (facility_type>=4 & facility_type<=7) /*primary & secondary*/
 	replace SDPlow		=1 if country=="BF" & (facility_type>=4 & facility_type<=7) /*primary & secondary level, both sectors*/
 
@@ -214,6 +199,68 @@ foreach survey  in $datalist{
 
 	replace SDPpub12	=1 if country=="UG" & managing_authority==1 & (facility_type>=3 & facility_type<=5) /*primary & secondary*/
 	replace SDPlow		=1 if country=="UG" & (facility_type>=3 & facility_type<=5) /*primary & secondary level, both sectors*/
+	*/
+
+	replace SDPpub12	=1 if country=="BF" & managing_authority==1 & (facility_type>=4) /*public, excludnig hospitals*/
+	replace SDPlow		=1 if country=="BF" & (facility_type>=4) /*excludnig hospitals*/
+
+	replace SDPpub12	=1 if country=="CI" & managing_authority==1 & (facility_type>=5) /*public, excludnig hospitals*/
+	replace SDPlow		=1 if country=="CI" & (facility_type>=5) /*excludnig hospitals*/
+
+	replace SDPpub12	=1 if country=="CD" & managing_authority==1 & (facility_type>=2) /*public, excludnig hospitals*/
+	replace SDPlow		=1 if country=="CD" & (facility_type>=2) /*excludnig hospitals*/
+	
+	replace SDPpub12	=1 if country=="ET" & managing_authority==1 & (facility_type>=2) /*public, excludnig hospitals*/
+	replace SDPlow		=1 if country=="ET" & (facility_type>=2) /*excludnig hospitals*/
+	
+	replace SDPpub12	=1 if country=="IN" & managing_authority==1 & (facility_type>=2) /*public, excludnig hospitals*/
+	replace SDPlow		=1 if country=="IN" & (facility_type>=2) /*excludnig hospitals*/
+	
+	replace SDPpub12	=1 if country=="KE" & managing_authority==1 & (facility_type>=2) /*public, excludnig hospitals*/
+	replace SDPlow		=1 if country=="KE" & (facility_type>=2) /*excludnig hospitals*/
+
+	replace SDPpub12	=1 if country=="NE" & managing_authority==1 & (facility_type>=4) /*public, excludnig hospitals*/
+	replace SDPlow		=1 if country=="NE" & (facility_type>=4) /*excludnig hospitals*/
+	
+	replace SDPpub12	=1 if country=="NG" & managing_authority==1 & (facility_type>=2) /*public, excludnig hospitals*/
+	replace SDPlow		=1 if country=="NG" & (facility_type>=2) /*excludnig hospitals*/
+
+	replace SDPpub12	=1 if country=="UG" & managing_authority==1 & (facility_type>=3) /*public, excludnig hospitals*/
+	replace SDPlow		=1 if country=="UG" & (facility_type>=3) /*excludnig hospitals*/
+	
+	save SR_SDPtype_`survey'.dta, replace 	
+}
+
+*************************************************************************************************
+* B.3 Reshape SDP to EA-SDP level LONG file 
+*************************************************************************************************
+/*
+**** CHECK if SDP has duplicates => NONE confirmed
+foreach survey  in $datalist{
+	use SR_SDPtype_`survey'.dta, clear	
+	tab xsurvey
+	duplicates report
+	}
+
+***** CHECK all surveys have "EAserved..."
+foreach survey  in $datalist{
+	use SR_SDPtype_`survey'.dta, clear	
+	lookfor EAserved
+	sum EAserved*
+	}
+	
+***** CHECK all surveys for date var
+foreach survey  in $datalist{
+	use SR_SDPtype_`survey'.dta, clear	
+	tab xsurvey
+	lookfor todaySIF
+	}
+	
+*/
+
+set more off
+foreach survey  in $datalist{
+	use SR_SDPtype_`survey'.dta, clear	
 	
 	* reshape SDP to EA-SDP level long file. After this, some SDPs will be linked to multiple EAs. 	
 	* codebook EAserved1  EAserved2 EAserved3 EAserved4 EAserved5 EAserved6 EAserved7 EAserved8 EAserved9 EAserved10
@@ -290,7 +337,7 @@ foreach survey  in $datalist{
 */
 
 *************************************************************************************************
-* B.3 Create EA-level data which has service environment characterisics based on linked SDPs
+* B.4 Create EA-level data which has service environment characterisics based on linked SDPs
 *************************************************************************************************
 
 
@@ -440,7 +487,7 @@ use "$data/EA_BFR1.dta", clear
 	save EA_SDP_Link_Summary.dta, replace	
 		
 *** 2. Number of SDP	
-use "$data/SR_BFR1.dta", clear
+use SR_SDPtype_BFR1.dta, clear
 		gen nSDP	= 1
 		gen nSDPpub	=1 if managing_authority==1
 		gen nSDPprivate	=1 if managing_authority>1	
@@ -448,7 +495,7 @@ use "$data/SR_BFR1.dta", clear
 		save temp.dta, replace
 
 	foreach survey  in $datalistminusone{
-	use "$data/SR_`survey'.dta", clear
+	use SR_SDPtype_`survey'.dta, clear
 		gen nSDP	= 1
 		gen nSDPpub	=1 if managing_authority==1
 		gen nSDPprivate	=1 if managing_authority>1	
@@ -604,17 +651,16 @@ use "$data/EAlevel_SDP_BFR1.dta", clear
 	save EA_SDP_Link_Summary.dta, replace	
 	
 	export delimited using EA_SDP_Link_Summary.csv, replace
+	
 
 *************************************************************************************************	
 * D. Create dataset summarizing the SDP level results 
 *************************************************************************************************
 
 *** 1. Number of SDP	
-use "$data/SR_BFR1.dta", clear
+use SR_SDPtype_BFR1.dta, clear
 		gen nSDP	= 1
-		gen nSDPpub	=1 if managing_authority==1
-		gen nSDPprivate	=1 if managing_authority>1	
-		
+
 			gen temp = dofc(todaySIF)
 			format %td temp
 			gen tempmonth = month(temp)
@@ -626,14 +672,13 @@ use "$data/SR_BFR1.dta", clear
 		gen month= cmc-12*(year - 1900)		
 	
 		collapse (count) nSDP* (mean) year month cmc, by(xsurvey)	
+		gen group="All"
 		save temp.dta, replace
 
 	foreach survey  in $datalistminusone{
-	use "$data/SR_`survey'.dta", clear
+	use SR_SDPtype_`survey'.dta, clear
 		gen nSDP	= 1
-		gen nSDPpub	=1 if managing_authority==1
-		gen nSDPprivate	=1 if managing_authority>1	
-		
+	
 			gen temp = dofc(todaySIF)
 			format %td temp
 			gen tempmonth = month(temp)
@@ -645,50 +690,75 @@ use "$data/SR_BFR1.dta", clear
 		gen month= cmc-12*(year - 1900)				
 		
 		collapse (count) nSDP* (mean) year month cmc, by(xsurvey)	
+		gen group="All"
 		append using temp.dta, 
+	
 		save temp.dta, replace
+	}
+
+	foreach survey  in $datalist{
+	use SR_SDPtype_`survey'.dta, clear
+	
+	keep if SDPlow==1
+	
+		gen nSDP	= 1
+	
+			gen temp = dofc(todaySIF)
+			format %td temp
+			gen tempmonth = month(temp)
+			gen tempyear = year(temp)
+			gen tempcmc 	= 12*(tempyear - 1900) + tempmonth
+			
+		egen cmc = median(tempcmc)
+		gen year = 1900 + int(cmc/12) 
+		gen month= cmc-12*(year - 1900)				
 		
-		}
+		collapse (count) nSDP* (mean) year month cmc, by(xsurvey)	
+		gen group="Excluding hospitals"
+		append using temp.dta, 
+	
+		save temp.dta, replace
+	}	
+	
 		
-	lab var nSDP "Total number of SDPs in the survey" 	
-	lab var nSDPpub "Total number of PUBLIC SDPs in the survey" 	
-	lab var nSDPprivate "Total number of PRIVATE SDPs in the survey" 	
+	lab var nSDP "Total number of SDPs analyzed"
 		
-	sort xsurvey 
+	sort xsurvey group
 	save "summary_Access_Indicators_SR.dta", replace
 	
 *** 2. Percent of SDPs with the essential 5 methods 
 
-use "$data/SR_BFR1.dta", clear	
+use SR_SDPtype_BFR1.dta, clear	
 		collapse (mean) essential5_* , by(xsurvey)
+		gen group="All"
 		save temp.dta, replace
-	/*
-	use "$data/SR_BFR1.dta", clear	
-		collapse (mean) essential5_* , by(xsurvey managingauthority)
-		append using temp.dta, 
-		save temp.dta, replace		
-	*/	
 	
 	foreach survey  in $datalistminusone{
-	use "$data/SR_`survey'.dta", clear	
+	use SR_SDPtype_`survey'.dta, clear	
 		collapse (mean) essential5_* , by(xsurvey)
+		gen group="All"
 		append using temp.dta, 
 		save temp.dta, replace		
-	/*
-	use "$data/SR_`survey'.dta", clear	
-		collapse (mean) essential5_* , by(xsurvey managingauthority)
-		append using temp.dta, 
-		save temp.dta, replace			
-	*/	
 	}
+	
+	
+	foreach survey  in $datalist{
+	use SR_SDPtype_`survey'.dta, clear	
+	keep if SDPlow==1
+	
+		collapse (mean) essential5_* , by(xsurvey)
+		gen group="Excluding hospitals"
+		append using temp.dta, 
+		save temp.dta, replace		
+	}	
 
 		foreach var of varlist essential5_*{
 			replace `var' = `var'*100
 			format `var' %4.1f
 		}
 	
-	sort xsurvey 
-	merge xsurvey using "summary_Access_Indicators_SR.dta", 
+	sort xsurvey group
+	merge xsurvey group using "summary_Access_Indicators_SR.dta", 
 		tab _merge, m
 		
 		keep if _merge==3 /*all*/

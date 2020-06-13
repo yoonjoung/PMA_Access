@@ -414,7 +414,7 @@ foreach survey  in $surveylistEASDPLINK{
 		*keep if _merge==3
 		*drop _merge
 		
-		drop SDPlow* /*low level regardless of sector*/
+		*drop SDPlow* /*low level regardless of sector*/
 		sum SDP*
 		
 		foreach var of varlist SDP*{
@@ -713,6 +713,11 @@ global indicatorlist "
 	SDPall_essential5_rnoso
 	SDPall_essential5_noso 
 	SDPall_essential5_ready
+	SDPlow_essential5_offer
+	SDPlow_essential5_curav
+	SDPlow_essential5_rnoso
+	SDPlow_essential5_noso 
+	SDPlow_essential5_ready	
 	
 	";
 	#delimit cr
@@ -751,6 +756,12 @@ global indicatorlistall "
 	SDPall_essential5_rnoso
 	SDPall_essential5_noso 
 	SDPall_essential5_ready
+	SDPlow_essential5_offer
+	SDPlow_essential5_curav
+	SDPlow_essential5_rnoso
+	SDPlow_essential5_noso 
+	SDPlow_essential5_ready	
+	
 	xmii_side
 	xmii_sidewhat
 	xmii_other
@@ -1306,7 +1317,7 @@ save temp.dta, replace
 	
 	export delimited using summary_Access_Indicators_IR.csv, replace
 	* save in additional folders for apps
-	export delimited using ShinyAppEffectiveAccess/summary_Access_Indicators_IR.csv, replace
+	export delimited using ShinyAppAccess/summary_Access_Indicators_IR.csv, replace
 	export delimited using ShinyAppPopAccessToMethods/summary_Access_Indicators_IR.csv, replace
 	export delimited using ShinyAppPsychosocial/summary_Access_Indicators_IR.csv, replace
 		

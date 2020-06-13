@@ -1,0 +1,474 @@
+---
+output:
+  html_document:
+    toc: true
+    toc_depth: 5
+    toc_float: true
+---
+
+```{r intro, echo=FALSE, results="hide"}
+knitr::opts_chunk$set(echo=FALSE, 
+                      message=FALSE, 
+                      comment = "", 
+                      warning=FALSE, 
+                      results="hide") 
+knitr::opts_knit$set(root.dir = "C:/Users/YoonJoung Choi/Dropbox/0 iSquared/iSquared_PMA/Effective Access/")
+
+date<-as.Date(Sys.time(	), format='%d%b%Y')
+time<-Sys.time()
+
+suppressMessages(library(dplyr))
+suppressMessages(library(ggplot2))
+suppressWarnings(suppressMessages(library(tidyverse)))
+suppressMessages(library(plotly))
+suppressMessages(library(stringr))
+suppressMessages(library(stringi))
+
+```
+
+```{r dtaSDP}
+#Survey-level link summary data, constructed from Stata
+dtaSDP<-read.csv("summary_Access_Indicators_SR.csv")%>%
+    #filter(xsurvey!="NENiameyR5" & xsurvey!="BFR6" & xsurvey!="NGKanoR3")%>%
+    #filter(country!="Niger, Niamey" & country!="Nigeria, Lagos" & country!="Nigeria, Kano" & country!="India, Rajasthan")%>%
+    group_by(country)%>%
+    mutate(latest=round==max(round))%>%
+    ungroup()%>%
+    #filter(countrycode!="NE" & countrycode!="NG")%>%
+    mutate(
+        month = ifelse(month==0, 12, month), 
+        yearmonth = ISOdate(year, month, 15),
+        essential5_offer=round(essential5_offer, 0),
+        essential5_curav=round(essential5_curav, 0),
+        essential5_noso =round(essential5_noso, 0),
+        essential5_ready=round(essential5_ready, 0),
+        essential5_rnoso=round(essential5_rnoso, 0)
+    )
+    
+    #table(dtaSDP$country)
+    #table(dtaSDP$xsurvey)
+    
+#temp<-dtaSDP%>%filter(latest==TRUE)
+    #table(temp$country)
+    #table(temp$xsurvey)
+
+nrow(dtaSDP)
+length(unique(dtaSDP$country)) 
+length(unique(dtaSDP$xsurvey)) 
+```
+
+```{r dtaIR}
+dtaIR<-data.frame(read_csv("summary_Access_Indicators_IR.csv"))%>%
+    #filter(xsurvey!="NENiameyR5" & xsurvey!="BFR6" & xsurvey!="NGKanoR3")%>%
+    #filter(country!="Niger, Niamey" & country!="Nigeria, Lagos" & country!="Nigeria, Kano" & country!="India, Rajasthan")%>%
+    filter(year<=2018)%>%
+    mutate(month = ifelse(month==0, 12, month), 
+           yearmonth = ISOdate(year, month, 15)
+           #yearmonth = as.POSIXct(as.numeric(yearmonth), origin="1970-01-01"), 
+           #yearmonth = substr(as.character(yearmonth),0,7), 
+           )%>%
+    group_by(country)%>%
+    mutate(latestIRLINK=round==max(round))%>%
+    ungroup()%>%
+    filter(groupdemand==0)   
+    #filter(countrycode!="NE" & countrycode!="NG")
+    
+    #table(dtaIR$country)
+    #table(dtaIR$xsurvey)
+
+#temp<-dtaIR%>%filter(group=="All" & latestIRLINK==TRUE)
+    #table(temp$country)    
+    #table(temp$xsurvey)    
+    
+nrow(dtaIR)
+length(unique(dtaIR$country)) 
+length(unique(dtaIR$xsurvey)) 
+
+nsurveys<-nrow(dtaIR)
+ncountries<-length(unique(dtaIR$country)) 
+```
+
+####__Women's access to contraceptive methods__ 
+
+(Updated: `r date`)
+
+This presents women's access to a set of contraceptive methods at SDPs that serve her community. 
+
+* A set of five methods: __IUD, implants, injectables, pills, and male condom__. 
+
+* __SDPs serving a community__: any SDPs (public and private) that are located in the community (i.e., EA), or any public SDPs that are designated to serve the community.    
+
+* Four definitions of methods availability (the higher number, the darker shades in figures):   
+     1. All five methods currently available    
+     2. All five methods currently available + no stock out in the past 3 months for any of the five methods
+     3. All five methods currently available + SDP is _ready to insert and remove_ IUD and Implants
+     4. All five methods currently available + no stock out in the past 3 months for any of the five methods + SDP is _"ready" to insert and remove_ IUD and Implants
+
+* __<span style="color: orange;">Orange bars/lines</span>__: __percent of SDPs__ with the methods.   
+* __<span style="color: blue;">Blue bars/lines</span>__: __percent of women__ who has geographic/administrative access to SDPs with the methods.    
+
+See Annexes for more info on the background and methods. 
+
+---
+
+####__1. Latest level__
+
+See x-axis for the survey year. 
+
+Interpretation example: In Kenya PMA 2018,   
+* 44% of all SDPs surveyed had the five methods currently in stock.   
+* But, 29% had the five methods currently available, without 3-month stockout, _and_ ready to provide them.    
+* Meanwhile, at the population level, 86% of women lived in a community that was served by at least one SDP with the five methods in stock.   
+* 73% of women live in a community that was served by at least one SDP that had the five methods currently available, without 3-month stockout, _and_ ready to provide them.    
+
+_(NOTE: Population-level estimates are higher, because as long as the community is served by at least one SDPs with the methods - out of roughly 3+ SDPs that are linked to the community - women are considered having access.)_      
+
+```{r plotlevel, results='asis', fig.align="left", out.width="900px", out.height="700px"}
+############### SDP
+panel <- . %>% 
+    plot_ly(x=~year, y=~essential5_curav, type = 'bar', 
+                name = "5 specific methods* available currently",
+                marker = list(color = '#fdae6b'),
+                text = ~essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y = ~essential5_noso, 
+                name = "5 specific methods* available currently/3-month",
+                marker = list(color = '#fd8d3c'),
+                text = ~essential5_noso, textfont = list(size = 10) , textposition = 'outside') %>% 
+    add_trace(y = ~essential5_ready, 
+                name = "Currently ready** to provide 5 specific methods*", 
+                marker = list(color = '#f16913'),
+                text = ~essential5_ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+    add_trace(y = ~essential5_rnoso, 
+                name = "Meeting both conditions", 
+                marker = list(color = '#d94801'),
+                text = ~essential5_rnoso, textfont = list(size = 10) , textposition = 'outside') %>%     
+    add_annotations(
+        text = ~unique(country),
+        x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 10)
+        ) %>%
+    layout(
+        yaxis = list(title = "Percent of SDPs",
+                             range = c(0, 110), tickfont = list(size=8)),
+        xaxis = list(title = "Survey year", tickfont = list(size=8)), 
+        showlegend = FALSE
+        )
+
+dtafig<-dtaSDP%>%filter(latest==TRUE)
+
+fig1<-dtafig%>%
+    group_by(country) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 4, shareY = FALSE)%>%
+    layout(showlegend = FALSE)
+
+############### IR
+panel <- . %>% 
+    plot_ly(x=~year, y=~SDPall_essential5_curav, type = 'bar', 
+                name = "5 specific methods* available currently/3-month",
+                marker = list(color = '#6baed6'),
+                text = ~SDPall_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y = ~SDPall_essential5_noso, type = 'bar', 
+                name = "5 specific methods* available currently/3-month",
+                marker = list(color = '#4292c6'),
+                text = ~SDPall_essential5_noso, textfont = list(size = 10) , textposition = 'outside') %>%    
+    add_trace(y = ~SDPall_essential5_ready, 
+                      name = "Currently ready** to provide 5 specific methods*", 
+                      marker = list(color = '#2171b5'),
+                      text = ~SDPall_essential5_ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+    add_trace(y = ~SDPall_essential5_rnoso, 
+                      name = "Meeting both conditions", 
+                      marker = list(color = '#084594'),
+                      text = ~SDPall_essential5_rnoso, textfont = list(size = 10) , textposition = 'outside') %>%     
+    add_annotations(
+        text = ~unique(country),
+        x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 10)
+        ) %>%
+    layout(
+        yaxis = list(title = "Percent of all women with service environment***",
+                             range = c(0, 110), tickfont = list(size=8)),
+        xaxis = list(title = "Survey year", tickfont = list(size=8)),
+        
+        showlegend = FALSE
+        )
+
+dtafig<-dtaIR%>%
+    filter(group=="All" & latestIRLINK==1)%>%
+    filter(is.na(SDPall_essential5_noso)==FALSE)
+
+fig2<-dtafig%>%
+    group_by(country) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 4, shareY = FALSE)%>%
+    layout(showlegend = FALSE)
+
+subplot(fig1, fig2, nrows=1, titleY = TRUE, margin = 0.05) %>%
+    layout( 
+            showlegend = FALSE, 
+            yaxis = list(range = c(0, 110), tickfont = list(size=8)) )
+```
+
+####__2. Trends__
+
+_(Note: 35 surveys used for the SDP-level data on the left/orange panel. But, only 29 surveys are used for the pop-level data on the right/blue panel, excluding earlier surveys that did not have questions for the cognitive access domain. If needed, data from the earlier surveys can be added.)_ 
+
+```{r plottrend, results='asis', fig.align="left", out.width="900px", out.height="700px"}
+############### SDP
+panel <- . %>%
+    plot_ly(x=~round, y=~essential5_curav, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently", 
+            marker = list(color = '#fdae6b'),
+            line = list(color = '#fdae6b')) %>%
+    add_trace(y=~essential5_noso, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently/3-month", 
+            marker = list(color = '#fd8d3c'),
+            line = list(color = '#fd8d3c')) %>%    
+    add_trace(y = ~essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+              marker = list(color = '#f16913'),
+              line = list(color = '#f16913')) %>% 
+    add_trace(y = ~essential5_rnoso, name = "Meeting both conditions", 
+              marker = list(color = '#d94801'),
+              line = list(color = '#d94801')) %>% 
+    add_annotations(
+        text = ~unique(country),
+        x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 10)
+        ) %>%    
+    layout(
+            yaxis = list(title = "",
+                         range = c(0, 110), tickfont = list(size=8)),
+            xaxis = list(title = "Survey year", 
+                         range = c(1, 7), tickfont = list(size=8))
+            )
+        
+dtafig<-dtaSDP
+
+fig1<-dtafig%>%
+    group_by(country) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 4, shareX = TRUE, shareY = TRUE)%>%
+    layout(showlegend = FALSE)
+
+############### IR
+
+panel <- . %>%
+    plot_ly(x=~round, y=~SDPall_essential5_curav, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently", 
+            marker = list(color = '#6baed6'),
+            line = list(color = '#6baed6')) %>%
+    add_trace(y=~SDPall_essential5_noso, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently/3-month", 
+            marker = list(color = '#4292c6'),
+            line = list(color = '#4292c6')) %>%    
+    add_trace(y = ~SDPall_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+              marker = list(color = '#2171b5'),
+              line = list(color = '#2171b5')) %>% 
+    add_trace(y = ~SDPall_essential5_rnoso, name = "Meeting both conditions", 
+              marker = list(color = '#084594'),
+              line = list(color = '#084594')) %>% 
+    add_annotations(
+        text = ~unique(country),
+        x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 10)
+        ) %>%    
+    layout(
+            yaxis = list(title = "",
+                         range = c(0, 110), tickfont = list(size=8)),
+            xaxis = list(title = "Survey year", 
+                         range = c(1, 7), tickfont = list(size=8))
+            )
+        
+dtafig<-dtaIR%>%
+    filter(group=="All")%>%
+    filter(is.na(SDPall_essential5_noso)==FALSE)
+
+fig2<-dtafig%>%
+    group_by(country) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 4, shareX = TRUE, shareY = TRUE)%>%
+    layout(showlegend = FALSE)
+
+subplot(fig1, fig2, nrows=1, titleY = TRUE, margin = 0.05) %>%
+    layout( showlegend = FALSE, 
+            xaxis = list(title="Survey round"),
+            yaxis = list(range = c(0, 110), tickfont = list(size=8))
+            )
+```
+
+####__3. Latest pattern by SES (only for population-based access)__
+
+Across countries, population-level access to methods does not have a common pattern with background SES, unlike other access metrics (e.g., cognitive).  
+
+* Often there is no significant difference.   
+* There is a negative association (e.g., Uganda), potentially because of: more programming in disadvantaged areas, supply not meeting demand in areas with more users proportionately, etc.    
+* In some cases, there is a positive association (e.g., Cote d'Ivoire, Kinshasa, and Niger).    
+
+#####__3.1. By education: < vs. >= ever attended secondary school__
+
+```{r plotpattern1, results='asis', fig.align="left", out.width="900px", out.height="700px"}
+panel <- . %>%
+    plot_ly(x=~grouplabel, y=~SDPall_essential5_curav, type = 'bar', 
+                name = "5 specific methods* available currently", 
+                marker = list(color = '#6baed6'),
+                text = ~SDPall_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y=~SDPall_essential5_noso, type = 'bar', 
+                name = "5 specific methods* available currently/3-month", 
+                marker = list(color = '#4292c6'),
+                text = ~SDPall_essential5_noso, textfont = list(size = 10) , textposition = 'outside') %>%    
+    add_trace(y = ~SDPall_essential5_ready, 
+              name = "Currently ready** to provide 5 specific methods*", 
+              marker = list(color = '#2171b5'),
+              text = ~SDPall_essential5_ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+    add_trace(y = ~SDPall_essential5_rnoso, name = "Meeting both conditions", 
+              marker = list(color = '#084594'),
+              text = ~SDPall_essential5_rnoso, textfont = list(size = 10) , textposition = 'outside') %>% 
+    add_annotations(
+        text = ~unique(country),
+        x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 10)
+        ) %>%        
+    layout(
+        yaxis = list(title = "Percent of all women",
+                     range = c(0, 110), tickfont = list(size=8)),
+        xaxis = list(title = "", tickfont = list(size=8)), 
+        showlegend=FALSE
+        )
+
+dtafig<-dtaIR%>%
+    filter(latestIRLINK==1 & group=="Education")%>%
+    filter(is.na(SDPall_essential5_noso)==FALSE)
+
+dtafig%>%
+    group_by(country) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 4, shareY = FALSE)%>%
+    layout(showlegend = FALSE, 
+           title=c(""))        
+```
+
+#####__3.2. By HH wealth: bottom 2 vs. top 3 quintiles__
+
+```{r plotpattern2, results='asis', fig.align="left", out.width="900px", out.height="700px"}
+
+dtafig<-dtaIR%>%filter(latestIRLINK==1 & group=="HH wealth")
+
+dtafig%>%
+    group_by(country) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 4, shareY = FALSE)%>%
+    layout(showlegend = FALSE, 
+           title=c(""))   
+```
+
+#####__3.3. By residential area: rural vs. urban__
+
+```{r plotpattern3, results='asis', fig.align="left", out.width="900px", out.height="700px"}
+
+dtafig<-dtaIR%>%filter(latestIRLINK==1 & group=="Residential area")
+
+dtafig%>%
+    group_by(country) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 4, shareY = FALSE)%>%
+    layout(showlegend = FALSE, 
+           title=c(""))  
+        
+```
+
+####__4. Latest pattern of MCPR by indicator (only for population-based access)__
+
+As expected, based on its inconsistent association with women's background characteristics, there is no common pattern with MCPR. 
+
+MCPR (%) on the Y axis.   
+* Green bar: MCPR among women __without__ access to the methods.       
+* Blue bar: MCPR among women __with__ access to the methods.   
+
+Pairs to the right side has more strict definitions of access.   
+* __curav__: All five methods currently available    
+* __noso__: All five methods currently available + no stock out in the past 3 months for any of the five methods    
+* __ready__: All five methods currently available + SDP is _ready to insert and remove_ IUD and Implants    
+* __rnoso__: All five methods currently available + no stock out in the past 3 months for any of the five methods + SDP is _"ready" to insert and remove_ IUD and Implants   
+
+```{r plotmcpr, results='asis', fig.align="left", out.width="900px", out.height="700px"}
+
+panel <- . %>%
+    plot_ly(x=~group, y=~mcp, type = 'bar', 
+            color = ~grouplabel
+        )%>% 
+    add_annotations(
+        text = ~unique(country),
+        x = 0.5, y = 0.8, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 10)
+        ) %>%        
+    layout(
+        yaxis = list(title = "Percent of women in the group",
+                     range = c(0, 100), tickfont = list(size=8)),
+        xaxis = list(title = "", tickfont = list(size=8)), 
+        showlegend = FALSE
+        )
+
+dtafig<-dtaIR%>%
+    filter((group=="By SDPall_essential5_curav"|
+            group=="By SDPall_essential5_noso"|
+            group=="By SDPall_essential5_ready"|
+            group=="By SDPall_essential5_rnoso") & 
+    latestIRLINK==1)%>%
+    select(xsurvey, mcp, country, group, grouplabel)%>%
+    mutate(
+        group=ifelse(group=="By SDPall_essential5_curav", "curav", group),
+        group=ifelse(group=="By SDPall_essential5_noso", "noso", group),
+        group=ifelse(group=="By SDPall_essential5_ready", "ready", group),
+        group=ifelse(group=="By SDPall_essential5_rnoso", "rnoso", group)
+    )
+
+dtafig$group<-fct_relevel(
+    factor(dtafig$group, levels = unique(dtafig$group)),
+    c("curav", "noso", "ready", "rnoso"))
+        
+dtafig%>%
+    group_by(country) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 4, shareY = FALSE, margin = 0.02)%>%
+    layout(showlegend = FALSE, 
+           title=c(""))  
+```
+
+---
+
+#### Annex 1. Why link communities and SDPs? 
+
+__1. Why not study just SDP-level data?__ Service quality at the SDP level doesn't necessarily reflect population's access to the service. Typically SDP surveys are representative of facilities in the catchment area/country. But, SDPs are more densely located in urban areas, and distribution SDPs often do not follow population distribution (see below example of Mali). In this case, facility data from this particular survey are not necessarily representative for SDPs that are accessible to the population.   
+
+```{r figure, results="asis", fig.align="center", out.width = "600px"}
+knitr::include_graphics("DIstributionOfFacilitiesAndPopulation_Mali.png")
+```
+
+__2. Why not study SDPs that were used by women?__ Most surveys do not identify exact SDPs used by respondents. One reason is, even if such SDPs can be identified accurately, they may not be representative (e.g., popular SDPs for various reasons) and data from such SDPs can be biased.    
+
+__An alternative approach is to study SDPs that are supposed to provide service to the population__. SDP surveys in PMA are designed to cover SDPs that are either geographically or administratively linked to sampled EAs for the household/female surveys. Thus, when SDP characteristics (e.g., readiness to provide FP service) are linked to the index EAs, we can assess 'population-level accessibility to quality services', including availability of a range of methods and service readiness.    
+
+NOTE: It is possible to have other cluster-level aggregate service quality variables using information in female surveys (e.g., cluster mean of MII among users). However, such indicators are reported only among current users. Also, if individual factors determine utilization (e.g., individual demographic and socioeconomic characteristics), rather than cluster-level factors, aggregation of information from only users may be inappropriate to understand associations between service quality and utilization (and later causality using panel data).     
+
+---
+
+#### Annex 2. Methods 
+
+* For methods to link survey EAs and SDPs, see here: (https://rpubs.com/YJ_Choi/PMA_EA_SDP_Link)    
+* All data come from publicly available PMA surveys. But in Burkina Faso and Niamey, Niger, the latest publicly available surveys have issues in EA-SDP linking that are currently under investigation. Thus, Burkina Faso Round 6 and Niamey Round 5 are excluded.   
+* India and Nigeria are also excluded, to further investigate EA-SDP link.   
+
+---
+
+<p style="color:gray">
+See [GitHub](https://github.com/yoonjoung/PMA_Access) for data, code (for both Stata and R), and more information.   
+For typos, errors, and questions, contact me at [yj.choi@isquared.global]("yj.choi@isquared.global").</p>
+
+<p style="color:gray">
+_Making Data Delicious, One Byte at a Time_</p>
