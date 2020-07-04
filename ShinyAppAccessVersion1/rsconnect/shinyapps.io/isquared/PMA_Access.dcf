@@ -5,8 +5,8 @@ account: isquared
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2433159
-bundleId: 3341613
+bundleId: 3274222
 url: https://isquared.shinyapps.io/PMA_Access/
-when: 1593652360.5133
+when: 1592259468.78555
 asMultiple: FALSE
 asStatic: FALSE

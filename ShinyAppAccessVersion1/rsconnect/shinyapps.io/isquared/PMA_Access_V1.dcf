@@ -1,0 +1,12 @@
+name: PMA_Access_V1
+title: PMA_Access_V1
+username:
+account: isquared
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2515671
+bundleId: 3327643
+url: https://isquared.shinyapps.io/PMA_Access_V1/
+when: 1593400113.23418
+asMultiple: FALSE
+asStatic: FALSE

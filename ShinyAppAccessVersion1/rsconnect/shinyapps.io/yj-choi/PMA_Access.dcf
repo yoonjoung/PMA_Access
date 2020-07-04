@@ -1,12 +1,12 @@
 name: PMA_Access
 title: PMA_Access
 username:
-account: isquared
+account: yj-choi
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
-appId: 2433159
-bundleId: 3341613
-url: https://isquared.shinyapps.io/PMA_Access/
-when: 1593652360.5133
+appId: 2118107
+bundleId: 3274235
+url: https://yj-choi.shinyapps.io/PMA_Access/
+when: 1592259774.47545
 asMultiple: FALSE
 asStatic: FALSE
