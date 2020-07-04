@@ -27,7 +27,7 @@
 * 	A. SETTING 
 *		(NOTE: earlier surveys do not have "ever heard of" questions) 
 * 	B. PREP create women-level access variables  
-*		1. Psycosocial =>see at the end of the section
+*		1. Psychosocial =>see at the end of the section
 *		2. Cognitive
 *		3. Geographic accessibility  
 *		4. Service quality 
@@ -36,7 +36,7 @@
 *		7. BASIC var
 *		8. MERGE with the EA-SDP data, created from "Effective_Access_Pop_SDP_`counry'.do". 
 *			- ONLY USING PUBLIC DATA, thus set $surveylistEASDPLINK under SETTING 
-*		1. Psycosocial: var changed over time  
+*		1. Psychosocial: var changed over time <= revised after a call with Caroline 6/24 
 *			- ONLY using $surveylistNEWER (later PMA2020 surveys)
 *			- ONLY using $surveylistNEW (PAM surveys)
 * 	C. Create summary dataset 
@@ -113,12 +113,11 @@ global surveylistEASDPLINK "
 	";
 	#delimit cr
 	
-
 ************************************************************************
 * B. PREP women-level access variables  
 ************************************************************************
 
-*****1. Psycosocial => see at the end of this section, done in two different ways for newer vs. new surveys 
+*****1. Psychosocial => see at the end of this section, done in two different ways for newer vs. new surveys 
 	
 *****2. Cognitive
 
@@ -309,6 +308,12 @@ foreach survey in $surveylist{
 	sum round
 	d EA_ID strata
 	}
+set more off
+foreach survey in $surveylist{
+	use "$data/IR_`survey'.dta", clear
+	tab unmet xsurvey, m
+	}
+		
 	
 set more off
 foreach survey in $surveylist{
@@ -331,6 +336,32 @@ foreach survey in $surveylist{
 		replace `var'=. if `var'<0
 		}	
 		gen countrycode=substr(xsurvey, 1, length(xsurvey)-2)
+		
+		gen byte xd_use  	=unmet>=3 & unmet<=4
+ 		gen byte xd_unmet	=unmet>=1 & unmet<=2
+		gen byte xd_nodemand_fecund		=unmet>=5 & unmet<=8
+		gen byte xd_nodemand_infecund	=unmet==9
+		gen byte xd_notSA				=unmet==97 | unmet==-97
+		
+		gen xdenominator=.
+		replace xdenominator=1 if xd_use==1
+		replace xdenominator=2 if xd_unmet==1
+		replace xdenominator=3 if xd_nodemand_fecund==1
+		replace xdenominator=4 if xd_nodemand_infecund==1
+		replace xdenominator=5 if xd_notSA==1
+		
+		lab define xdenominator 1 "demand, use" 2 "demand, unmet" 3 "no demand, fecund" 4 "no demand, infecund" 5 "not sexually active" 
+		lab values xdenominator xdenominator 
+		
+		foreach var of varlist xd_*   {
+		replace `var'=. if unmet==99 | unmet==-99
+		}	
+		
+		lab var xd_use "women category: use"
+		lab var xd_unmet "women category: unmet need"
+		lab var xd_nodemand_fecund "women category: no demand for FP, fecund"
+		lab var xd_nodemand_infecund "women category: no demand for FP, infecund"
+		lab var xd_notSA 	 "women category: no demand for FP, not SA"
 		
 		*gen byte xeverbirth=ever_birth==1
 		gen byte xwealth5=wealthquintile
@@ -455,7 +486,7 @@ foreach survey  in $surveylistEASDPLINK{
 	pwcorr SDPpub12_essential5_noso SDPpub12_essential5ec_noso SDPpub12_essential5_curav SDPpub12_essential5ec_curav, sig
 */
 
-*****1. Psycosocial  - NEWER 2020 surveys 
+*****1. Psychosocial  - NEWER 2020 surveys 
 
 * check variables - find NEWER surveys
 set more off
@@ -514,7 +545,15 @@ foreach survey in $surveylistNEWER{
 	save IR_`survey'_Access_Indicators.dta, replace
 	}	
 	
-*****1. Psycosocial  - NEW 2.0 surveys  
+*****1. Psychosocial  - NEW 2.0 surveys  
+
+/*call with Caroline on June 24
+1. Do not use WGE pregnancy questions yet. still under investgation. 
+2. For WGE family planning: 
+	1) calculate simple average of existence of choice
+	2) calculate simple average of exercise of choice
+	3) then get the simple average of the two 
+*/
 
 #delimit;
 global surveylistNEW " 
@@ -547,6 +586,19 @@ foreach survey in $surveylistNEW{
 		*/
 		sum round fp_promiscuous_view - fp_lifestyle_self 
 	}
+	
+capture log close	
+log using WGE_codebook.log, replace
+set more off
+foreach survey in $surveylistNEW{
+	use "$data/IR_`survey'.dta", clear
+	tab xsurvey
+	*codebook wge*
+	codebook wge_seek_partner  - wge_body_side_effects   
+	codebook wge_confident_switch   wge_switch_fp  
+	}
+log close
+
 	
 set more off
 foreach survey  in $surveylistNEW{
@@ -610,64 +662,49 @@ foreach survey  in $surveylistNEW{
 		lab var xxfp_self_nul "FP opinion, only for those with kids: St disagree + disagree"
 		lab var xxfp_self_life "FP opinion, better quality life: St agree + agree"		
 		
-		#delimit; 
-		gen byte xwge_preg_exercise1=	(wge_decide_start_none ==5) |
-										(wge_decide_start ==5); 
-		gen byte xwge_preg_exercise2=	(wge_partner_talk_start ==5) |
-										(wge_decide_another ==5) ; 
-		gen byte xwge_preg_exercise3=	(wge_negotiate_stop_none ==5) |
-										(wge_negotiate_stop ==5) ; 
-		#delimit cr
-		
-		egen temp=rowtotal(xwge_preg_*)
-		gen byte xwge_preg_exercise = temp==3
-			drop temp
+		* FP existence of choice 
+		gen byte xwge_fp_existence1=wge_seek_partner 
+		gen byte xwge_fp_existence2=wge_trouble_preg
+		gen byte xwge_fp_existence3=.
+			replace xwge_fp_existence3=wge_could_conflict if wge_could_conflict!=.		
+			replace xwge_fp_existence3=wge_will_conflict  if wge_will_conflict!=.
+		gen byte xwge_fp_existence4=wge_abnormal_birth  
+		gen byte xwge_fp_existence5=wge_body_side_effects       
+	
+		foreach var of varlist xwge_fp_existence*{
+			recode `var' (1 = 5) (2 = 4) (5 = 1) (4 = 2), 
+			}
+		foreach var of varlist xwge_fp_existence*{
+			gen byte `var'_dk= `var' == -88
+			}
+		foreach var of varlist xwge_fp_existence*{
+			gen byte `var'_nr= `var' == -99
+			}
+		foreach var of varlist xwge_fp_existence*{
+			replace `var'=. if `var'<0
+			}	
+			
+		* FP exercise of choice
+		gen byte xwge_fp_exercise1=wge_switch_fp
+		gen byte xwge_fp_exercise2=wge_confident_switch
 
-		gen byte xwge_fp_exercise1=(wge_switch_fp==5)
-		gen byte xwge_fp_exercise2=(wge_confident_switch==5)
+		foreach var of varlist xwge_fp_exercise*{
+			gen byte `var'_dk= `var' == -88
+			}
+		foreach var of varlist xwge_fp_exercise*{
+			gen byte `var'_nr= `var' == -99
+			}	
+		foreach var of varlist xwge_fp_exercise*{
+			replace `var'=. if `var'<0
+			}
+			
+		egen xwge_fp_existence=rowmean(xwge_fp_existence1 xwge_fp_existence2 xwge_fp_existence3 xwge_fp_existence4 xwge_fp_existence5)
+		egen xwge_fp_exercise =rowmean(xwge_fp_exercise1 xwge_fp_exercise2)		
+		egen xwge_fp = rowmean(xwge_fp_existence xwge_fp_exercise) 
 
-		egen temp=rowtotal(xwge_fp_*)
-		gen byte xwge_fp_exercise = temp==2
-			drop temp			
-		
-		lab var xwge_preg_exercise1 "WGE, pregancy: strongly agree: I can decide when to start/next" 
-		lab var xwge_preg_exercise2 "WGE, pregancy: strongly agree: I can discuss when to start/next"
-		lab var xwge_preg_exercise3 "WGE, pregancy: strongly agree: I can negotiate when to stop"	
-		lab var xwge_preg_exercise "WGE, pregancy: strongly agree: all three"	
-
-		lab var xwge_fp_exercise1 "WGE, FP: strongly agree: i can switch"
-		lab var xwge_fp_exercise2 "WGE, FP: strongly agree: i can talk to HW to switch"
-		lab var xwge_fp_exercise "WGE, FP: strongly agree: both"		
-		
-		
-		#delimit; 
-		gen byte xxwge_preg_exercise1=	(wge_decide_start_none ==5 | wge_decide_start_none ==4 ) |
-										(wge_decide_start ==5 | wge_decide_start ==4); 
-		gen byte xxwge_preg_exercise2=	(wge_partner_talk_start ==5 | wge_partner_talk_start ==4) |
-										(wge_decide_another ==5 | wge_decide_another ==4) ; 
-		gen byte xxwge_preg_exercise3=	(wge_negotiate_stop_none ==5 | wge_negotiate_stop_none ==4) |
-										(wge_negotiate_stop ==5 | wge_negotiate_stop ==4) ; 
-		#delimit cr
-		
-		egen temp=rowtotal(xxwge_preg_*)
-		gen byte xxwge_preg_exercise = temp==3
-			drop temp
-
-		gen byte xxwge_fp_exercise1=(wge_switch_fp==5 | wge_switch_fp==4)
-		gen byte xxwge_fp_exercise2=(wge_confident_switch==5 | wge_confident_switch==4)
-
-		egen temp=rowtotal(xxwge_fp_*)
-		gen byte xxwge_fp_exercise = temp==2
-			drop temp			
-		
-		lab var xxwge_preg_exercise1 "WGE, pregancy: >= agree: I can decide when to start/next" 
-		lab var xxwge_preg_exercise2 "WGE, pregancy: >= agree: I can discuss when to start/next"
-		lab var xxwge_preg_exercise3 "WGE, pregancy: >= agree: I can negotiate when to stop"	
-		lab var xxwge_preg_exercise "WGE, pregancy: >= agree: all three"	
-
-		lab var xxwge_fp_exercise1 "WGE, FP: >= agree: i can switch"
-		lab var xxwge_fp_exercise2 "WGE, FP: >= agree: i can talk to HW to switch"
-		lab var xxwge_fp_exercise "WGE, FP: >= agree: both"	
+		lab var xwge_fp_existence "WGE, existnece of choice for FP: average (0-5)"		
+		lab var xwge_fp_exercise  "WGE, exercise of choice for FP: average (0-5)"
+		lab var xwge_fp "WGE, for FP"	
 	
 	save IR_`survey'_Access_Indicators.dta, replace
 	}	
@@ -685,20 +722,6 @@ foreach survey  in $surveylistNEW{
 global indicatorlist "
 	
 	xdec
-	xwge_preg_exercise1
-	xwge_preg_exercise2
-	xwge_preg_exercise3
-	xwge_preg_exercise
-	xwge_fp_exercise1
-	xwge_fp_exercise2
-	xwge_fp_exercise
-	xxwge_preg_exercise1
-	xxwge_preg_exercise2
-	xxwge_preg_exercise3
-	xxwge_preg_exercise
-	xxwge_fp_exercise1
-	xxwge_fp_exercise2
-	xxwge_fp_exercise	
 	xfp_self*
 	xxfp_self*
 	
@@ -721,27 +744,28 @@ global indicatorlist "
 	
 	";
 	#delimit cr
+
+#delimit; 
+global indicatorlistwge "	
+	
+	xwge_fp_existence1
+	xwge_fp_existence2
+	xwge_fp_existence3
+	xwge_fp_existence4
+	xwge_fp_existence5
+	xwge_fp_existence
+	xwge_fp_exercise1
+	xwge_fp_exercise2
+	xwge_fp_exercise
+	xwge_fp	
+
+	";
+	#delimit cr	
 	
 #delimit; 
 global indicatorlistall "
 
-	xdec_users
-	xdec_nonusers
 	xdec
-	xwge_preg_exercise1
-	xwge_preg_exercise2
-	xwge_preg_exercise3
-	xwge_preg_exercise
-	xwge_fp_exercise1
-	xwge_fp_exercise2
-	xwge_fp_exercise
-	xxwge_preg_exercise1
-	xxwge_preg_exercise2
-	xxwge_preg_exercise3
-	xxwge_preg_exercise
-	xxwge_fp_exercise1
-	xxwge_fp_exercise2
-	xxwge_fp_exercise	
 	xfp_self*
 	xxfp_self*
 	
@@ -768,6 +792,13 @@ global indicatorlistall "
 	xmii_switch
 	xmii3
 	xmii4
+	
+	xd_use  	
+ 	xd_unmet	
+ 	xd_nodemand_fecund			
+	xd_nodemand_infecund	
+	xd_notSA		
+	
 	";
 	#delimit cr	
 
@@ -801,446 +832,227 @@ foreach survey in $surveylistEASDPLINK{
 ***** Weighted eestimates 
 
 	use temp.dta, clear
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}			
+		collapse  (mean) mcp $indicatorlistwge $indicatorlistall [pw=FQweight], by(xsurvey round cmc)		
 			gen group="All"	
 			gen grouplabel="All"
-		save summary_Access_Indicators_IR.dta, replace 	
-		
+		save summary_Access_Indicators_IR_estimates.dta, replace 	
+
 	use temp.dta, clear
 	foreach cov of varlist $covlist{
-	use temp.dta, clear
-	keep if `cov'==0	
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}					
-			gen group="By `cov'"	
-			gen grouplabel="No"
-		append using summary_Access_Indicators_IR.dta, 	
-		save summary_Access_Indicators_IR.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==1	
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}					
-			gen group="By `cov'"	
-			gen grouplabel="Yes"
-		append using summary_Access_Indicators_IR.dta, 	
-		save summary_Access_Indicators_IR.dta, replace 	
-	}
+	local num=0
+	while `num'<=1{
 	
+	use temp.dta, clear	
+	keep if `cov'==`num'	
+		collapse  (mean) mcp $indicatorlistwge $indicatorlistall [pw=FQweight], by(xsurvey round cmc)			
+			gen group="By `cov'"	
+			gen grouplabel="`num'"
+		append using summary_Access_Indicators_IR_estimates.dta, 	
+		save summary_Access_Indicators_IR_estimates.dta, replace 	
+			
+	local num=`num'+1
+	}
+	}		
+
 	use temp.dta, clear
 	foreach cov of varlist xedurban{
-	use temp.dta, clear
-	keep if `cov'==1	
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}					
+	local num=1
+	while `num'<=4{
+	
+	use temp.dta, clear	
+	keep if `cov'==`num'	
+		collapse  (mean) mcp $indicatorlistwge $indicatorlistall [pw=FQweight], by(xsurvey round cmc)				
 			gen group="By `cov'"	
-			gen grouplabel="1"
-		append using summary_Access_Indicators_IR.dta, 	
-		save summary_Access_Indicators_IR.dta, replace 	
-		
+			gen grouplabel="`num'"
+		append using summary_Access_Indicators_IR_estimates.dta, 	
+		save summary_Access_Indicators_IR_estimates.dta, replace 	
+			
+	local num=`num'+1
+	}
+	}		
+	
 	use temp.dta, clear
-	keep if `cov'==2	
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}					
+	foreach cov of varlist xdenominator{
+	local num=1
+	while `num'<=5{
+	
+	use temp.dta, clear	
+	keep if `cov'==`num'	
+		collapse  (mean) mcp $indicatorlistwge $indicatorlistall [pw=FQweight], by(xsurvey round cmc)					
 			gen group="By `cov'"	
-			gen grouplabel="2"
-		append using summary_Access_Indicators_IR.dta, 	
-		save summary_Access_Indicators_IR.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==3	
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}					
-			gen group="By `cov'"	
-			gen grouplabel="3"
-		append using summary_Access_Indicators_IR.dta, 	
-		save summary_Access_Indicators_IR.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==4	
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}					
-			gen group="By `cov'"	
-			gen grouplabel="4"
-		append using summary_Access_Indicators_IR.dta, 	
-		save summary_Access_Indicators_IR.dta, replace 			
-	}	
+			gen grouplabel="`num'"
+		append using summary_Access_Indicators_IR_estimates.dta, 	
+		save summary_Access_Indicators_IR_estimates.dta, replace 	
+			
+	local num=`num'+1
+	}
+	}			
 				
 	use temp.dta, clear				
 	foreach indicator of varlist $indicatorlist{
+	local num=0
+	while `num'<=1{
+	
 	use temp.dta, clear	
-	keep if `indicator'==0	
+	keep if `indicator'==`num'	
 		collapse  (mean) mcp [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp {
-				replace `var'=round(`var'*100, 1)
-				}
 			gen group="By `indicator'"		
-			gen grouplabel="No"
-		append using summary_Access_Indicators_IR.dta, 	
-		save summary_Access_Indicators_IR.dta, replace 	
+			gen grouplabel="`num'"
+		append using summary_Access_Indicators_IR_estimates.dta, 	
+		save summary_Access_Indicators_IR_estimates.dta, replace 	
+		
+	local num=`num'+1
+	}
+	}	
 	
 	use temp.dta, clear
-	keep if `indicator'==1	
-		collapse  (mean) mcp [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp {
-				replace `var'=round(`var'*100, 1)
-				}
-			gen group="By `indicator'"		
-			gen grouplabel="Yes"
-		append using summary_Access_Indicators_IR.dta, 	
+	foreach cov of varlist xagegroup5{
+	local num=15
+	while `num'<=45{
+	
+	use temp.dta, clear	
+	keep if `cov'==`num'	
+		collapse  (mean) xd_* [pw=FQweight], by(xsurvey round cmc)				
+			gen group="By `cov'"	
+			gen grouplabel="`num'"
+		append using summary_Access_Indicators_IR_estimates.dta, 	
+		save summary_Access_Indicators_IR_estimates.dta, replace 	
+			
+	local num=`num'+5
+	}
+	}		
 		
-		sort xsurvey group grouplabel
-		save summary_Access_Indicators_IR.dta, replace 		
-	}	
-
-
+		foreach var of varlist mcp $indicatorlistall {
+			replace `var'=round(`var'*100, 1)
+			}		
+	
+	sort xsurvey cmc group grouplabel	
+	save summary_Access_Indicators_IR_estimates.dta, replace 	
+		
 ***** Unweighted number of observation
 
 	use temp.dta, clear
-		collapse (count) obs , by(xsurvey)
+		collapse  (count) obs, by(xsurvey round cmc)		
 			gen group="All"	
 			gen grouplabel="All"
 		save summary_Access_Indicators_IR_obs.dta, replace 	
-	
+
 	use temp.dta, clear
 	foreach cov of varlist $covlist{
-	use temp.dta, clear
-	keep if `cov'==0	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `cov'"	
-			gen grouplabel="No"
-		append using summary_Access_Indicators_IR_obs.dta, 	
-		save summary_Access_Indicators_IR_obs.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==1	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `cov'"	
-			gen grouplabel="Yes"
-		append using summary_Access_Indicators_IR_obs.dta, 	
-		save summary_Access_Indicators_IR_obs.dta, replace 	
-	}
+	local num=0
+	while `num'<=1{
 	
+	use temp.dta, clear	
+	keep if `cov'==`num'	
+		collapse  (count) obs, by(xsurvey round cmc)					
+			gen group="By `cov'"	
+			gen grouplabel="`num'"
+		append using summary_Access_Indicators_IR_obs.dta, 	
+		save summary_Access_Indicators_IR_obs.dta, replace 	
+			
+	local num=`num'+1
+	}
+	}		
+
 	use temp.dta, clear
 	foreach cov of varlist xedurban{
-	use temp.dta, clear
-	keep if `cov'==1	
-		collapse (count) obs , by(xsurvey)
+	local num=1
+	while `num'<=4{
+	
+	use temp.dta, clear	
+	keep if `cov'==`num'	
+		collapse  (count) obs, by(xsurvey round cmc)				
 			gen group="By `cov'"	
-			gen grouplabel="1"
+			gen grouplabel="`num'"
 		append using summary_Access_Indicators_IR_obs.dta, 	
 		save summary_Access_Indicators_IR_obs.dta, replace 	
-		
+			
+	local num=`num'+1
+	}
+	}		
+	
 	use temp.dta, clear
-	keep if `cov'==2	
-		collapse (count) obs , by(xsurvey)
+	foreach cov of varlist xdenominator{
+	local num=1
+	while `num'<=5{
+	
+	use temp.dta, clear	
+	keep if `cov'==`num'	
+		collapse  (count) obs, by(xsurvey round cmc)					
 			gen group="By `cov'"	
-			gen grouplabel="2"
+			gen grouplabel="`num'"
 		append using summary_Access_Indicators_IR_obs.dta, 	
 		save summary_Access_Indicators_IR_obs.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==3	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `cov'"	
-			gen grouplabel="3"
-		append using summary_Access_Indicators_IR_obs.dta, 	
-		save summary_Access_Indicators_IR_obs.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==4	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `cov'"	
-			gen grouplabel="4"
-		append using summary_Access_Indicators_IR_obs.dta, 	
-		save summary_Access_Indicators_IR_obs.dta, replace 			
-	}	
+			
+	local num=`num'+1
+	}
+	}			
 				
 	use temp.dta, clear				
 	foreach indicator of varlist $indicatorlist{
+	local num=0
+	while `num'<=1{
+	
 	use temp.dta, clear	
-	keep if `indicator'==0	
-		collapse (count) obs , by(xsurvey)
+	keep if `indicator'==`num'	
+		collapse  (count) obs, by(xsurvey round cmc)
 			gen group="By `indicator'"		
-			gen grouplabel="No"
+			gen grouplabel="`num'"
 		append using summary_Access_Indicators_IR_obs.dta, 	
 		save summary_Access_Indicators_IR_obs.dta, replace 	
+
+		
+	local num=`num'+1
+	}
+	}	
 	
 	use temp.dta, clear
-	keep if `indicator'==1	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `indicator'"		
-			gen grouplabel="Yes"
+	foreach cov of varlist xagegroup5{
+	local num=15
+	while `num'<=45{
+	
+	use temp.dta, clear	
+	keep if `cov'==`num'	
+		collapse (count) obs, by(xsurvey round cmc)			
+			gen group="By `cov'"	
+			gen grouplabel="`num'"
 		append using summary_Access_Indicators_IR_obs.dta, 	
-		
-		sort xsurvey group grouplabel
-		save summary_Access_Indicators_IR_obs.dta, replace 		
-	}	
+		save summary_Access_Indicators_IR_obs.dta, replace 	
+			
+	local num=`num'+5
+	}
+	}			
 
+	sort xsurvey cmc group grouplabel	
+	save summary_Access_Indicators_IR_obs.dta, replace 	
+		
 ***** Merge weighted estimates and unweighted number of observations 
-	use summary_Access_Indicators_IR.dta, clear
-		codebook xsurvey
+	use summary_Access_Indicators_IR_estimates.dta, clear
+		egen test=group(xsurvey cmc group grouplabel   )
+		codebook xsurvey test
 	use summary_Access_Indicators_IR_obs.dta, clear
-		codebook xsurvey
+		egen test=group(xsurvey cmc group grouplabel   )
+		codebook xsurvey test	
+		
+			sort xsurvey cmc group grouplabel
+			gen duplicate = 1 if test==test[_n-1]
+			tab xsurvey duplicate, m
+			list xsurvey cmc group grouplabel obs duplicate if xsurvey=="NENiameyR5"
 	
 	use summary_Access_Indicators_IR_obs.dta, clear
-		sort xsurvey group grouplabel	
-		merge xsurvey group grouplabel	using summary_Access_Indicators_IR.dta
+		sort xsurvey cmc group grouplabel	
+		merge xsurvey cmc group grouplabel	using summary_Access_Indicators_IR_estimates.dta
 			tab _merge
+				tab xsurvey _merge, m /*Niamey has some rows that do not have estimates*/
+				tab xsurvey group if _merge==1, m /*They are all SDP variables */
+			
+			keep if _merge==3
 			drop _merge
 			
-		tab xsurvey if group=="All"	
-
-		gen groupdemand=0
-		lab	var	groupdemand "only women with demand"
+		tab xsurvey if group=="All"	/*this should be 49. Check duplicates*/
 		
 	save summary_Access_Indicators_IR.dta, replace
-		
-**************************************** AMONG women with DEMAND 
 
-use IR_BFR2_Access_Indicators.dta, clear
-foreach survey in $surveylistminusone{
-	append using IR_`survey'_Access_Indicators.dta, force
-	}
-	
-	keep if cp==1 | unmet==1 /*KEEP Only women with demand for FP*/
-	
-	gen obs=1
-save temp.dta, replace
-
-
-***** Weighted eestimates 
-
-	use temp.dta, clear
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}			
-			gen group="All"	
-			gen grouplabel="All"
-		save summary_Access_Indicators_IR_demand.dta, replace 	
-		
-	use temp.dta, clear
-	foreach cov of varlist $covlist{
-	use temp.dta, clear
-	keep if `cov'==0	
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}					
-			gen group="By `cov'"	
-			gen grouplabel="No"
-		append using summary_Access_Indicators_IR_demand.dta, 	
-		save summary_Access_Indicators_IR_demand.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==1	
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}					
-			gen group="By `cov'"	
-			gen grouplabel="Yes"
-		append using summary_Access_Indicators_IR_demand.dta, 	
-		save summary_Access_Indicators_IR_demand.dta, replace 	
-	}
-	
-	use temp.dta, clear
-	foreach cov of varlist xedurban{
-	use temp.dta, clear
-	keep if `cov'==1	
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}					
-			gen group="By `cov'"	
-			gen grouplabel="1"
-		append using summary_Access_Indicators_IR_demand.dta, 	
-		save summary_Access_Indicators_IR_demand.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==2	
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}					
-			gen group="By `cov'"	
-			gen grouplabel="2"
-		append using summary_Access_Indicators_IR_demand.dta, 	
-		save summary_Access_Indicators_IR_demand.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==3	
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}					
-			gen group="By `cov'"	
-			gen grouplabel="3"
-		append using summary_Access_Indicators_IR_demand.dta, 	
-		save summary_Access_Indicators_IR_demand.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==4	
-		collapse  (mean) mcp $indicatorlistall [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp $indicatorlistall {
-				replace `var'=round(`var'*100, 1)
-				}					
-			gen group="By `cov'"	
-			gen grouplabel="4"
-		append using summary_Access_Indicators_IR_demand.dta, 	
-		save summary_Access_Indicators_IR_demand.dta, replace 			
-	}	
-				
-	use temp.dta, clear				
-	foreach indicator of varlist $indicatorlist{
-	use temp.dta, clear	
-	keep if `indicator'==0	
-		collapse  (mean) mcp [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp {
-				replace `var'=round(`var'*100, 1)
-				}
-			gen group="By `indicator'"		
-			gen grouplabel="No"
-		append using summary_Access_Indicators_IR_demand.dta, 	
-		save summary_Access_Indicators_IR_demand.dta, replace 	
-	
-	use temp.dta, clear
-	keep if `indicator'==1	
-		collapse  (mean) mcp [pw=FQweight], by(xsurvey round cmc)
-			foreach var of varlist mcp {
-				replace `var'=round(`var'*100, 1)
-				}
-			gen group="By `indicator'"		
-			gen grouplabel="Yes"
-		append using summary_Access_Indicators_IR_demand.dta, 	
-		
-		sort xsurvey group grouplabel
-		save summary_Access_Indicators_IR_demand.dta, replace 		
-	}	
-
-
-***** Unweighted number of observation
-
-	use temp.dta, clear
-		collapse (count) obs , by(xsurvey)
-			gen group="All"	
-			gen grouplabel="All"
-		save summary_Access_Indicators_IR_obs.dta, replace 	
-	
-	use temp.dta, clear
-	foreach cov of varlist $covlist{
-	use temp.dta, clear
-	keep if `cov'==0	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `cov'"	
-			gen grouplabel="No"
-		append using summary_Access_Indicators_IR_obs.dta, 	
-		save summary_Access_Indicators_IR_obs.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==1	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `cov'"	
-			gen grouplabel="Yes"
-		append using summary_Access_Indicators_IR_obs.dta, 	
-		save summary_Access_Indicators_IR_obs.dta, replace 	
-	}
-	
-	use temp.dta, clear
-	foreach cov of varlist xedurban{
-	use temp.dta, clear
-	keep if `cov'==1	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `cov'"	
-			gen grouplabel="1"
-		append using summary_Access_Indicators_IR_obs.dta, 	
-		save summary_Access_Indicators_IR_obs.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==2	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `cov'"	
-			gen grouplabel="2"
-		append using summary_Access_Indicators_IR_obs.dta, 	
-		save summary_Access_Indicators_IR_obs.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==3	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `cov'"	
-			gen grouplabel="3"
-		append using summary_Access_Indicators_IR_obs.dta, 	
-		save summary_Access_Indicators_IR_obs.dta, replace 	
-		
-	use temp.dta, clear
-	keep if `cov'==4	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `cov'"	
-			gen grouplabel="4"
-		append using summary_Access_Indicators_IR_obs.dta, 	
-		save summary_Access_Indicators_IR_obs.dta, replace 			
-	}	
-				
-	use temp.dta, clear				
-	foreach indicator of varlist $indicatorlist{
-	use temp.dta, clear	
-	keep if `indicator'==0	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `indicator'"		
-			gen grouplabel="No"
-		append using summary_Access_Indicators_IR_obs.dta, 	
-		save summary_Access_Indicators_IR_obs.dta, replace 	
-	
-	use temp.dta, clear
-	keep if `indicator'==1	
-		collapse (count) obs , by(xsurvey)
-			gen group="By `indicator'"		
-			gen grouplabel="Yes"
-		append using summary_Access_Indicators_IR_obs.dta, 	
-		
-		sort xsurvey group grouplabel
-		save summary_Access_Indicators_IR_obs.dta, replace 		
-	}	
-
-***** Merge weighted estimates and unweighted number of observations 
-	use summary_Access_Indicators_IR_demand.dta, clear
-		codebook xsurvey
-	use summary_Access_Indicators_IR_obs.dta, clear
-		codebook xsurvey
-	
-	use summary_Access_Indicators_IR_obs.dta, clear
-		sort xsurvey group grouplabel	
-		merge xsurvey group grouplabel	using summary_Access_Indicators_IR_demand.dta
-			tab _merge
-			drop _merge
-			
-		tab xsurvey if group=="All"	
-		
-		gen groupdemand=1
-		lab	var	groupdemand "only women with demand"
-		
-	save summary_Access_Indicators_IR_demand.dta, replace
-	
-**************************************** APPEND BOTH DATA SETS 
-
-	use summary_Access_Indicators_IR.dta, replace
-	append using summary_Access_Indicators_IR_demand.dta, 
 	
 ***** Further variables and data cleaning 
 
@@ -1249,22 +1061,28 @@ save temp.dta, replace
 		lab	var	SDPall_essential5_ready	"SDPall_essential5_ready"
 		lab	var	SDPall_essential5_rnoso	"SDPall_essential5_rnoso"
 
-	    replace grouplabel="currently NOT in union" 		if group=="By xinunion" & grouplabel=="No"
-        replace grouplabel="currently in union" 		if group=="By xinunion" & grouplabel=="Yes" 			
-	    replace grouplabel="NEVER given birth" 		if group=="By xeverbirth" & grouplabel=="No"
-        replace grouplabel="EVER given birth" 		if group=="By xeverbirth" & grouplabel=="Yes" 	
-	    replace grouplabel="less than secondary" 	if group=="By xedu_sec" & grouplabel=="No"
-        replace grouplabel="secondary or more" 		if group=="By xedu_sec" & grouplabel=="Yes" 
-        replace grouplabel="Bottom 2 quintiles"	if group=="By xtop3" & grouplabel=="No" 
-        replace grouplabel="Top 3 quintiles"	if group=="By xtop3" & grouplabel=="Yes" 
-        replace grouplabel="Rural"	if group=="By xurban" & grouplabel=="No"
-        replace grouplabel="Urban" 	if group=="By xurban" & grouplabel=="Yes" 
+	    replace grouplabel="currently NOT in union" if group=="By xinunion" & grouplabel=="0"
+        replace grouplabel="currently in union" 	if group=="By xinunion" & grouplabel=="1" 			
+	    replace grouplabel="NEVER given birth" 		if group=="By xeverbirth" & grouplabel=="0"
+        replace grouplabel="EVER given birth" 		if group=="By xeverbirth" & grouplabel=="1" 	
+	    replace grouplabel="less than secondary" 	if group=="By xedu_sec" & grouplabel=="0"
+        replace grouplabel="secondary or more" 		if group=="By xedu_sec" & grouplabel=="1" 
+        replace grouplabel="Bottom 2 quintiles"		if group=="By xtop3" & grouplabel=="0" 
+        replace grouplabel="Top 3 quintiles"		if group=="By xtop3" & grouplabel=="1" 
+        replace grouplabel="Rural"	if group=="By xurban" & grouplabel=="0"
+        replace grouplabel="Urban" 	if group=="By xurban" & grouplabel=="1" 
 		
 		replace grouplabel="Rural, <secondary" 	if group=="By xedurban" & grouplabel=="1" 
 		replace grouplabel="Urban, <secondary" 	if group=="By xedurban" & grouplabel=="2" 
 		replace grouplabel="Rural, >=secondary" 	if group=="By xedurban" & grouplabel=="3" 
 		replace grouplabel="Urban, >=secondary" 	if group=="By xedurban" & grouplabel=="4" 
-				
+		
+		replace grouplabel ="demand, use"			if group=="By xdenominator" & grouplabel=="1"
+        replace grouplabel ="demand, unmet"			if group=="By xdenominator" & grouplabel=="2"
+		replace grouplabel ="no demand, fecund"	 	if group=="By xdenominator" & grouplabel=="3"
+		replace grouplabel ="no demand, infecund"	if group=="By xdenominator" & grouplabel=="4"
+		replace grouplabel ="not sexually active"	if group=="By xdenominator" & grouplabel=="5"
+		
 		replace group="Education" if group=="By xedu_sec" 
 		replace group="HH wealth" if group=="By xtop3"
 		replace group="Residential area" if group=="By xurban"
@@ -1285,6 +1103,7 @@ save temp.dta, replace
 		replace country="Nigeria, Kano" if country=="NGKano"
 		replace country="Nigeria, Lagos" if country=="NGLagos"
 		replace country="Uganda" if country=="UG"	
+		
 	gen countrycode=substr(xsurvey, 1, 2)
 
 	gen year = 1900 + int(cmc/12) 
@@ -1305,13 +1124,13 @@ save temp.dta, replace
 				
 	* CHECK small n : SHOULD NOT BE an issue in IR in most cases
 	sum obs	
-	sort groupdemand xsurvey
-	list xsurvey groupdemand group grouplabel obs if obs<=20
+	sort xsurvey
+	list xsurvey group grouplabel obs if obs<=20
 	
-		foreach var of varlist xdec_users - xmii4 {
+	foreach var of varlist xd_use - xmii4 {
 			replace `var'=. if obs<=20
 			}
-	
+		
 	sort xsurvey group grouplabel
 	save summary_Access_Indicators_IR.dta, replace 	
 	
@@ -1322,19 +1141,24 @@ save temp.dta, replace
 	export delimited using ShinyAppPsychosocial/summary_Access_Indicators_IR.csv, replace
 		
 erase temp.dta		
-erase summary_Access_Indicators_IR_obs.dta
+
+OKAY Summary DATA READY FOR ANALYSIS and Shiny App
+
+set more off
+foreach survey in $surveylist{
+	use IR_`survey'_Access_Indicators.dta , clear
+	tab xdenominator
+}
 
 set more off
 foreach survey in $surveylist{
 	erase IR_`survey'_Access_Indicators.dta 
 }
 
-OKAY Summary DATA READY FOR ANALYSIS and Shiny App
-
 */
 
 use  summary_Access_Indicators_IR.dta, clear
-keep if group=="All" & groupdemand==0
+keep if group=="All" 
 bysort country: tab xsurvey cmc
 
 use  summary_Access_Indicators_IR.dta, clear
