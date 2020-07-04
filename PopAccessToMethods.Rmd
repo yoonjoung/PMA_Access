@@ -30,7 +30,7 @@ suppressMessages(library(stringi))
 #Survey-level link summary data, constructed from Stata
 dtaSDP<-read.csv("summary_Access_Indicators_SR.csv")%>%
     #filter(xsurvey!="NENiameyR5" & xsurvey!="BFR6" & xsurvey!="NGKanoR3")%>%
-    filter(country!="Niger, Niamey" & country!="Nigeria, Lagos" & country!="Nigeria, Kano" & country!="India, Rajasthan")%>%
+    filter(country!="Niger, Niamey" & country!="Nigeria, Lagos" & country!="Nigeria, Kano")%>%
     group_by(country)%>%
     mutate(latest=round==max(round))%>%
     ungroup()%>%
@@ -61,7 +61,7 @@ table(dtaSDP$group)
 ```{r dtaIR}
 dtaIR<-data.frame(read_csv("summary_Access_Indicators_IR_PopAccessToMethods.csv"))%>%
     filter(xsurvey!="NENiameyR5" & xsurvey!="BFR6" & xsurvey!="NGKanoR3")%>%
-    filter(country!="Niger, Niamey" & country!="Nigeria, Lagos" & country!="Nigeria, Kano" & country!="India, Rajasthan")%>%
+    filter(country!="Niger, Niamey" & country!="Nigeria, Lagos" & country!="Nigeria, Kano")%>%
     filter(year<=2018)%>%
     mutate(month = ifelse(month==0, 12, month), 
            yearmonth = ISOdate(year, month, 15)
@@ -70,8 +70,7 @@ dtaIR<-data.frame(read_csv("summary_Access_Indicators_IR_PopAccessToMethods.csv"
            )%>%
     group_by(country)%>%
     mutate(latestIRLINK=round==max(round))%>%
-    ungroup()%>%
-    filter(groupdemand==0)   
+    ungroup()
     #filter(countrycode!="NE" & countrycode!="NG")
     
     #table(dtaIR$country)
@@ -95,15 +94,17 @@ ncountries<-length(unique(dtaIR$country))
 
 This presents women's access to a set of contraceptive methods at SDPs that serve her community. 
 
-* A set of five methods: __IUD, implants, injectables, pills, and male condom__. 
+* A set of five methods: __IUD, implants, injectables, pills, and male condom__.   
+(__Exception in India__: Only four methods (IUD, injectables, pills, and male condom) are considered, since implants are practically not available. Inflatables is also low, but included for now)       
 
 * __SDPs serving a community__: any SDPs (public and private) that are located in the community (i.e., EA), or any public SDPs that are designated to serve the community.    
 
-* Four definitions of methods availability (the higher number, the darker shades in figures):   
-     1. All five methods currently available    
-     2. All five methods currently available + no stock out in the past 3 months for any of the five methods
-     3. All five methods currently available + SDP is _ready to insert and remove_ IUD and Implants
-     4. All five methods currently available + no stock out in the past 3 months for any of the five methods + SDP is _"ready" to insert and remove_ IUD and Implants
+* Five definitions of methods availability (the higher number, the darker shades in figures):   
+     1. All five methods are offered     
+     2. All five methods currently available    
+     3. All five methods currently available + no stock out in the past 3 months for any of the five methods
+     4. All five methods currently available + SDP is _ready to insert and remove_ IUD and Implants
+     5. All five methods currently available + no stock out in the past 3 months for any of the five methods + SDP is _"ready" to insert and remove_ IUD and Implants
 
 * __<span style="color: orange;">Orange bars/lines</span>__: __percent of SDPs__ with the methods.   
 * __<span style="color: blue;">Blue bars/lines</span>__: __percent of women__ who has geographic/administrative access to SDPs with the methods.    
@@ -124,10 +125,14 @@ Interpretation example: In Kenya PMA 2018,
 
 _(NOTE: Population-level estimates are higher, because as long as the community is served by at least one SDPs with the methods - out of roughly 3+ SDPs that are linked to the community - women are considered having access.)_      
 
-```{r plotlevel, results='asis', fig.align="left", out.width="900px", out.height="700px"}
+```{r plotlevelAll, results='asis', fig.align="left", out.width="900px", out.height="700px"}
 ############### SDP
 panel <- . %>% 
-    plot_ly(x=~year, y=~essential5_curav, type = 'bar', 
+    plot_ly(x=~year, y=~essential5_offer, type = 'bar', 
+                name = "offer 5 specific methods*",
+                marker = list(color = '#fdd0a2'),
+                text = ~essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y=~essential5_curav, type = 'bar', 
                 name = "5 specific methods* available currently",
                 marker = list(color = '#fdae6b'),
                 text = ~essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
@@ -156,20 +161,24 @@ panel <- . %>%
         showlegend = FALSE
         )
 
-dtafig<-dtaSDP%>%filter(latest==TRUE)%>%filter(group=="All")
+dtafig<-dtaSDP%>%filter(group=="All")%>%filter(latest==TRUE)
 
 fig1<-dtafig%>%
     group_by(country) %>%
     do(p = panel(.)) %>%
-    subplot(nrows = 4, shareY = FALSE)%>%
+    subplot(nrows = 5, shareY = FALSE)%>%
     layout(showlegend = FALSE)
 
 ############### IR
 panel <- . %>% 
-    plot_ly(x=~year, y=~SDPall_essential5_curav, type = 'bar', 
+    plot_ly(x=~year, y=~SDPall_essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#9ecae1'),
+                text = ~SDPall_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y=~SDPall_essential5_curav, type = 'bar', 
                 name = "5 specific methods* available currently/3-month",
                 marker = list(color = '#6baed6'),
-                text = ~SDPall_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+                text = ~SDPall_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%    
     add_trace(y = ~SDPall_essential5_noso, type = 'bar', 
                 name = "5 specific methods* available currently/3-month",
                 marker = list(color = '#4292c6'),
@@ -196,14 +205,14 @@ panel <- . %>%
         showlegend = FALSE
         )
 
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All" & latestIRLINK==1)%>%
     filter(is.na(SDPall_essential5_noso)==FALSE)
 
 fig2<-dtafig%>%
     group_by(country) %>%
     do(p = panel(.)) %>%
-    subplot(nrows = 4, shareY = FALSE)%>%
+    subplot(nrows = 5, shareY = FALSE)%>%
     layout(showlegend = FALSE)
 
 subplot(fig1, fig2, nrows=1, titleY = TRUE, margin = 0.05) %>%
@@ -222,13 +231,17 @@ Using countries where EA-SDP linkage is relatively good for both types - [see th
 
 2. Restricted to only lower-level SDPs (see second and fourth set of bars under each country), the population-level estimates (fourth set, blue bars) are again higher than SDP-level estimates (second set, orange bars).    
 
-3. The difference between all vs. lower-level SDPs becomes larger when linked to EAs (see third vs. fourth set of bars, both blue), compared to the SDP-level estimates (first vs. second set of bars, both orange). This is clearer in Ethiopia and Uganda. In other words, hospitals tend to have all five methods and also serve multiple EAs. When we exclude the hospitals, population-level access is much lower. 
+3. The difference between all vs. lower-level SDPs becomes larger when linked to EAs (see third vs. fourth set of bars, both blue), compared to the SDP-level estimates (first vs. second set of bars, both orange). This is clearer in Ethiopia and Uganda, even more in Rajasthan, India (especially see the difference in trends below). In other words, hospitals tend to have all five methods and also serve multiple EAs. When we exclude the hospitals, population-level access is much lower. 
 
-#####__Burkina Faso__
+__Burkina Faso__
 ```{r plotlevelSDPtypeBF, results='asis', fig.align="left", out.width="900px", out.height="200px"}
 ############### SDP
 panel <- . %>% 
-    plot_ly(x=~year, y=~essential5_curav, type = 'bar', 
+    plot_ly(x=~year, y=~essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#fdd0a2'),
+                text = ~essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(x=~year, y=~essential5_curav, 
                 name = "5 specific methods* available currently",
                 marker = list(color = '#fdae6b'),
                 text = ~essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
@@ -266,8 +279,14 @@ figSDP<-dtafig%>%
     layout(showlegend = FALSE)
 
 ############### IR: SDPall
+
+
 panel <- . %>% 
-    plot_ly(x=~year, y=~SDPall_essential5_curav, type = 'bar', 
+    plot_ly(x=~year, y=~SDPall_essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#9ecae1'),
+                text = ~SDPall_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y=~SDPall_essential5_curav, type = 'bar', 
                 name = "5 specific methods* available currently/3-month",
                 marker = list(color = '#6baed6'),
                 text = ~SDPall_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
@@ -297,7 +316,7 @@ panel <- . %>%
         showlegend = FALSE
         )
 
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All" & latestIRLINK==1)%>%
     filter(is.na(SDPall_essential5_noso)==FALSE)%>%
     filter(country=="Burkina Faso")
@@ -310,7 +329,11 @@ fig1<-dtafig%>%
 
 ############### IR: SDPlow
 panel <- . %>% 
-    plot_ly(x=~year, y=~SDPlow_essential5_curav, type = 'bar', 
+    plot_ly(x=~year, y=~SDPlow_essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#9ecae1'),
+                text = ~SDPlow_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y=~SDPlow_essential5_curav, type = 'bar', 
                 name = "5 specific methods* available currently/3-month",
                 marker = list(color = '#6baed6'),
                 text = ~SDPlow_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
@@ -340,7 +363,7 @@ panel <- . %>%
         showlegend = FALSE
         )
 
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All" & latestIRLINK==1)%>%
     filter(is.na(SDPall_essential5_noso)==FALSE)%>%
     filter(country=="Burkina Faso")
@@ -362,11 +385,15 @@ subplot(figSDP, figIR, nrows=1, titleY = TRUE, margin = 0.05) %>%
             yaxis = list(range = c(0, 110), tickfont = list(size=8)) )
 ```
 
-#####__Ethiopia__
+__Ethiopia__
 ```{r plotlevelSDPtypeET, results='asis', fig.align="left", out.width="900px", out.height="200px"}
 ############### SDP
 panel <- . %>% 
-    plot_ly(x=~year, y=~essential5_curav, type = 'bar', 
+    plot_ly(x=~year, y=~essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#fdd0a2'),
+                text = ~essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(x=~year, y=~essential5_curav, 
                 name = "5 specific methods* available currently",
                 marker = list(color = '#fdae6b'),
                 text = ~essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
@@ -404,8 +431,14 @@ figSDP<-dtafig%>%
     layout(showlegend = FALSE)
 
 ############### IR: SDPall
+
+
 panel <- . %>% 
-    plot_ly(x=~year, y=~SDPall_essential5_curav, type = 'bar', 
+    plot_ly(x=~year, y=~SDPall_essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#9ecae1'),
+                text = ~SDPall_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y=~SDPall_essential5_curav, type = 'bar', 
                 name = "5 specific methods* available currently/3-month",
                 marker = list(color = '#6baed6'),
                 text = ~SDPall_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
@@ -429,13 +462,13 @@ panel <- . %>%
         ) %>%
     layout(
         yaxis = list(title = "Percent of all women with service environment***",
-                             range = c(0, 100), tickfont = list(size=8)),
+                             range = c(0, 110), tickfont = list(size=8)),
         xaxis = list(title = "Survey year", tickfont = list(size=8)),
         
         showlegend = FALSE
         )
 
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All" & latestIRLINK==1)%>%
     filter(is.na(SDPall_essential5_noso)==FALSE)%>%
     filter(country=="Ethiopia")
@@ -448,7 +481,11 @@ fig1<-dtafig%>%
 
 ############### IR: SDPlow
 panel <- . %>% 
-    plot_ly(x=~year, y=~SDPlow_essential5_curav, type = 'bar', 
+    plot_ly(x=~year, y=~SDPlow_essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#9ecae1'),
+                text = ~SDPlow_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y=~SDPlow_essential5_curav, type = 'bar', 
                 name = "5 specific methods* available currently/3-month",
                 marker = list(color = '#6baed6'),
                 text = ~SDPlow_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
@@ -472,13 +509,13 @@ panel <- . %>%
         ) %>%
     layout(
         yaxis = list(title = "Percent of all women with service environment***",
-                             range = c(0, 100), tickfont = list(size=8)),
+                             range = c(0, 110), tickfont = list(size=8)),
         xaxis = list(title = "Survey year", tickfont = list(size=8)),
         
         showlegend = FALSE
         )
 
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All" & latestIRLINK==1)%>%
     filter(is.na(SDPall_essential5_noso)==FALSE)%>%
     filter(country=="Ethiopia")
@@ -492,19 +529,23 @@ fig2<-dtafig%>%
 figIR<-subplot(fig1, fig2, nrows=1, titleY = TRUE, margin = 0.05) %>%
     layout( 
             showlegend = FALSE, 
-            yaxis = list(range = c(0, 100), tickfont = list(size=8)) )
+            yaxis = list(range = c(0, 110), tickfont = list(size=8)) )
 
 subplot(figSDP, figIR, nrows=1, titleY = TRUE, margin = 0.05) %>%
     layout( 
             showlegend = FALSE, 
-            yaxis = list(range = c(0, 100), tickfont = list(size=8)) )
+            yaxis = list(range = c(0, 110), tickfont = list(size=8)) )
 ```
 
-#####__Uganda__
+__Uganda__
 ```{r plotlevelSDPtypeUG, results='asis', fig.align="left", out.width="900px", out.height="200px"}
 ############### SDP
 panel <- . %>% 
-    plot_ly(x=~year, y=~essential5_curav, type = 'bar', 
+    plot_ly(x=~year, y=~essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#fdd0a2'),
+                text = ~essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(x=~year, y=~essential5_curav, 
                 name = "5 specific methods* available currently",
                 marker = list(color = '#fdae6b'),
                 text = ~essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
@@ -542,8 +583,14 @@ figSDP<-dtafig%>%
     layout(showlegend = FALSE)
 
 ############### IR: SDPall
+
+
 panel <- . %>% 
-    plot_ly(x=~year, y=~SDPall_essential5_curav, type = 'bar', 
+    plot_ly(x=~year, y=~SDPall_essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#9ecae1'),
+                text = ~SDPall_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y=~SDPall_essential5_curav, type = 'bar', 
                 name = "5 specific methods* available currently/3-month",
                 marker = list(color = '#6baed6'),
                 text = ~SDPall_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
@@ -567,13 +614,13 @@ panel <- . %>%
         ) %>%
     layout(
         yaxis = list(title = "Percent of all women with service environment***",
-                             range = c(0, 100), tickfont = list(size=8)),
+                             range = c(0, 110), tickfont = list(size=8)),
         xaxis = list(title = "Survey year", tickfont = list(size=8)),
         
         showlegend = FALSE
         )
 
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All" & latestIRLINK==1)%>%
     filter(is.na(SDPall_essential5_noso)==FALSE)%>%
     filter(country=="Uganda")
@@ -586,7 +633,11 @@ fig1<-dtafig%>%
 
 ############### IR: SDPlow
 panel <- . %>% 
-    plot_ly(x=~year, y=~SDPlow_essential5_curav, type = 'bar', 
+    plot_ly(x=~year, y=~SDPlow_essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#9ecae1'),
+                text = ~SDPlow_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y=~SDPlow_essential5_curav, type = 'bar', 
                 name = "5 specific methods* available currently/3-month",
                 marker = list(color = '#6baed6'),
                 text = ~SDPlow_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
@@ -610,13 +661,13 @@ panel <- . %>%
         ) %>%
     layout(
         yaxis = list(title = "Percent of all women with service environment***",
-                             range = c(0, 100), tickfont = list(size=8)),
+                             range = c(0, 110), tickfont = list(size=8)),
         xaxis = list(title = "Survey year", tickfont = list(size=8)),
         
         showlegend = FALSE
         )
 
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All" & latestIRLINK==1)%>%
     filter(is.na(SDPall_essential5_noso)==FALSE)%>%
     filter(country=="Uganda")
@@ -630,35 +681,293 @@ fig2<-dtafig%>%
 figIR<-subplot(fig1, fig2, nrows=1, titleY = TRUE, margin = 0.05) %>%
     layout( 
             showlegend = FALSE, 
-            yaxis = list(range = c(0, 100), tickfont = list(size=8)) )
+            yaxis = list(range = c(0, 110), tickfont = list(size=8)) )
 
 subplot(figSDP, figIR, nrows=1, titleY = TRUE, margin = 0.05) %>%
     layout( 
             showlegend = FALSE, 
-            yaxis = list(range = c(0, 100), tickfont = list(size=8)) )
+            yaxis = list(range = c(0, 110), tickfont = list(size=8)) )
+```
+
+```{r plotlevelSDPtypeUGfig2, fig.align="left", out.width="700px", out.height="200px"}
+############### SDP
+dtafig<-dtaSDP%>%filter(latest==TRUE)%>%filter(country=="Uganda")%>%filter(group=="Excluding hospitals")
+
+figSDP<-dtafig%>%
+    plot_ly(x=~year, y=~essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#fdd0a2'),
+                text = ~essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(x=~year, y=~essential5_curav, 
+                name = "available currently",
+                marker = list(color = '#fdae6b'),
+                text = ~essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y = ~essential5_noso, 
+                name = "available currently/3-month",
+                marker = list(color = '#fd8d3c'),
+                text = ~essential5_noso, textfont = list(size = 10) , textposition = 'outside') %>% 
+    add_trace(y = ~essential5_ready, 
+                name = "Currently ready** to provide 5 specific methods*", 
+                marker = list(color = '#f16913'),
+                text = ~essential5_ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+    add_trace(y = ~essential5_rnoso, 
+                name = "Meeting all conditions", 
+                marker = list(color = '#d94801'),
+                text = ~essential5_rnoso, textfont = list(size = 10) , textposition = 'outside') %>%     
+    add_annotations(
+        text = "Percent of SDPs with the methods",
+        x = 0.5, y = 1, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    add_annotations(
+        text = "(excluding hospitals)",
+        x = 0.5, y = 0.90, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%    
+    layout(
+        yaxis = list(title = "",
+                             font=list(size=8), range = c(0, 50), tickfont = list(size=8)),
+        xaxis = list(title = "Survey year", font=list(size=8),tickfont = list(size=8)),
+        showlegend = FALSE
+        )
+
+############### IR: SDPlow
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
+    filter(group=="All" & latestIRLINK==1)%>%
+    filter(is.na(SDPall_essential5_noso)==FALSE)%>%
+    filter(country=="Uganda")
+
+figIR<-dtafig%>%
+    plot_ly(x=~year, y=~SDPlow_essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#9ecae1'),
+                text = ~SDPlow_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y=~SDPlow_essential5_curav, type = 'bar', 
+                name = "available currently",
+                marker = list(color = '#6baed6'),
+                text = ~SDPlow_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y = ~SDPlow_essential5_noso, type = 'bar', 
+                name = "available currently/3-month",
+                marker = list(color = '#4292c6'),
+                text = ~SDPlow_essential5_noso, textfont = list(size = 10) , textposition = 'outside') %>%    
+    add_trace(y = ~SDPlow_essential5_ready, 
+                      name = "Currently ready** to provide 5 specific methods*", 
+                      marker = list(color = '#2171b5'),
+                      text = ~SDPlow_essential5_ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+    add_trace(y = ~SDPlow_essential5_rnoso, 
+                      name = "Meeting all conditions", 
+                      marker = list(color = '#084594'),
+                      text = ~SDPlow_essential5_rnoso, textfont = list(size = 10) , textposition = 'outside') %>%     
+    add_annotations(
+        text = "Percent of women served by",
+        x = 0.5, y = 1, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    add_annotations(
+        text = "SDPs with the methods",
+        x = 0.5, y = 0.90, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(
+        yaxis = list(title = "",
+                     font=list(size=8),
+                     range = c(0, 50), 
+                     tickfont = list(size=8)),
+        xaxis = list(title = "Survey year", font=list(size=8),tickfont = list(size=8)),
+        
+        showlegend = FALSE
+        )
+
+############### subplot
+
+subplot(figSDP, figIR, nrows=1, margin = 0.05, titleY = TRUE) %>%
+    layout(yaxis = list(range = c(0, 50), font=list(size=8),
+                        tickfont = list(size=8)) )
+```
+
+__India, Rajasthan__
+```{r plotlevelSDPtypeIN, results='asis', fig.align="left", out.width="900px", out.height="200px"}
+############### SDP
+panel <- . %>% 
+    plot_ly(x=~year, y=~essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#fdd0a2'),
+                text = ~essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(x=~year, y=~essential5_curav, 
+                name = "5 specific methods* available currently",
+                marker = list(color = '#fdae6b'),
+                text = ~essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y = ~essential5_noso, 
+                name = "5 specific methods* available currently/3-month",
+                marker = list(color = '#fd8d3c'),
+                text = ~essential5_noso, textfont = list(size = 10) , textposition = 'outside') %>% 
+    add_trace(y = ~essential5_ready, 
+                name = "Currently ready** to provide 5 specific methods*", 
+                marker = list(color = '#f16913'),
+                text = ~essential5_ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+    add_trace(y = ~essential5_rnoso, 
+                name = "Meeting both conditions", 
+                marker = list(color = '#d94801'),
+                text = ~essential5_rnoso, textfont = list(size = 10) , textposition = 'outside') %>%     
+    add_annotations(
+        text = ~unique(group),
+        x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(
+        yaxis = list(title = "Percent of SDPs",
+                             range = c(0, 100), tickfont = list(size=8)),
+        xaxis = list(title = "Survey year", tickfont = list(size=8)), 
+        showlegend = FALSE
+        )
+
+dtafig<-dtaSDP%>%filter(latest==TRUE)%>%filter(country=="India, Rajasthan")
+
+figSDP<-dtafig%>%
+    group_by(group) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 1, shareY = FALSE)%>%
+    layout(showlegend = FALSE)
+
+############### IR: SDPall
+
+
+panel <- . %>% 
+    plot_ly(x=~year, y=~SDPall_essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#9ecae1'),
+                text = ~SDPall_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y=~SDPall_essential5_curav, type = 'bar', 
+                name = "5 specific methods* available currently/3-month",
+                marker = list(color = '#6baed6'),
+                text = ~SDPall_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y = ~SDPall_essential5_noso, type = 'bar', 
+                name = "5 specific methods* available currently/3-month",
+                marker = list(color = '#4292c6'),
+                text = ~SDPall_essential5_noso, textfont = list(size = 10) , textposition = 'outside') %>%    
+    add_trace(y = ~SDPall_essential5_ready, 
+                      name = "Currently ready** to provide 5 specific methods*", 
+                      marker = list(color = '#2171b5'),
+                      text = ~SDPall_essential5_ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+    add_trace(y = ~SDPall_essential5_rnoso, 
+                      name = "Meeting both conditions", 
+                      marker = list(color = '#084594'),
+                      text = ~SDPall_essential5_rnoso, textfont = list(size = 10) , textposition = 'outside') %>%     
+    add_annotations(
+        text = "All",
+        x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(
+        yaxis = list(title = "Percent of all women with service environment***",
+                             range = c(0, 110), tickfont = list(size=8)),
+        xaxis = list(title = "Survey year", tickfont = list(size=8)),
+        
+        showlegend = FALSE
+        )
+
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
+    filter(group=="All" & latestIRLINK==1)%>%
+    filter(is.na(SDPall_essential5_noso)==FALSE)%>%
+    filter(country=="India, Rajasthan")
+
+fig1<-dtafig%>%
+    group_by(country) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 1, shareY = FALSE)%>%
+    layout(showlegend = FALSE)
+
+############### IR: SDPlow
+panel <- . %>% 
+    plot_ly(x=~year, y=~SDPlow_essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*",
+                marker = list(color = '#9ecae1'),
+                text = ~SDPlow_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y=~SDPlow_essential5_curav, type = 'bar', 
+                name = "5 specific methods* available currently/3-month",
+                marker = list(color = '#6baed6'),
+                text = ~SDPlow_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(y = ~SDPlow_essential5_noso, type = 'bar', 
+                name = "5 specific methods* available currently/3-month",
+                marker = list(color = '#4292c6'),
+                text = ~SDPlow_essential5_noso, textfont = list(size = 10) , textposition = 'outside') %>%    
+    add_trace(y = ~SDPlow_essential5_ready, 
+                      name = "Currently ready** to provide 5 specific methods*", 
+                      marker = list(color = '#2171b5'),
+                      text = ~SDPlow_essential5_ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+    add_trace(y = ~SDPlow_essential5_rnoso, 
+                      name = "Meeting both conditions", 
+                      marker = list(color = '#084594'),
+                      text = ~SDPlow_essential5_rnoso, textfont = list(size = 10) , textposition = 'outside') %>%     
+    add_annotations(
+        text = "Excluding hospitals",
+        x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(
+        yaxis = list(title = "Percent of all women with service environment***",
+                             range = c(0, 110), tickfont = list(size=8)),
+        xaxis = list(title = "Survey year", tickfont = list(size=8)),
+        
+        showlegend = FALSE
+        )
+
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
+    filter(group=="All" & latestIRLINK==1)%>%
+    filter(is.na(SDPall_essential5_noso)==FALSE)%>%
+    filter(country=="India, Rajasthan")
+
+fig2<-dtafig%>%
+    group_by(country) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 1, shareY = FALSE)%>%
+    layout(showlegend = FALSE)
+
+figIR<-subplot(fig1, fig2, nrows=1, titleY = TRUE, margin = 0.05) %>%
+    layout( 
+            showlegend = FALSE, 
+            yaxis = list(range = c(0, 110), tickfont = list(size=8)) )
+
+subplot(figSDP, figIR, nrows=1, titleY = TRUE, margin = 0.05) %>%
+    layout( 
+            showlegend = FALSE, 
+            yaxis = list(range = c(0, 110), tickfont = list(size=8)) )
 ```
 
 ####__2. Trends__
 
 _(Note: 35 surveys used for the SDP-level data on the left/orange panel. But, only 29 surveys are used for the pop-level data on the right/blue panel, excluding earlier surveys that did not have questions for the cognitive access domain. If needed, data from the earlier surveys can be added.)_ 
 
-```{r plottrend, results='asis', fig.align="left", out.width="900px", out.height="700px"}
+```{r plottrendAll, results='asis', fig.align="left", out.width="900px", out.height="700px"}
 ############### SDP
 panel <- . %>%
-    plot_ly(x=~round, y=~essential5_curav, type = 'scatter', mode = 'lines',
-            name = "5 specific methods* available currently", 
+    plot_ly(x=~round, y=~essential5_offer, type = 'scatter', mode = 'lines',
+            name = "offer 5 specific methods*",
+            marker = list(color = '#fdd0a2'),
+            line = list(color = '#fdd0a2')) %>%
+    add_trace(y=~essential5_curav, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently",
             marker = list(color = '#fdae6b'),
-            line = list(color = '#fdae6b')) %>%
+            line = list(color = '#fdae6b')) %>%  
     add_trace(y=~essential5_noso, type = 'scatter', mode = 'lines',
             name = "5 specific methods* available currently/3-month", 
             marker = list(color = '#fd8d3c'),
             line = list(color = '#fd8d3c')) %>%    
-    add_trace(y = ~essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
-              marker = list(color = '#f16913'),
-              line = list(color = '#f16913')) %>% 
-    add_trace(y = ~essential5_rnoso, name = "Meeting both conditions", 
-              marker = list(color = '#d94801'),
-              line = list(color = '#d94801')) %>% 
+    add_trace(y = ~essential5_ready, type = 'scatter', mode = 'lines',
+            name = "Currently ready** to provide 5 specific methods*", 
+            marker = list(color = '#f16913'),
+            line = list(color = '#f16913')) %>% 
+    add_trace(y = ~essential5_rnoso, type = 'scatter', mode = 'lines',
+            name = "Meeting both conditions", 
+            marker = list(color = '#d94801'),
+            line = list(color = '#d94801')) %>% 
     add_annotations(
         text = ~unique(country),
         x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
@@ -672,18 +981,22 @@ panel <- . %>%
                          range = c(1, 7), tickfont = list(size=8))
             )
         
-dtafig<-dtaSDP%>%filter(group=="All")
+dtafig<-dtaSDP%>%filter(group=="All") 
 
 fig1<-dtafig%>%
     group_by(country) %>%
     do(p = panel(.)) %>%
-    subplot(nrows = 4, shareX = TRUE, shareY = TRUE)%>%
+    subplot(nrows = 5, shareX = TRUE, shareY = TRUE)%>%
     layout(showlegend = FALSE)
 
 ############### IR
 
 panel <- . %>%
-    plot_ly(x=~round, y=~SDPall_essential5_curav, type = 'scatter', mode = 'lines',
+    plot_ly(x=~round, y=~SDPall_essential5_offer, type = 'scatter', mode = 'lines',
+            name = "offer 5 specific methods*", 
+            marker = list(color = '#9ecae1'),
+            line = list(color = '#9ecae1')) %>%
+    add_trace(y=~SDPall_essential5_curav, type = 'scatter', mode = 'lines',
             name = "5 specific methods* available currently", 
             marker = list(color = '#6baed6'),
             line = list(color = '#6baed6')) %>%
@@ -691,12 +1004,14 @@ panel <- . %>%
             name = "5 specific methods* available currently/3-month", 
             marker = list(color = '#4292c6'),
             line = list(color = '#4292c6')) %>%    
-    add_trace(y = ~SDPall_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
-              marker = list(color = '#2171b5'),
-              line = list(color = '#2171b5')) %>% 
-    add_trace(y = ~SDPall_essential5_rnoso, name = "Meeting both conditions", 
-              marker = list(color = '#084594'),
-              line = list(color = '#084594')) %>% 
+    add_trace(y = ~SDPall_essential5_ready, type = 'scatter', mode = 'lines',
+            name = "Currently ready** to provide 5 specific methods*", 
+            marker = list(color = '#2171b5'),
+            line = list(color = '#2171b5')) %>% 
+    add_trace(y = ~SDPall_essential5_rnoso, type = 'scatter', mode = 'lines',
+            name = "Meeting both conditions", 
+            marker = list(color = '#084594'),
+            line = list(color = '#084594')) %>% 
     add_annotations(
         text = ~unique(country),
         x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
@@ -710,14 +1025,14 @@ panel <- . %>%
                          range = c(1, 7), tickfont = list(size=8))
             )
         
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All")%>%
     filter(is.na(SDPall_essential5_noso)==FALSE)
 
 fig2<-dtafig%>%
     group_by(country) %>%
     do(p = panel(.)) %>%
-    subplot(nrows = 4, shareX = TRUE, shareY = TRUE)%>%
+    subplot(nrows = 5, shareX = TRUE, shareY = TRUE)%>%
     layout(showlegend = FALSE)
 
 subplot(fig1, fig2, nrows=1, titleY = TRUE, margin = 0.05) %>%
@@ -733,22 +1048,28 @@ subplot(fig1, fig2, nrows=1, titleY = TRUE, margin = 0.05) %>%
 
 Using countries where EA-SDP linkage is relatively good for both types - [see this](https://rpubs.com/YJ_Choi/PMA_EA_SDP_Link). 
 
-#####__Burkina Faso__
+__Burkina Faso__
 ```{r plottrendSDPtypeBF, results='asis', fig.align="left", out.width="900px", out.height="200px"}
 ############### SDP
 panel <- . %>%
-    plot_ly(x=~round, y=~essential5_curav, type = 'scatter', mode = 'lines',
-            name = "5 specific methods* available currently", 
+    plot_ly(x=~round, y=~essential5_offer, type = 'scatter', mode = 'lines',
+            name = "offer 5 specific methods*",
+            marker = list(color = '#fdd0a2'),
+            line = list(color = '#fdd0a2')) %>%
+    add_trace(y=~essential5_curav, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently",
             marker = list(color = '#fdae6b'),
             line = list(color = '#fdae6b')) %>%
     add_trace(y=~essential5_noso, type = 'scatter', mode = 'lines',
             name = "5 specific methods* available currently/3-month", 
             marker = list(color = '#fd8d3c'),
             line = list(color = '#fd8d3c')) %>%    
-    add_trace(y = ~essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+    add_trace(y = ~essential5_ready, type = 'scatter', mode = 'lines',
+              name = "Currently ready** to provide 5 specific methods*", 
               marker = list(color = '#f16913'),
               line = list(color = '#f16913')) %>% 
-    add_trace(y = ~essential5_rnoso, name = "Meeting both conditions", 
+    add_trace(y = ~essential5_rnoso, type = 'scatter', mode = 'lines',
+              name = "Meeting both conditions", 
               marker = list(color = '#d94801'),
               line = list(color = '#d94801')) %>% 
     add_annotations(
@@ -775,7 +1096,11 @@ figSDP<-dtafig%>%
 ############### IR: SDPany
 
 panel <- . %>%
-    plot_ly(x=~round, y=~SDPall_essential5_curav, type = 'scatter', mode = 'lines',
+    plot_ly(x=~round, y=~SDPall_essential5_offer, type = 'scatter', mode = 'lines',
+            name = "offer 5 specific methods*", 
+            marker = list(color = '#9ecae1'),
+            line = list(color = '#9ecae1')) %>%
+    add_trace(y=~SDPall_essential5_curav, type = 'scatter', mode = 'lines',
             name = "5 specific methods* available currently", 
             marker = list(color = '#6baed6'),
             line = list(color = '#6baed6')) %>%
@@ -783,10 +1108,12 @@ panel <- . %>%
             name = "5 specific methods* available currently/3-month", 
             marker = list(color = '#4292c6'),
             line = list(color = '#4292c6')) %>%    
-    add_trace(y = ~SDPall_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+    add_trace(y = ~SDPall_essential5_ready, type = 'scatter', mode = 'lines',
+              name = "Currently ready** to provide 5 specific methods*", 
               marker = list(color = '#2171b5'),
               line = list(color = '#2171b5')) %>% 
-    add_trace(y = ~SDPall_essential5_rnoso, name = "Meeting both conditions", 
+    add_trace(y = ~SDPall_essential5_rnoso, type = 'scatter', mode = 'lines',
+              name = "Meeting both conditions", 
               marker = list(color = '#084594'),
               line = list(color = '#084594')) %>% 
     add_annotations(
@@ -802,7 +1129,7 @@ panel <- . %>%
                          range = c(1, 7), tickfont = list(size=8))
             )
         
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All")%>%
     filter(is.na(SDPall_essential5_noso)==FALSE)%>%filter(country=="Burkina Faso")
 
@@ -815,7 +1142,11 @@ fig1<-dtafig%>%
 ############### IR: SDP lower level 
 
 panel <- . %>%
-    plot_ly(x=~round, y=~SDPlow_essential5_curav, type = 'scatter', mode = 'lines',
+    plot_ly(x=~round, y=~SDPlow_essential5_offer, type = 'scatter', mode = 'lines',
+            name = "Offer 5 specific methods*", 
+            marker = list(color = '#9ecae1'),
+            line = list(color = '#9ecae1')) %>%
+    add_trace(y=~SDPlow_essential5_curav, type = 'scatter', mode = 'lines',
             name = "5 specific methods* available currently", 
             marker = list(color = '#6baed6'),
             line = list(color = '#6baed6')) %>%
@@ -842,7 +1173,7 @@ panel <- . %>%
                          range = c(1, 7), tickfont = list(size=8))
             )
         
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All")%>%
     filter(is.na(SDPlow_essential5_noso)==FALSE)%>%filter(country=="Burkina Faso")
 
@@ -866,22 +1197,28 @@ subplot(figSDP, figIR, nrows=1, titleY = TRUE, margin = 0.05) %>%
 
 ```
 
-#####__Ethiopia__
+__Ethiopia__
 ```{r plottrendSDPtypeET, results='asis', fig.align="left", out.width="900px", out.height="200px"}
 ############### SDP
 panel <- . %>%
-    plot_ly(x=~round, y=~essential5_curav, type = 'scatter', mode = 'lines',
-            name = "5 specific methods* available currently", 
+    plot_ly(x=~round, y=~essential5_offer, type = 'scatter', mode = 'lines',
+            name = "offer 5 specific methods*",
+            marker = list(color = '#fdd0a2'),
+            line = list(color = '#fdd0a2')) %>%
+    add_trace(y=~essential5_curav, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently",
             marker = list(color = '#fdae6b'),
             line = list(color = '#fdae6b')) %>%
     add_trace(y=~essential5_noso, type = 'scatter', mode = 'lines',
             name = "5 specific methods* available currently/3-month", 
             marker = list(color = '#fd8d3c'),
             line = list(color = '#fd8d3c')) %>%    
-    add_trace(y = ~essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+    add_trace(y = ~essential5_ready, type = 'scatter', mode = 'lines',
+              name = "Currently ready** to provide 5 specific methods*", 
               marker = list(color = '#f16913'),
               line = list(color = '#f16913')) %>% 
-    add_trace(y = ~essential5_rnoso, name = "Meeting both conditions", 
+    add_trace(y = ~essential5_rnoso, type = 'scatter', mode = 'lines',
+              name = "Meeting both conditions", 
               marker = list(color = '#d94801'),
               line = list(color = '#d94801')) %>% 
     add_annotations(
@@ -892,7 +1229,7 @@ panel <- . %>%
         ) %>%    
     layout(
             yaxis = list(title = "",
-                         range = c(0, 110), tickfont = list(size=8)),
+                         range = c(0, 100), tickfont = list(size=8)),
             xaxis = list(title = "Survey year", 
                          range = c(1, 7), tickfont = list(size=8))
             )
@@ -908,7 +1245,11 @@ figSDP<-dtafig%>%
 ############### IR: SDPany
 
 panel <- . %>%
-    plot_ly(x=~round, y=~SDPall_essential5_curav, type = 'scatter', mode = 'lines',
+    plot_ly(x=~round, y=~SDPall_essential5_offer, type = 'scatter', mode = 'lines',
+            name = "offer 5 specific methods*", 
+            marker = list(color = '#9ecae1'),
+            line = list(color = '#9ecae1')) %>%
+    add_trace(y=~SDPall_essential5_curav, type = 'scatter', mode = 'lines',
             name = "5 specific methods* available currently", 
             marker = list(color = '#6baed6'),
             line = list(color = '#6baed6')) %>%
@@ -916,10 +1257,12 @@ panel <- . %>%
             name = "5 specific methods* available currently/3-month", 
             marker = list(color = '#4292c6'),
             line = list(color = '#4292c6')) %>%    
-    add_trace(y = ~SDPall_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+    add_trace(y = ~SDPall_essential5_ready, type = 'scatter', mode = 'lines',
+              name = "Currently ready** to provide 5 specific methods*", 
               marker = list(color = '#2171b5'),
               line = list(color = '#2171b5')) %>% 
-    add_trace(y = ~SDPall_essential5_rnoso, name = "Meeting both conditions", 
+    add_trace(y = ~SDPall_essential5_rnoso, type = 'scatter', mode = 'lines',
+              name = "Meeting both conditions", 
               marker = list(color = '#084594'),
               line = list(color = '#084594')) %>% 
     add_annotations(
@@ -930,12 +1273,12 @@ panel <- . %>%
         ) %>%    
     layout(
             yaxis = list(title = "",
-                         range = c(0, 100), tickfont = list(size=8)),
+                         range = c(0, 110), tickfont = list(size=8)),
             xaxis = list(title = "Survey year", 
                          range = c(1, 7), tickfont = list(size=8))
             )
         
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All")%>%
     filter(is.na(SDPall_essential5_noso)==FALSE)%>%filter(country=="Ethiopia")
 
@@ -948,7 +1291,11 @@ fig1<-dtafig%>%
 ############### IR: SDP lower level 
 
 panel <- . %>%
-    plot_ly(x=~round, y=~SDPlow_essential5_curav, type = 'scatter', mode = 'lines',
+    plot_ly(x=~round, y=~SDPlow_essential5_offer, type = 'scatter', mode = 'lines',
+            name = "Offer 5 specific methods*", 
+            marker = list(color = '#9ecae1'),
+            line = list(color = '#9ecae1')) %>%
+    add_trace(y=~SDPlow_essential5_curav, type = 'scatter', mode = 'lines',
             name = "5 specific methods* available currently", 
             marker = list(color = '#6baed6'),
             line = list(color = '#6baed6')) %>%
@@ -970,12 +1317,12 @@ panel <- . %>%
         ) %>%    
     layout(
             yaxis = list(title = "",
-                         range = c(0, 100), tickfont = list(size=8)),
+                         range = c(0, 110), tickfont = list(size=8)),
             xaxis = list(title = "Survey year", 
                          range = c(1, 7), tickfont = list(size=8))
             )
         
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All")%>%
     filter(is.na(SDPlow_essential5_noso)==FALSE)%>%filter(country=="Ethiopia")
 
@@ -999,22 +1346,28 @@ subplot(figSDP, figIR, nrows=1, titleY = TRUE, margin = 0.05) %>%
 
 ```
 
-#####__Uganda__
+__Uganda__
 ```{r plottrendSDPtypeUG, results='asis', fig.align="left", out.width="900px", out.height="200px"}
 ############### SDP
 panel <- . %>%
-    plot_ly(x=~round, y=~essential5_curav, type = 'scatter', mode = 'lines',
-            name = "5 specific methods* available currently", 
+    plot_ly(x=~round, y=~essential5_offer, type = 'scatter', mode = 'lines',
+            name = "offer 5 specific methods*",
+            marker = list(color = '#fdd0a2'),
+            line = list(color = '#fdd0a2')) %>%
+    add_trace(y=~essential5_curav, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently",
             marker = list(color = '#fdae6b'),
             line = list(color = '#fdae6b')) %>%
     add_trace(y=~essential5_noso, type = 'scatter', mode = 'lines',
             name = "5 specific methods* available currently/3-month", 
             marker = list(color = '#fd8d3c'),
             line = list(color = '#fd8d3c')) %>%    
-    add_trace(y = ~essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+    add_trace(y = ~essential5_ready, type = 'scatter', mode = 'lines',
+              name = "Currently ready** to provide 5 specific methods*", 
               marker = list(color = '#f16913'),
               line = list(color = '#f16913')) %>% 
-    add_trace(y = ~essential5_rnoso, name = "Meeting both conditions", 
+    add_trace(y = ~essential5_rnoso, type = 'scatter', mode = 'lines',
+              name = "Meeting both conditions", 
               marker = list(color = '#d94801'),
               line = list(color = '#d94801')) %>% 
     add_annotations(
@@ -1025,7 +1378,7 @@ panel <- . %>%
         ) %>%    
     layout(
             yaxis = list(title = "",
-                         range = c(0, 110), tickfont = list(size=8)),
+                         range = c(0, 100), tickfont = list(size=8)),
             xaxis = list(title = "Survey year", 
                          range = c(1, 7), tickfont = list(size=8))
             )
@@ -1041,7 +1394,11 @@ figSDP<-dtafig%>%
 ############### IR: SDPany
 
 panel <- . %>%
-    plot_ly(x=~round, y=~SDPall_essential5_curav, type = 'scatter', mode = 'lines',
+    plot_ly(x=~round, y=~SDPall_essential5_offer, type = 'scatter', mode = 'lines',
+            name = "offer 5 specific methods*", 
+            marker = list(color = '#9ecae1'),
+            line = list(color = '#9ecae1')) %>%
+    add_trace(y=~SDPall_essential5_curav, type = 'scatter', mode = 'lines',
             name = "5 specific methods* available currently", 
             marker = list(color = '#6baed6'),
             line = list(color = '#6baed6')) %>%
@@ -1049,10 +1406,12 @@ panel <- . %>%
             name = "5 specific methods* available currently/3-month", 
             marker = list(color = '#4292c6'),
             line = list(color = '#4292c6')) %>%    
-    add_trace(y = ~SDPall_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+    add_trace(y = ~SDPall_essential5_ready, type = 'scatter', mode = 'lines',
+              name = "Currently ready** to provide 5 specific methods*", 
               marker = list(color = '#2171b5'),
               line = list(color = '#2171b5')) %>% 
-    add_trace(y = ~SDPall_essential5_rnoso, name = "Meeting both conditions", 
+    add_trace(y = ~SDPall_essential5_rnoso, type = 'scatter', mode = 'lines',
+              name = "Meeting both conditions", 
               marker = list(color = '#084594'),
               line = list(color = '#084594')) %>% 
     add_annotations(
@@ -1063,12 +1422,12 @@ panel <- . %>%
         ) %>%    
     layout(
             yaxis = list(title = "",
-                         range = c(0, 100), tickfont = list(size=8)),
+                         range = c(0, 110), tickfont = list(size=8)),
             xaxis = list(title = "Survey year", 
                          range = c(1, 7), tickfont = list(size=8))
             )
         
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All")%>%
     filter(is.na(SDPall_essential5_noso)==FALSE)%>%filter(country=="Uganda")
 
@@ -1081,7 +1440,11 @@ fig1<-dtafig%>%
 ############### IR: SDP lower level 
 
 panel <- . %>%
-    plot_ly(x=~round, y=~SDPlow_essential5_curav, type = 'scatter', mode = 'lines',
+    plot_ly(x=~round, y=~SDPlow_essential5_offer, type = 'scatter', mode = 'lines',
+            name = "Offer 5 specific methods*", 
+            marker = list(color = '#9ecae1'),
+            line = list(color = '#9ecae1')) %>%
+    add_trace(y=~SDPlow_essential5_curav, type = 'scatter', mode = 'lines',
             name = "5 specific methods* available currently", 
             marker = list(color = '#6baed6'),
             line = list(color = '#6baed6')) %>%
@@ -1103,12 +1466,12 @@ panel <- . %>%
         ) %>%    
     layout(
             yaxis = list(title = "",
-                         range = c(0, 100), tickfont = list(size=8)),
+                         range = c(0, 110), tickfont = list(size=8)),
             xaxis = list(title = "Survey year", 
                          range = c(1, 7), tickfont = list(size=8))
             )
         
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(group=="All")%>%
     filter(is.na(SDPlow_essential5_noso)==FALSE)%>%filter(country=="Uganda")
 
@@ -1132,8 +1495,643 @@ subplot(figSDP, figIR, nrows=1, titleY = TRUE, margin = 0.05) %>%
 
 ```
 
+```{r plottrendSDPtypeUGfig3, fig.align="left", out.width="700px", out.height="200px"}
+############### SDP
+dtafig<-dtaSDP%>%filter(country=="Uganda")%>%filter(group=="Excluding hospitals")
 
-####__3. Latest pattern by SES (only for population-based access)__
+figSDP<-dtafig%>%
+    plot_ly(x=~yearmonth, y=~essential5_offer, type = 'scatter', mode = 'lines',
+            name = "offer 5 specific methods*",
+            marker = list(color = '#fdd0a2'),
+            line = list(color = '#fdd0a2')) %>%
+    add_trace(y=~essential5_curav, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently",
+            marker = list(color = '#fdae6b'),
+            line = list(color = '#fdae6b')) %>%
+    add_trace(y=~essential5_noso, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently/3-month", 
+            marker = list(color = '#fd8d3c'),
+            line = list(color = '#fd8d3c')) %>%    
+    add_trace(y = ~essential5_ready, type = 'scatter', mode = 'lines',
+              name = "Currently ready** to provide 5 specific methods*", 
+              marker = list(color = '#f16913'),
+              line = list(color = '#f16913')) %>% 
+    add_trace(y = ~essential5_rnoso, type = 'scatter', mode = 'lines',
+              name = "Meeting both conditions", 
+              marker = list(color = '#d94801'),
+              line = list(color = '#d94801')) %>% 
+    add_annotations(
+        text = "Percent of SDPs with the methods",
+        x = 0.5, y = 1, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    add_annotations(
+        text = "(excluding hospitals)",
+        x = 0.5, y = 0.90, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%     
+    layout(
+            yaxis = list(title = "",
+                         font=list(size=8),
+                         range = c(0, 50), tickfont = list(size=8)),
+            xaxis = list(title = "", 
+                         font=list(size=8),
+                         tickfont = list(size=8)),
+            showlegend = FALSE
+            )
+        
+
+############### IR: SDP lower level 
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
+    filter(group=="All")%>%
+    filter(is.na(SDPlow_essential5_noso)==FALSE)%>%filter(country=="Uganda")
+
+figIR<-dtafig%>%
+    plot_ly(x=~yearmonth, y=~SDPlow_essential5_offer, type = 'scatter', mode = 'lines',
+            name = "Offer 5 specific methods*", 
+            marker = list(color = '#9ecae1'),
+            line = list(color = '#9ecae1')) %>%
+    add_trace(y=~SDPlow_essential5_curav, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently", 
+            marker = list(color = '#6baed6'),
+            line = list(color = '#6baed6')) %>%
+    add_trace(y=~SDPlow_essential5_noso, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently/3-month", 
+            marker = list(color = '#4292c6'),
+            line = list(color = '#4292c6')) %>%    
+    add_trace(y = ~SDPlow_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+              marker = list(color = '#2171b5'),
+              line = list(color = '#2171b5')) %>% 
+    add_trace(y = ~SDPlow_essential5_rnoso, name = "Meeting both conditions", 
+              marker = list(color = '#084594'),
+              line = list(color = '#084594')) %>% 
+    add_annotations(
+        text = "Percent of all women served by",
+        x = 0.5, y = 1, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    add_annotations(
+        text = "SDPs with the methods",
+        x = 0.5, y = 0.90, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%    
+    layout(
+            yaxis = list(title = "",
+                         font=list(size=8),
+                         range = c(0, 50), tickfont = list(size=8)),
+            xaxis = list(title = "Survey year", 
+                         font=list(size=8),
+                         tickfont = list(size=8)),
+            showlegend = FALSE
+            )
+
+subplot(figSDP, figIR, nrows=1, margin = 0.05, shareX = TRUE) %>%
+    layout( 
+            xaxis = list(title="Survey year", font=list(size=8)),
+            yaxis = list(range = c(0, 50), 
+                         font=list(size=8), tickfont = list(size=8))
+            )
+
+```
+
+__India, Rajasthan__
+```{r plottrendSDPtypeIN, results='asis', fig.align="left", out.width="900px", out.height="200px"}
+############### SDP
+panel <- . %>%
+    plot_ly(x=~round, y=~essential5_offer, type = 'scatter', mode = 'lines',
+            name = "offer 5 specific methods*",
+            marker = list(color = '#fdd0a2'),
+            line = list(color = '#fdd0a2')) %>%
+    add_trace(y=~essential5_curav, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently",
+            marker = list(color = '#fdae6b'),
+            line = list(color = '#fdae6b')) %>%
+    add_trace(y=~essential5_noso, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently/3-month", 
+            marker = list(color = '#fd8d3c'),
+            line = list(color = '#fd8d3c')) %>%    
+    add_trace(y = ~essential5_ready, type = 'scatter', mode = 'lines',
+              name = "Currently ready** to provide 5 specific methods*", 
+              marker = list(color = '#f16913'),
+              line = list(color = '#f16913')) %>% 
+    add_trace(y = ~essential5_rnoso, type = 'scatter', mode = 'lines',
+              name = "Meeting both conditions", 
+              marker = list(color = '#d94801'),
+              line = list(color = '#d94801')) %>% 
+    add_annotations(
+        text = ~unique(group),
+        x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%    
+    layout(
+            yaxis = list(title = "",
+                         range = c(0, 100), tickfont = list(size=8)),
+            xaxis = list(title = "Survey year", 
+                         range = c(1, 7), tickfont = list(size=8))
+            )
+        
+dtafig<-dtaSDP%>%filter(country=="India, Rajasthan")
+
+figSDP<-dtafig%>%
+    group_by(group) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 1, shareX = TRUE, shareY = TRUE)%>%
+    layout(showlegend = FALSE)
+
+############### IR: SDPany
+
+panel <- . %>%
+    plot_ly(x=~round, y=~SDPall_essential5_offer, type = 'scatter', mode = 'lines',
+            name = "offer 5 specific methods*", 
+            marker = list(color = '#9ecae1'),
+            line = list(color = '#9ecae1')) %>%
+    add_trace(y=~SDPall_essential5_curav, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently", 
+            marker = list(color = '#6baed6'),
+            line = list(color = '#6baed6')) %>%
+    add_trace(y=~SDPall_essential5_noso, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently/3-month", 
+            marker = list(color = '#4292c6'),
+            line = list(color = '#4292c6')) %>%    
+    add_trace(y = ~SDPall_essential5_ready, type = 'scatter', mode = 'lines',
+              name = "Currently ready** to provide 5 specific methods*", 
+              marker = list(color = '#2171b5'),
+              line = list(color = '#2171b5')) %>% 
+    add_trace(y = ~SDPall_essential5_rnoso, type = 'scatter', mode = 'lines',
+              name = "Meeting both conditions", 
+              marker = list(color = '#084594'),
+              line = list(color = '#084594')) %>% 
+    add_annotations(
+        text = "All",
+        x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%    
+    layout(
+            yaxis = list(title = "",
+                         range = c(0, 110), tickfont = list(size=8)),
+            xaxis = list(title = "Survey year", 
+                         range = c(1, 7), tickfont = list(size=8))
+            )
+        
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
+    filter(group=="All")%>%
+    filter(is.na(SDPall_essential5_noso)==FALSE)%>%filter(country=="India, Rajasthan")
+
+fig1<-dtafig%>%
+    group_by(country) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 1, shareX = TRUE, shareY = TRUE)%>%
+    layout(showlegend = FALSE)
+
+############### IR: SDP lower level 
+
+panel <- . %>%
+    plot_ly(x=~round, y=~SDPlow_essential5_offer, type = 'scatter', mode = 'lines',
+            name = "Offer 5 specific methods*", 
+            marker = list(color = '#9ecae1'),
+            line = list(color = '#9ecae1')) %>%
+    add_trace(y=~SDPlow_essential5_curav, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently", 
+            marker = list(color = '#6baed6'),
+            line = list(color = '#6baed6')) %>%
+    add_trace(y=~SDPlow_essential5_noso, type = 'scatter', mode = 'lines',
+            name = "5 specific methods* available currently/3-month", 
+            marker = list(color = '#4292c6'),
+            line = list(color = '#4292c6')) %>%    
+    add_trace(y = ~SDPlow_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
+              marker = list(color = '#2171b5'),
+              line = list(color = '#2171b5')) %>% 
+    add_trace(y = ~SDPlow_essential5_rnoso, name = "Meeting both conditions", 
+              marker = list(color = '#084594'),
+              line = list(color = '#084594')) %>% 
+    add_annotations(
+        text = "Excluding hospitals",
+        x = 0.5, y = 0.95, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%    
+    layout(
+            yaxis = list(title = "",
+                         range = c(0, 110), tickfont = list(size=8)),
+            xaxis = list(title = "Survey year", 
+                         range = c(1, 7), tickfont = list(size=8))
+            )
+        
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
+    filter(group=="All")%>%
+    filter(is.na(SDPlow_essential5_noso)==FALSE)%>%filter(country=="India, Rajasthan")
+
+fig2<-dtafig%>%
+    group_by(country) %>%
+    do(p = panel(.)) %>%
+    subplot(nrows = 1, shareX = TRUE, shareY = TRUE)%>%
+    layout(showlegend = FALSE)
+
+figIR<-subplot(fig1, fig2, nrows=1, titleY = TRUE, margin = 0.05) %>%
+    layout( showlegend = FALSE, 
+            xaxis = list(title="Survey round"),
+            yaxis = list(range = c(0, 100), tickfont = list(size=8))
+            )
+
+subplot(figSDP, figIR, nrows=1, titleY = TRUE, margin = 0.05) %>%
+    layout( showlegend = FALSE, 
+            xaxis = list(title="Survey round"),
+            yaxis = list(range = c(0, 100), tickfont = list(size=8))
+            )
+
+```
+
+####__3. SDP vs. Population-level metrics__ 
+__Pop-based estimates of access to methods__ are always higher than __SDP-level estimates of method availability__. This section examines any pattern across countries (because of different health systems, including the role/significance of hospitals).    
+
+Each dot represents a survey. Investigate if certain countries have high ratios, per given level of SDP-level metrics (presented on the x-axis).         
+
+Plots to the right side has more strict definitions of access.    
+* __offer__: All five methods offered        
+* __curav__: All five methods currently available    
+* __noso__: All five methods currently available + no stock out in the past 3 months for any of the five methods    
+* __ready__: All five methods currently available + SDP is _ready to insert and remove_ IUD and Implants    
+* __rnoso__: All five methods currently available + no stock out in the past 3 months for any of the five methods + SDP is _"ready" to insert and remove_ IUD and Implants   
+
+__<span style="color: red;">Among all/any SDPs</span>__
+```{r scatterplotALL, results='asis', fig.align="left", out.width="1100px", out.height="300px"}
+tempSDP<-dtaSDP%>%filter(group=="All")%>%
+    select(-country, -countrycode, -year, -month, -yearmonth, -cmc, -group)
+    
+tempIR<-dtaIR%>%filter(group=="All"& groupdemand==0)%>%
+    select(-starts_with("SDPlow")) 
+
+dtafig<-left_join(tempSDP, tempIR, by=c("xsurvey"))%>%
+    filter(is.na(essential5_offer)==FALSE & is.na(SDPall_essential5_offer)==FALSE)  
+
+layoutlist<-list(autosize = F, width = 200, height = 200, 
+                 xaxis = list(title = "SDP-level ", 
+                              range = c(0, 100), tickfont = list(size=8)), 
+                 yaxis = list(title = "Population-level",
+                              range = c(0, 110), tickfont = list(size=8)),
+                 showlegend=FALSE)
+
+fig1<-dtafig%>%
+    plot_ly(x = ~essential5_offer, y = ~SDPall_essential5_offer, color = ~country)%>%
+    add_annotations(
+        text = "offer", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig2<-dtafig%>%
+    plot_ly(x = ~essential5_curav, y = ~SDPall_essential5_curav, color = ~country)%>%
+    add_annotations(
+        text = "curav", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig3<-dtafig%>%
+    plot_ly(x = ~essential5_ready, y = ~SDPall_essential5_ready, color = ~country)%>%
+    add_annotations(
+        text = "ready", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig4<-dtafig%>%
+    plot_ly(x = ~essential5_noso, y = ~SDPall_essential5_noso, color = ~country)%>%
+    add_annotations(
+        text = "noso", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig5<-dtafig%>%
+    plot_ly(x = ~essential5_rnoso, y = ~SDPall_essential5_rnoso, color = ~country)%>%
+    add_annotations(
+        text = "rnoso", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+subplot(fig1, fig2, fig3, fig4, fig5, 
+        nrows = 1, shareX = FALSE, shareY = TRUE)%>%
+    layout( 
+            xaxis = list(title = "SDP-level ", 
+                              range = c(0, 100), tickfont = list(size=8)), 
+            yaxis = list(title = "Population-level",
+                              range = c(0, 110), tickfont = list(size=8)),
+            showlegend=FALSE)
+```
+
+```{r ratioALL, results='asis', fig.align="left", out.width="1100px", out.height="300px"}
+dtafig<-dtafig%>%mutate(
+    ratio_essential5_offer= SDPall_essential5_offer / essential5_offer, 
+    ratio_essential5_curav= SDPall_essential5_curav / essential5_curav, 
+    ratio_essential5_ready= SDPall_essential5_ready / essential5_ready, 
+    ratio_essential5_noso = SDPall_essential5_noso  / essential5_noso, 
+    ratio_essential5_rnoso= SDPall_essential5_rnoso / essential5_rnoso) 
+
+layoutlist<-list(autosize = F, width = 200, height = 200, 
+                 xaxis = list(title = "SDP-level ", 
+                              range = c(0, 100), tickfont = list(size=8)), 
+                 yaxis = list(title = "Ratio",
+                              tickfont = list(size=8)),
+                 showlegend=FALSE)
+
+fig1<-dtafig%>%
+    plot_ly(x = ~essential5_offer, y = ~ratio_essential5_offer, color = ~country)%>%
+    add_annotations(
+        text = "offer", x = 0.75, y = 0.75, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig2<-dtafig%>%
+    plot_ly(x = ~essential5_curav, y = ~ratio_essential5_curav, color = ~country)%>%
+    add_annotations(
+        text = "curav", x = 0.75, y = 0.75, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig3<-dtafig%>%
+    plot_ly(x = ~essential5_ready, y = ~ratio_essential5_ready, color = ~country)%>%
+    add_annotations(
+        text = "ready", x = 0.75, y = 0.75, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig4<-dtafig%>%
+    plot_ly(x = ~essential5_noso, y = ~ratio_essential5_noso, color = ~country)%>%
+    add_annotations(
+        text = "noso", x = 0.75, y = 0.75, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig5<-dtafig%>%
+    plot_ly(x = ~essential5_rnoso, y = ~ratio_essential5_rnoso, color = ~country)%>%
+    add_annotations(
+        text = "rnoso", x = 0.75, y = 0.75, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+subplot(fig1, fig2, fig3, fig4, fig5, 
+        nrows = 1, shareX = FALSE, shareY = TRUE)%>%
+    layout( 
+            xaxis = list(title = "SDP-level ", 
+                              range = c(0, 100), tickfont = list(size=8)), 
+            yaxis = list(title = "Ratio: Pop/SDP level",
+                              tickfont = list(size=8)),
+            showlegend=FALSE)
+
+```
+
+__<span style="color: red;">Excluding hospitals: this makes sense for only select countries - probably Burkina Faso, Ethiopia, India/Rajasthan, and Uganda</span>__
+```{r scatterplotLOW, results='asis', fig.align="left", out.width="1100px", out.height="300px"}
+tempSDP<-dtaSDP%>%filter(group!="All")%>%
+    filter(country=="Burkina Faso" | country=="Ethiopia" | country=="Uganda" | country=="India, Rajasthan")%>%
+    select(-country, -countrycode, -year, -month, -yearmonth, -cmc, -group)
+    
+tempIR<-dtaIR%>%filter(group=="All"& groupdemand==0)%>%
+    select(-starts_with("SDPall")) 
+
+dtafig<-left_join(tempSDP, tempIR, by=c("xsurvey"))%>%
+    filter(is.na(essential5_offer)==FALSE & is.na(SDPlow_essential5_offer)==FALSE)  
+
+layoutlist<-list(autosize = F, width = 200, height = 200, 
+                 xaxis = list(title = "SDP-level ", 
+                              range = c(0, 100), tickfont = list(size=8)), 
+                 yaxis = list(title = "Population-level",
+                              range = c(0, 110), tickfont = list(size=8)),
+                 showlegend=FALSE)
+
+fig1<-dtafig%>%
+    plot_ly(x = ~essential5_offer, y = ~SDPlow_essential5_offer, color = ~country)%>%
+    add_annotations(
+        text = "offer", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig2<-dtafig%>%
+    plot_ly(x = ~essential5_curav, y = ~SDPlow_essential5_curav, color = ~country)%>%
+    add_annotations(
+        text = "curav", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig3<-dtafig%>%
+    plot_ly(x = ~essential5_ready, y = ~SDPlow_essential5_ready, color = ~country)%>%
+    add_annotations(
+        text = "ready", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig4<-dtafig%>%
+    plot_ly(x = ~essential5_noso, y = ~SDPlow_essential5_noso, color = ~country)%>%
+    add_annotations(
+        text = "noso", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig5<-dtafig%>%
+    plot_ly(x = ~essential5_rnoso, y = ~SDPlow_essential5_rnoso, color = ~country)%>%
+    add_annotations(
+        text = "rnoso", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+subplot(fig1, fig2, fig3, fig4, fig5, 
+        nrows = 1, shareX = FALSE, shareY = TRUE)%>%
+    layout( 
+            xaxis = list(title = "SDP-level ", 
+                              range = c(0, 100), tickfont = list(size=8)), 
+            yaxis = list(title = "Population-level",
+                              range = c(0, 110), tickfont = list(size=8)),
+            showlegend=FALSE)
+```
+
+```{r ratioLOW, results='asis', fig.align="left", out.width="1100px", out.height="300px"}
+dtafig<-dtafig%>%mutate(
+    ratio_essential5_offer= SDPlow_essential5_offer / essential5_offer, 
+    ratio_essential5_curav= SDPlow_essential5_curav / essential5_curav, 
+    ratio_essential5_ready= SDPlow_essential5_ready / essential5_ready, 
+    ratio_essential5_noso = SDPlow_essential5_noso  / essential5_noso, 
+    ratio_essential5_rnoso= SDPlow_essential5_rnoso / essential5_rnoso) 
+
+layoutlist<-list(autosize = F, width = 200, height = 200, 
+                 xaxis = list(title = "SDP-level ", 
+                              range = c(0, 100), tickfont = list(size=8)), 
+                 yaxis = list(title = "Ratio",
+                              tickfont = list(size=8)),
+                 showlegend=FALSE)
+
+fig1<-dtafig%>%
+    plot_ly(x = ~essential5_offer, y = ~ratio_essential5_offer, color = ~country)%>%
+    add_annotations(
+        text = "offer", x = 0.75, y = 0.75, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig2<-dtafig%>%
+    plot_ly(x = ~essential5_curav, y = ~ratio_essential5_curav, color = ~country)%>%
+    add_annotations(
+        text = "curav", x = 0.75, y = 0.75, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig3<-dtafig%>%
+    plot_ly(x = ~essential5_ready, y = ~ratio_essential5_ready, color = ~country)%>%
+    add_annotations(
+        text = "ready", x = 0.75, y = 0.75, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig4<-dtafig%>%
+    plot_ly(x = ~essential5_noso, y = ~ratio_essential5_noso, color = ~country)%>%
+    add_annotations(
+        text = "noso", x = 0.75, y = 0.75, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig5<-dtafig%>%
+    plot_ly(x = ~essential5_rnoso, y = ~ratio_essential5_rnoso, color = ~country)%>%
+    add_annotations(
+        text = "rnoso", x = 0.75, y = 0.75, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+subplot(fig1, fig2, fig3, fig4, fig5, 
+        nrows = 1, shareX = FALSE, shareY = TRUE)%>%
+    layout( 
+            xaxis = list(title = "SDP-level ", 
+                              range = c(0, 100), tickfont = list(size=8)), 
+            yaxis = list(title = "Ratio: Pop/SDP level",
+                              tickfont = list(size=8)),
+            showlegend=FALSE)
+
+```
+
+####__4. Denominator: all women vs. women with demand__
+
+Because this "population-level access" approach is essentially at the EA-level, there is no reason to expect any pattern by individual women's demand status. If there is any pattern, it is operated via EA-level differences in demand for FP.
+
+Nevertheless, just in case, the following compares estimates between two denominators: all women vs. women with demand for FP. No pattern - in fact, almost identical in most cases. 
+
+```{r plotdenominator, results='asis', fig.align="left", out.width="1000px", out.height="250px"}
+
+library(reshape2)
+dtafig<-dtaIR%>%filter(group=="All")%>%
+    select(xsurvey, groupdemand, starts_with("SDPall"))%>%
+    filter(is.na(SDPall_essential5_noso)==FALSE)%>%
+    mutate(
+        groupdemand = as.character(groupdemand), 
+        groupdemand = str_replace(groupdemand,"0","All"), 
+        groupdemand = str_replace(groupdemand,"1","Demand"))%>% 
+    recast(xsurvey ~ variable + groupdemand, id.var = c("xsurvey", "groupdemand"))%>%
+    mutate(country = substr(xsurvey,1,nchar(xsurvey)-2))
+
+layoutlist<-list(autosize = F, width = 200, height = 200, 
+                 xaxis = list(title = "SDP-level ", 
+                              range = c(0, 100), tickfont = list(size=8)), 
+                 yaxis = list(title = "Population-level",
+                              range = c(0, 110), tickfont = list(size=8)),
+                 showlegend=FALSE)
+
+fig1<-dtafig%>%
+    plot_ly(x = ~SDPall_essential5_offer_All, y = ~SDPall_essential5_offer_Demand, color = ~country)%>%
+    add_annotations(
+        text = "offer", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig2<-dtafig%>%
+    plot_ly(x = ~SDPall_essential5_curav_All, y = ~SDPall_essential5_curav_Demand, color = ~country)%>%
+    add_annotations(
+        text = "curav", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig3<-dtafig%>%
+    plot_ly(x = ~SDPall_essential5_ready_All, y = ~SDPall_essential5_ready_Demand, color = ~country)%>%
+    add_annotations(
+        text = "ready", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig4<-dtafig%>%
+    plot_ly(x = ~SDPall_essential5_noso_All, y = ~SDPall_essential5_noso_Demand, color = ~country)%>%
+    add_annotations(
+        text = "noso", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+fig5<-dtafig%>%
+    plot_ly(x = ~SDPall_essential5_rnoso_All, y = ~SDPall_essential5_rnoso_Demand, color = ~country)%>%
+    add_annotations(
+        text = "rnoso", x = 0.75, y = 0.25, xref = "paper", yref = "paper",    
+        xanchor = "center", yanchor = "center", showarrow = FALSE,
+        font = list(size = 12)
+        ) %>%
+    layout(layoutlist)
+
+subplot(fig1, fig2, fig3, fig4, fig5, 
+        nrows = 1, shareX = FALSE, shareY = TRUE)%>%
+    layout( 
+            xaxis = list(title = "Among all women", 
+                              range = c(0, 100), tickfont = list(size=8)), 
+            yaxis = list(title = "Among women with demand",
+                              range = c(0, 110), tickfont = list(size=8)),
+            showlegend=FALSE)
+
+
+```
+
+####__5. Latest pattern by SES (only for population-based access)__
 
 Across countries, population-level access to methods does not have a common pattern with background SES, unlike other access metrics (e.g., cognitive).  
 
@@ -1141,14 +2139,18 @@ Across countries, population-level access to methods does not have a common patt
 * There is a negative association (e.g., Uganda), potentially because of: more programming in disadvantaged areas, supply not meeting demand in areas with more users proportionately, etc.    
 * In some cases, there is a positive association (e.g., Cote d'Ivoire, Kinshasa, and Niger).    
 
-#####__3.1. By education: < vs. >= ever attended secondary school__
+####__5.1. By education: < vs. >= ever attended secondary school__
 
 ```{r plotpattern1, results='asis', fig.align="left", out.width="900px", out.height="700px"}
 panel <- . %>%
-    plot_ly(x=~grouplabel, y=~SDPall_essential5_curav, type = 'bar', 
+    plot_ly(x=~grouplabel, y=~SDPall_essential5_offer, type = 'bar', 
+                name = "Offer 5 specific methods*", 
+                marker = list(color = '#9ecae1'),
+                text = ~SDPall_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+    add_trace(x=~grouplabel, y=~SDPall_essential5_curav, type = 'bar', 
                 name = "5 specific methods* available currently", 
                 marker = list(color = '#6baed6'),
-                text = ~SDPall_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+                text = ~SDPall_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%    
     add_trace(y=~SDPall_essential5_noso, type = 'bar', 
                 name = "5 specific methods* available currently/3-month", 
                 marker = list(color = '#4292c6'),
@@ -1173,48 +2175,50 @@ panel <- . %>%
         showlegend=FALSE
         )
 
-dtafig<-dtaIR%>%
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
     filter(latestIRLINK==1 & group=="Education")%>%
     filter(is.na(SDPall_essential5_noso)==FALSE)
 
 dtafig%>%
     group_by(country) %>%
     do(p = panel(.)) %>%
-    subplot(nrows = 4, shareY = FALSE)%>%
+    subplot(nrows = 5, shareY = FALSE)%>%
     layout(showlegend = FALSE, 
            title=c(""))        
 ```
 
-#####__3.2. By HH wealth: bottom 2 vs. top 3 quintiles__
+####__5.2. By HH wealth: bottom 2 vs. top 3 quintiles__
 
 ```{r plotpattern2, results='asis', fig.align="left", out.width="900px", out.height="700px"}
 
-dtafig<-dtaIR%>%filter(latestIRLINK==1 & group=="HH wealth")
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
+    filter(latestIRLINK==1 & group=="HH wealth")
 
 dtafig%>%
     group_by(country) %>%
     do(p = panel(.)) %>%
-    subplot(nrows = 4, shareY = FALSE)%>%
+    subplot(nrows = 5, shareY = FALSE)%>%
     layout(showlegend = FALSE, 
            title=c(""))   
 ```
 
-#####__3.3. By residential area: rural vs. urban__
+####__5.3. By residential area: rural vs. urban__
 
 ```{r plotpattern3, results='asis', fig.align="left", out.width="900px", out.height="700px"}
 
-dtafig<-dtaIR%>%filter(latestIRLINK==1 & group=="Residential area")
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
+    filter(latestIRLINK==1 & group=="Residential area")
 
 dtafig%>%
     group_by(country) %>%
     do(p = panel(.)) %>%
-    subplot(nrows = 4, shareY = FALSE)%>%
+    subplot(nrows = 5, shareY = FALSE)%>%
     layout(showlegend = FALSE, 
            title=c(""))  
         
 ```
 
-####__4. Latest pattern of MCPR by indicator (only for population-based access)__
+####__6. Latest pattern of MCPR by indicator (only for population-based access)__
 
 As expected, based on its inconsistent association with women's background characteristics, there is no common pattern with MCPR. 
 
@@ -1223,6 +2227,7 @@ MCPR (%) on the Y axis.
 * Blue bar: MCPR among women __with__ access to the methods.   
 
 Pairs to the right side has more strict definitions of access.   
+* __offer__: All five methods offered        
 * __curav__: All five methods currently available    
 * __noso__: All five methods currently available + no stock out in the past 3 months for any of the five methods    
 * __ready__: All five methods currently available + SDP is _ready to insert and remove_ IUD and Implants    
@@ -1247,14 +2252,16 @@ panel <- . %>%
         showlegend = FALSE
         )
 
-dtafig<-dtaIR%>%
-    filter((group=="By SDPall_essential5_curav"|
+dtafig<-dtaIR%>%filter(groupdemand==0)%>%
+    filter((group=="By SDPall_essential5_offer"|
+            group=="By SDPall_essential5_curav"|
             group=="By SDPall_essential5_noso"|
             group=="By SDPall_essential5_ready"|
             group=="By SDPall_essential5_rnoso") & 
     latestIRLINK==1)%>%
     select(xsurvey, mcp, country, group, grouplabel)%>%
     mutate(
+        group=ifelse(group=="By SDPall_essential5_offer", "offer", group),
         group=ifelse(group=="By SDPall_essential5_curav", "curav", group),
         group=ifelse(group=="By SDPall_essential5_noso", "noso", group),
         group=ifelse(group=="By SDPall_essential5_ready", "ready", group),
@@ -1263,12 +2270,12 @@ dtafig<-dtaIR%>%
 
 dtafig$group<-fct_relevel(
     factor(dtafig$group, levels = unique(dtafig$group)),
-    c("curav", "noso", "ready", "rnoso"))
+    c("offer", "curav", "noso", "ready", "rnoso"))
         
 dtafig%>%
     group_by(country) %>%
     do(p = panel(.)) %>%
-    subplot(nrows = 4, shareY = FALSE, margin = 0.02)%>%
+    subplot(nrows = 5, shareY = FALSE, margin = 0.02)%>%
     layout(showlegend = FALSE, 
            title=c(""))  
 ```
@@ -1276,6 +2283,8 @@ dtafig%>%
 ---
 
 #### Annex 1. Why link communities and SDPs? 
+
+Informed choice of contraceptive methods is an essential principle of family planning, enabling women to choose if, when, and how many children they want to have. This choice is shaped by various dimensions of access. A necessary - though not sufficient - foundation for informed choice is if a range of methods are available to women with demand for family planning at the population level. PMA surveys provide rare information about the "population-level access to methods," thanks to its unique design to link communities and service delivery points (SDPs) that serve them. 
 
 __1. Why not study just SDP-level data?__ Service quality at the SDP level doesn't necessarily reflect population's access to the service. Typically SDP surveys are representative of facilities in the catchment area/country. But, SDPs are more densely located in urban areas, and distribution SDPs often do not follow population distribution (see below example of Mali). In this case, facility data from this particular survey are not necessarily representative for SDPs that are accessible to the population.   
 
@@ -1294,8 +2303,7 @@ NOTE: It is possible to have other cluster-level aggregate service quality varia
 #### Annex 2. Methods 
 
 * For methods to link survey EAs and SDPs, see here: (https://rpubs.com/YJ_Choi/PMA_EA_SDP_Link)    
-* All data come from publicly available PMA surveys. But in Burkina Faso and Niamey, Niger, the latest publicly available surveys have issues in EA-SDP linking that are currently under investigation. Thus, Burkina Faso Round 6 and Niamey Round 5 are excluded.   
-* India and Nigeria are also excluded, to further investigate EA-SDP link.   
+* All data come from publicly available PMA surveys. But in Burkina Faso and Niamey, Niger, the latest publicly available surveys have issues in EA-SDP linking that are currently under investigation. Thus, Burkina Faso Round 6 and Niamey Round 5 are excluded.     
 
 ---
 
