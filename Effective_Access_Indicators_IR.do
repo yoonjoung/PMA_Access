@@ -705,6 +705,20 @@ foreach survey  in $surveylistNEW{
 		lab var xwge_fp_existence "WGE, existnece of choice for FP: average (0-5)"		
 		lab var xwge_fp_exercise  "WGE, exercise of choice for FP: average (0-5)"
 		lab var xwge_fp "WGE, for FP"	
+
+		#delimit;
+		gen byte xwge_fp_existence_all= (xwge_fp_existence1>=4 & xwge_fp_existence1<=5) & 
+										(xwge_fp_existence2>=4 & xwge_fp_existence2<=5) &  
+										(xwge_fp_existence3>=4 & xwge_fp_existence3<=5) & 
+										(xwge_fp_existence4>=4 & xwge_fp_existence4<=5) &  
+										(xwge_fp_existence5>=4 & xwge_fp_existence5<=5) 
+										;
+										#delimit cr
+		
+		gen byte xwge_fp_exercise_all = (xwge_fp_exercise1>=4 & xwge_fp_exercise1<=5) & (xwge_fp_exercise2>=4 & xwge_fp_exercise2<=5)
+						
+		gen byte xwge_fp_all = xwge_fp_existence_all==1 & xwge_fp_exercise_all==1
+		
 	
 	save IR_`survey'_Access_Indicators.dta, replace
 	}	
@@ -724,6 +738,10 @@ global indicatorlist "
 	xdec
 	xfp_self*
 	xxfp_self*
+	
+	xwge_fp_existence_all
+	xwge_fp_exercise_all
+	xwge_fp_all
 	
 	xheard_10
 	xheard_7
@@ -768,6 +786,10 @@ global indicatorlistall "
 	xdec
 	xfp_self*
 	xxfp_self*
+	
+	xwge_fp_existence_all
+	xwge_fp_exercise_all
+	xwge_fp_all
 	
 	xheard_10
 	xheard_7
@@ -1106,7 +1128,7 @@ foreach survey in $surveylistEASDPLINK{
 		
 	gen countrycode=substr(xsurvey, 1, 2)
 
-	gen year = 1900 + int(cmc/12) 
+	gen year = 1900 + trunc((cmc-1)/12)
 	gen month= cmc-12*(year - 1900)
 	
 	egen temp=max(round), by(country) 

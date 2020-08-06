@@ -1,0 +1,635 @@
+---
+output:
+  html_document:
+    toc: true
+    toc_depth: 5
+    toc_float: true
+---
+
+```{r intro, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo=FALSE, 
+                      message=FALSE, 
+                      comment = "", 
+                      warning=FALSE, 
+                      results="hide") 
+
+knitr::opts_knit$set(root.dir = "C:/Users/YoonJoung Choi/Dropbox/0 iSquared/iSquared_PMA/Effective Access/")
+
+date<-as.Date(Sys.time(	), format='%d%b%Y')
+time<-Sys.time()
+
+library(plyr)
+library(dplyr)
+library(tidyverse)
+library(plotly)
+library(lubridate)
+
+# Libraries for radar chart
+library(viridis)
+library(patchwork)
+library(hrbrthemes)
+library(fmsb)
+library(colormap)
+
+```
+
+```{r dta, results='hide'}
+dtaIR<-data.frame(read_csv("summary_Access_Indicators_IR.csv"))%>%
+    mutate(yearmonth = ISOdate(year, month, 15),
+           #yearmonth = as.POSIXct(as.numeric(yearmonth), origin="1970-01-01"), 
+           #yearmonth = substr(as.character(yearmonth),0,7), 
+           latestIRLINK=latestIR,
+           latestIRLINK=ifelse(xsurvey=="BFR5", 1, latestIRLINK),
+           latestIRLINK=ifelse(xsurvey=="BFR6", 0, latestIRLINK),
+           latestIRLINK=ifelse(xsurvey=="BFR7", 0, latestIRLINK),
+           latestIRLINK=ifelse(xsurvey=="KER7", 1, latestIRLINK),
+           latestIRLINK=ifelse(xsurvey=="KER8", 0, latestIRLINK), 
+           
+           linkissue=(country=="Nigeria, Kano" | country=="Nigeria, Lagos" | country=="India, Rajasthan" | 
+                      xsurvey=="NGKanoR3" | xsurvey=="BFR6"),
+           SDPall_essential5_rnoso=ifelse(linkissue==1, NA, SDPall_essential5_rnoso), 
+           SDPall_essential5_noso=ifelse(linkissue==1, NA, SDPall_essential5_noso), 
+           SDPall_essential5_ready=ifelse(linkissue==1, NA, SDPall_essential5_ready), 
+           SDPall_essential5ec_rnoso=ifelse(linkissue==1, NA, SDPall_essential5_rnoso), 
+           SDPall_essential5ec_noso=ifelse(linkissue==1, NA, SDPall_essential5_noso), 
+           SDPall_essential5ec_ready=ifelse(linkissue==1, NA, SDPall_essential5_ready) 
+           
+    )
+
+dtaCR<-data.frame(read_csv("summary_Access_Indicators_CR.csv"))%>%
+    mutate(yearmonth = ISOdate(year, month, 15)
+           #yearmonth = substr(as.character(yearmonth),0,7)
+    )
+
+    #table(dtaIR$xsurvey)
+    #table(dtaCR$xsurvey)
+    
+    #table(dtaIR$group)
+    #table(dtaCR$group)
+    
+    #table(dtaIR$grouplabel)
+    #table(dtaCR$grouplabel)    
+
+    #table(dtaIR$yearmonth)
+    #table(dtaCR$yearmonth)
+
+dta<-rbind.fill(dtaIR, dtaCR)
+```
+
+(last updated: `r time`)
+
+__Potential data viz exploration for women's access to family planning programs__ 
+
+Objectives:    
+1. communicate multi-dimensional access. The bigger/more round web, the better/more balanced access. (Note: Radar chart is useful specifically for XYZ)           
+2. visualize how this multi-dimensional access varies by sub-group.     
+
+Caveats:    
+1. In each dimension, a potential candidate metric is used. Part of this exercise is to identify/revise the candidates. So, they are not final. A few domains still have relatively poor data. Nevertheless, the metrics used here are:   
+
+* FP.agency: percent of women who strongly agreed or agreed with each of the following five statements:    
+* FP.efficacy: percent of women who strongly agreed or agreed with each of the following two statements:    
+* Information: percent of women who ever heard of specific 5 methods: IUD, implant, injectables, pills, and male condoms    
+* Affordability.insurance: percent of women who have health insurance (pretty bad...)   
+* Method.choice: percent of women who live in a community with at least on SDPs that have the five methods + have equipment/personnel to insert/remove IUD and implant + had no history of stock out in the past three months    
+* Service quality 1: percent of _FP clients_ who reported the communication was clear, they were allowed to ask questions, and they understood (index based on three questions).    
+* Service quality 2: percent of _FP clients_ who reported her provider discussed advantage/disadvantage of the method [she adopted].   
+
+__Questions__    
+1. Is it potentially useful?   
+2. Too simple to have one metric in each domain? We can have 2 metrics per domain. Not more than that.    
+3. 
+
+####__1. Among all women__
+
+```{r dtaRadar, results='hide'}
+dtafig<-dta%>%
+    filter(xsurvey=="BFR7" | xsurvey=="KER8")%>%
+    filter(group=="All" | group=="All clients")%>%
+    mutate(
+        FP.empowerment =xwge_fp_all, 
+        FP.agency=xwge_fp_existence_all,
+        FP.efficacy =xwge_fp_exercise_all,
+        Information    =xheard_select5, 
+        Affordability.insurance   = xinsurance,
+        Method.choice=SDPall_essential5_ready, 
+        Quality1 = ycommunication_all,
+        Quality2 = ydiscuss_procon
+    )%>%
+    select(xsurvey, 
+           FP.empowerment, 
+           FP.agency, 
+           FP.efficacy, 
+           Information, 
+           Affordability.insurance, 
+           Method.choice, 
+           Quality1,
+           Quality2)
+
+    temp<-dtafig[,-1]
+
+dtafig<-dtafig%>%
+    group_by(xsurvey)%>%
+    summarise_at(c(colnames(temp)), max, na.rm = TRUE)%>%
+    ungroup()%>%
+    mutate(
+        Method.choice=ifelse(xsurvey=="KER8", 73, Method.choice),
+        Method.choice=ifelse(xsurvey=="BFR7", 91, Method.choice) 
+    )
+    #pop-level access values borrowed from past survey in the country. "link to any SDPs": https://rpubs.com/YJ_Choi/AccessToMethods
+
+grouplist<-c(dtafig$xsurvey)
+grouplist
+
+maxvalue<-c(" ", rep(100,8))
+minvalue<-c(" ", rep(0,8))
+
+dtaradar <- rbind(maxvalue, minvalue, dtafig)%>%
+    select(-xsurvey)%>%
+    mutate_if(is.character,as.numeric)
+
+dtaradar<-as.data.frame(dtaradar)
+
+#View(dtafig)
+#View(dtaradar)
+
+```
+
+```{r plotRadar, results='asis', fig.align="left", out.width="1000px", out.height="800px"}
+# Set screen
+par(mar=c(rep(1,4)) )
+par(mfrow=c(1,2))
+
+# Loop for each plot
+grouplist<-c(dtafig$xsurvey)
+
+for(i in 1:length(grouplist)){
+
+radarchart(dtaradar[c(1,2,i+2), -1], axistype=1,
+           
+          #custom polygon
+          pcol=rgb(0.09,0.36,0.54, 0.8) , 
+          pfcol=rgb(0.09,0.36,0.54, 0.3) , 
+          plwd=2 , 
+        
+          #custom the grid
+          cglcol="grey", cglty=1, 
+          axislabcol="grey", 
+          cglwd=0.8,
+          caxislabels=seq(0,100,25), 
+        
+          #custom labels
+          vlcex=0.7,
+    
+          #title
+          title=grouplist[i]
+          )
+}
+          
+```
+
+
+
+####__2. By women's background characteristics: education as an example__
+
+```{r dtaRadar_ByEdu}
+dtafig<-dta%>%
+    filter(xsurvey=="BFR7" | xsurvey=="KER8")%>%
+    filter(group=="Education" | group=="Education (CR)" )%>%
+    mutate(grouplist=paste(xsurvey, grouplabel))%>%
+    mutate(
+        FP.empowerment =xwge_fp_all, 
+        FP.agency=xwge_fp_existence_all,
+        FP.efficacy =xwge_fp_exercise_all,
+        Information    =xheard_select5, 
+        Affordability.insurance   = xinsurance,
+        Method.choice   =SDPall_essential5_ready, 
+        Quality1 = ycommunication_all,
+        Quality2 = ydiscuss_procon
+    )%>%
+    select(grouplist,
+           FP.empowerment, 
+           FP.agency, 
+           FP.efficacy, 
+           Information, 
+           Affordability.insurance, 
+           Method.choice, 
+           Quality1,
+           Quality2)
+
+    temp<-dtafig[,-1]
+
+dtafig<-dtafig%>%
+    group_by(grouplist)%>%
+    summarise_at(c(colnames(temp)), max, na.rm = TRUE)%>%
+    ungroup()%>%
+    mutate(
+        Method.choice=ifelse(substr(grouplist, 1, 4)=="KER8", 73, Method.choice),
+        Method.choice=ifelse(substr(grouplist, 1, 4)=="BFR7", 91, Method.choice)
+    )
+    #pop-level access values borrowed from past survey in the country. "link to any SDPs": https://rpubs.com/YJ_Choi/AccessToMethods
+
+maxvalue<-c(" ", rep(100,8))
+minvalue<-c(" ", rep(0,8))
+
+dtaradar <- rbind(maxvalue, minvalue, dtafig)%>%
+    select(-grouplist)%>%
+    mutate_if(is.character,as.numeric)
+
+#View(dtafig)
+#View(dtaradar)
+```
+
+```{r plotRadar_ByEdu, results='asis', fig.align="left", out.width="1000px", out.height="800px"}
+# Set screen
+par(mar=c(rep(1,4)) )
+par(mfrow=c(2,2))
+
+# Loop for each plot
+grouplist<-c(dtafig$grouplist)
+
+for(i in 1:length(grouplist)){
+
+radarchart(dtaradar[c(1,2,i+2), -1], axistype=1,
+           
+          #custom polygon
+          pcol=rgb(0.09,0.36,0.54, 0.8) , 
+          pfcol=rgb(0.09,0.36,0.54, 0.3) , 
+          plwd=2 , 
+        
+          #custom the grid
+          cglcol="grey", cglty=1, 
+          axislabcol="grey", 
+          cglwd=0.8,
+          caxislabels=seq(0,100,25), 
+        
+          #custom labels
+          vlcex=0.7,
+    
+          #title
+          title=grouplist[i]
+          )
+}
+          
+```
+
+####__3. By women's FP demand, contraceptive use, and sexual activity status__
+
+Note: 
+* Service quality is not included.    
+
+#####__Among women with demand for FP__ 
+```{r dtaRadar_ByDenominator1}
+dtafig<-dta%>%
+    filter(xsurvey=="BFR7" | xsurvey=="KER8")%>%
+    filter(group=="By xdenominator" )%>%
+    filter(substr(grouplabel,1,6)=="demand" )%>%
+    mutate(grouplist=paste(substr(xsurvey,1,2), grouplabel))%>%
+    mutate(
+        FP.empowerment =xwge_fp_all, 
+        FP.agency=xwge_fp_existence_all,
+        FP.efficacy =xwge_fp_exercise_all,
+        Information    =xheard_select5, 
+        Affordability.insurance   = xinsurance,
+        Method.choice   =SDPall_essential5_ready
+    )%>%
+    select(grouplist,
+           FP.empowerment, 
+           FP.agency, 
+           FP.efficacy, 
+           Information, 
+           Affordability.insurance, 
+           Method.choice)
+
+    temp<-dtafig[,-1]
+
+dtafig<-dtafig%>%
+    group_by(grouplist)%>%
+    summarise_at(c(colnames(temp)), max, na.rm = TRUE)%>%
+    ungroup()%>%
+    mutate(
+        Method.choice=ifelse(substr(grouplist, 1, 2)=="KE", 73, Method.choice),
+        Method.choice=ifelse(substr(grouplist, 1, 2)=="BF", 91, Method.choice)
+    )
+    #pop-level access values borrowed from past survey in the country. "link to any SDPs": https://rpubs.com/YJ_Choi/AccessToMethods
+
+maxvalue<-c(" ", rep(100,6))
+minvalue<-c(" ", rep(0,6))
+
+dtaradar <- rbind(maxvalue, minvalue, dtafig)%>%
+    select(-grouplist)%>%
+    mutate_if(is.character,as.numeric)
+
+#View(dtafig)
+#View(dtaradar)
+```
+
+```{r plotRadar_ByDenominator1, results='asis', fig.align="left", out.width="1000px", out.height="800px"}
+# Set screen
+par(mar=c(rep(1,4)) )
+par(mfrow=c(2,2))
+
+# Loop for each plot
+grouplist<-c(dtafig$grouplist)
+grouplist<-c("BF demand, use", "BF demand, unmet", 
+             "KE demand, use", "KE demand, unmet")
+grouplist<-c(dtafig$grouplist)
+
+for(i in 1:length(grouplist)){
+
+radarchart(dtaradar[c(1,2,i+2), -1], axistype=1,
+           
+          #custom polygon
+          pcol=rgb(0.09,0.36,0.54, 0.8) , 
+          pfcol=rgb(0.09,0.36,0.54, 0.3) , 
+          plwd=2 , 
+        
+          #custom the grid
+          cglcol="grey", cglty=1, 
+          axislabcol="grey", 
+          cglwd=0.8,
+          caxislabels=seq(0,100,25), 
+        
+          #custom labels
+          vlcex=0.7,
+    
+          #title
+          title=grouplist[i]
+          )
+}
+          
+```
+
+#####__Among women without demand for FP__
+```{r dtaRadar_ByDenominator2}
+dtafig<-dta%>%
+    filter(xsurvey=="BFR7" | xsurvey=="KER8")%>%
+    filter(group=="By xdenominator" )%>%
+    filter(substr(grouplabel,1,6)!="demand" )%>%
+    mutate(grouplist=paste(substr(xsurvey,1,2), grouplabel))%>%
+    mutate(
+        FP.empowerment =xwge_fp_all, 
+        FP.agency=xwge_fp_existence_all,
+        FP.efficacy =xwge_fp_exercise_all,
+        Information    =xheard_select5, 
+        Affordability.insurance   = xinsurance,
+        Method.choice   =SDPall_essential5_ready
+    )%>%
+    select(grouplist,
+           FP.empowerment, 
+           FP.agency, 
+           FP.efficacy, 
+           Information, 
+           Affordability.insurance, 
+           Method.choice)
+
+    temp<-dtafig[,-1]
+
+dtafig<-dtafig%>%
+    group_by(grouplist)%>%
+    summarise_at(c(colnames(temp)), max, na.rm = TRUE)%>%
+    ungroup()%>%
+    mutate(
+        Method.choice=ifelse(substr(grouplist, 1, 2)=="KE", 73, Method.choice),
+        Method.choice=ifelse(substr(grouplist, 1, 2)=="BF", 91, Method.choice)
+    )
+    #pop-level access values borrowed from past survey in the country. "link to any SDPs": https://rpubs.com/YJ_Choi/AccessToMethods
+
+maxvalue<-c(" ", rep(100,6))
+minvalue<-c(" ", rep(0,6))
+
+dtaradar <- rbind(maxvalue, minvalue, dtafig)%>%
+    select(-grouplist)%>%
+    mutate_if(is.character,as.numeric)
+
+#View(dtafig)
+#View(dtaradar)
+```
+
+```{r plotRadar_ByDenominator2, results='asis', fig.align="left", out.width="1000px", out.height="800px"}
+# Set screen
+par(mar=c(rep(1,4)) )
+par(mfrow=c(2,3))
+
+# Loop for each plot
+grouplist<-c(dtafig$grouplist)
+grouplist<-c(
+             "BF no demand, fecund", "BF no demand, infecund", 
+             "BF not sexually active",
+             
+             "KE no demand, fecund", "KE no demand, infecund",
+             "KE not sexually active")
+grouplist<-c(dtafig$grouplist)
+
+for(i in 1:length(grouplist)){
+
+radarchart(dtaradar[c(1,2,i+2), -1], axistype=1,
+           
+          #custom polygon
+          pcol=rgb(0.09,0.36,0.54, 0.8) , 
+          pfcol=rgb(0.09,0.36,0.54, 0.3) , 
+          plwd=2 , 
+        
+          #custom the grid
+          cglcol="grey", cglty=1, 
+          axislabcol="grey", 
+          cglwd=0.8,
+          caxislabels=seq(0,100,25), 
+        
+          #custom labels
+          vlcex=0.7,
+    
+          #title
+          title=grouplist[i]
+          )
+}
+          
+```
+
+---
+
+```{r dtaRadar_ByDenominator}
+dtafig<-dta%>%
+    filter(xsurvey=="BFR7" | xsurvey=="KER8")%>%
+    filter(group=="By xdenominator" )%>%
+    mutate(grouplist=paste(substr(xsurvey,1,2), grouplabel))%>%
+    mutate(
+        FP.empowerment =xwge_fp_all, 
+        FP.agency=xwge_fp_existence_all,
+        FP.efficacy =xwge_fp_exercise_all,
+        Information    =xheard_select5, 
+        Affordability.insurance   = xinsurance,
+        Method.choice   =SDPall_essential5_ready
+    )%>%
+    select(grouplist,
+           FP.empowerment, 
+           FP.agency, 
+           FP.efficacy, 
+           Information, 
+           Affordability.insurance, 
+           Method.choice)
+
+    temp<-dtafig[,-1]
+
+dtafig<-dtafig%>%
+    group_by(grouplist)%>%
+    summarise_at(c(colnames(temp)), max, na.rm = TRUE)%>%
+    ungroup()%>%
+    mutate(
+        Method.choice=ifelse(substr(grouplist, 1, 2)=="KE", 73, Method.choice),
+        Method.choice=ifelse(substr(grouplist, 1, 2)=="BF", 91, Method.choice)
+    )
+    #pop-level access values borrowed from past survey in the country. "link to any SDPs": https://rpubs.com/YJ_Choi/AccessToMethods
+
+maxvalue<-c(" ", rep(100,6))
+minvalue<-c(" ", rep(0,6))
+
+dtaradar <- rbind(maxvalue, minvalue, dtafig)%>%
+    select(-grouplist)%>%
+    mutate_if(is.character,as.numeric)
+
+#View(dtafig)
+#View(dtaradar)
+```
+
+```{r plotRadar_ByDenominator, eval=FALSE}
+# Set screen
+par(mar=c(rep(1,4)) )
+par(mfrow=c(2,5))
+
+# Loop for each plot
+grouplist<-c(dtafig$grouplist)
+grouplist<-c("BF demand, use", "BF demand, unmet", 
+             "BF no demand, fecund", "BF no demand, infecund", 
+             "BF not sexually active",
+             "KE demand, use", "KE demand, unmet",
+             "KE no demand, fecund", "KE no demand, infecund",
+             "KE not sexually active")
+grouplist<-c(dtafig$grouplist)
+
+for(i in 1:length(grouplist)){
+
+radarchart(dtaradar[c(1,2,i+2), -1], axistype=1,
+           
+          #custom polygon
+          pcol=rgb(0.09,0.36,0.54, 0.8) , 
+          pfcol=rgb(0.09,0.36,0.54, 0.3) , 
+          plwd=2 , 
+        
+          #custom the grid
+          cglcol="grey", cglty=1, 
+          axislabcol="grey", 
+          cglwd=0.8,
+          caxislabels=seq(0,100,25), 
+        
+          #custom labels
+          vlcex=0.7,
+    
+          #title
+          title=grouplist[i]
+          )
+}
+          
+```
+
+
+---
+
+
+```{r plotlyRadar, fig.align="left", out.width="1000px", out.height="800px"}
+
+figBF<-plot_ly(
+    type = 'scatterpolar',
+    r = c(38,43,47,2,91,33,30,38),
+    theta = c("FP.agency", "FP.efficacy", 
+              "Information", "Affordability.insurance", "Method.choice",
+              "Quality1", "Quality2",
+              "FP.agency"),
+    name="Burkina Faso",
+    fill = 'toself'
+    )%>%
+    layout(
+        polar = list(radialaxis = list(visible = T,
+                                       range = c(0,100)) )
+    )
+
+figKE<-plot_ly(
+    type = 'scatterpolar',
+    r = c(40,43,70,28,73,43,62,40),
+    theta = c("FP.agency", "FP.efficacy", 
+              "Information", "Affordability.insurance", "Method.choice",
+              "Quality1", "Quality2",
+              "FP.agency"),
+    name="Kenya",
+    fill = 'toself'
+    )%>%
+    layout(
+        polar = list(radialaxis = list(visible = T,
+                                       range = c(0,100)) )
+    )
+
+subplot(figBF, figKE, nrows=1)
+```
+
+```{r, eval=FALSE}
+
+#from: https://stackoverflow.com/questions/37670412/can-i-recreate-this-polar-coordinate-spider-chart-in-plotly/37778091#37778091
+
+
+d <- structure(list(Year = rep(c("2015","2016"),each=24),
+                    Response = structure(rep(1L:24L,2), 
+                                         .Label = c("Trustworthy", "Supportive", "Leading",
+                                                    "Strong", "Dependable", "Consultative",
+                                                    "Knowledgeable", "Sensible", 
+                                                    "Intelligent", "Consistent", "Stable", 
+                                                    "Innovative", "Aggressive", 
+                                                    "Conservative", "Visionary", 
+                                                    "Arrogant", "Professional", 
+                                                    "Responsive", "Confident", "Accessible", 
+                                                    "Timely", "Focused", "Niche", "None"),
+                                         class = "factor"), 
+                    Proportion = c(0.54, 0.48, 0.33, 0.35, 0.47, 0.3, 0.43, 0.29, 0.36,
+                                   0.38, 0.45, 0.32, 0.27, 0.22, 0.26,0.95, 0.57, 0.42, 
+                                   0.38, 0.5, 0.31, 0.31, 0.12, 0.88, 0.55, 0.55, 0.31,
+                                   0.4, 0.5, 0.34, 0.53, 0.3, 0.41, 0.41, 0.46, 0.34, 
+                                   0.22, 0.17, 0.28, 0.94, 0.62, 0.46, 0.41, 0.53, 0.34, 
+                                   0.36, 0.1, 0.84), 
+                    n = rep(c(240L,258L),each=24)
+                    ),
+               .Names = c("Year", "Response", "Proportion", "n"), 
+               row.names = c(NA, -48L), 
+               class = c("tbl_df", "tbl", "data.frame"))
+
+str(d)
+dim(d)
+
+### 
+scale <- 10   # multiply latitudes by a factor of 10 to scale plot to good size in initial view
+d$lat <- scale*d$Proportion - 90
+d$long <- (as.numeric(d$Response)-1) * 360/24
+
+###
+p <- plot_ly(d[c(1:24,1,25:48,25),], lat=lat, lon=long, 
+             color = factor(Year), colors=c('#F8756B','#00BDC2'),
+             type = 'scattergeo', mode = 'lines+markers', showlegend=T) %>%
+    layout(geo = list(scope='world', showland=F, showcoastlines=F, showframe=F,
+                      projection = list(type = 'azimuthal equidistant', rotation=list(lat=-90), scale=5)),
+           legend=list(x=0.7,y=0.85))
+p
+
+###
+p %<>% add_trace(type="scattergeo",  mode = "text", lat=rep(scale*1.1-90,24), lon=long, 
+                 text=Response, showlegend=F, textfont=list(size=10)) %>%
+       add_trace(type="scattergeo",  mode = "text", showlegend=F, textfont=list(size=12),
+                 lat=seq(-90, -90+scale,length.out = 5), lon=rep(0,5), 
+                 text=c("","25%","50%","75%","100%"))
+
+###
+l1 <- list(width = 0.5, color = rgb(.5,.5,.5), dash = "3px")
+l2 <- list(width = 0.5, color = rgb(.5,.5,.5))
+for (i in c(0.1, 0.25, 0.5, 0.75, 1)) 
+    p <- add_trace(lat=rep(-90, 100)-scale*i, lon=seq(0,360, length.out=100), type='scattergeo', mode='lines', line=l1, showlegend=F, evaluate=T)
+for (i in 1:24) 
+    p <- add_trace(p,lat=c(-90+scale*0.1,-90+scale), lon=rep(i*360/24,2), type='scattergeo', mode='lines', line=l2, showlegend=F, evaluate=T)
+
+```

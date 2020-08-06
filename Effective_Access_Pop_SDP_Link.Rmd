@@ -135,25 +135,26 @@ dta%>%
                marker = list(color = '#1F88B4')) %>%
     layout(
         title = c(""),
-        xaxis = list(title = "", tickfont = list(size=8)), 
+        xaxis = list(title = "", tickangle=-90, tickfont = list(size=8)), 
         yaxis = list(title = "Number", tickfont = list(size=8))   ,
         legend = list(orientation = 'v',x = 0.1, y = 0.9, size=10)
         ) 
 ```
 
-#####__1.3. Distribution of SDPs by type in each survey__ 
+#####__1.3. Distribution of SDPs by managing authority in each survey__ 
 
 The public/private composition also should be roughly stable.   
 
 * Burkina Faso Round 6: It looks like the decrease is _primarily public facilities_, which should really remain stable.  
 
-```{r plotSDPcomposition, results='asis'}
+```{r plotSDPcompositionSector, results='asis'}
 dta%>%
     filter(group=="all")%>%
     plot_ly(x = ~xsurvey, y = ~nSDPpub, type = "bar", name="Public", marker = list(color = '#1F88B4')) %>%
     add_trace( y = ~nSDPprivate, type = "bar", name="Private", marker = list(color = '#70A8CF')) %>%
     layout(
         xaxis = list(title = "",
+                     tickangle=-90, 
                      tickfont = list(size=8)), 
         yaxis = list(title = "Number of SDPs",
                      titlefont=list(size=12),
@@ -161,6 +162,74 @@ dta%>%
         legend = list(orientation = 'v',x = 0.1, y = 0.9, size=10),
         barmode = 'stack'
         ) 
+
+
+```
+
+```{r plotSDPcompositionSectorPCT, results='asis'}
+dta%>%
+    filter(group=="all")%>%
+    mutate(pctSDPpub=100*nSDPpub/nSDP,
+           pctSDPprivate=100*nSDPprivate/nSDP)%>%
+    plot_ly(x = ~xsurvey, y = ~pctSDPpub, type = "bar", name="Public", marker = list(color = '#1F88B4')) %>%
+    add_trace( y = ~pctSDPprivate, type = "bar", name="Private", marker = list(color = '#70A8CF')) %>%
+    layout(
+        xaxis = list(title = "",
+                     tickangle=-90, 
+                     tickfont = list(size=8)), 
+        yaxis = list(title = "% of SDP sample",
+                     titlefont=list(size=12),
+                     tickfont = list(size=8)), 
+        legend = list(orientation = 'h',x = 0.5, y = 1.05, xanchor = "center", yanchor = "center", size=8),
+        barmode = 'stack'
+        ) 
+
+
+```
+
+#####__1.4. Distribution of SDPs by type/level in each survey__ 
+
+The type/level composition also should be roughly stable.   
+
+* Burkina Faso Round 6: It looks like the decrease is _primarily public facilities_, which should really remain stable.  
+
+```{r plotSDPcompositionLevel, results='asis'}
+dta%>%
+    filter(group=="all")%>%
+    plot_ly(x = ~xsurvey, y = ~nSDPhospital, type = "bar", name="Hospital", marker = list(color = '#FF7F0E')) %>%
+    add_trace( y = ~nSDPlow, type = "bar", name="Non-hospital", marker = list(color = '#FFBD84')) %>%
+    layout(
+        xaxis = list(title = "",
+                     tickangle=-90, 
+                     tickfont = list(size=8)), 
+        yaxis = list(title = "Number of SDPs",
+                     titlefont=list(size=12),
+                     tickfont = list(size=8)), 
+        legend = list(orientation = 'v',x = 0.1, y = 0.9, size=10),
+        barmode = 'stack'
+        ) 
+```
+
+```{r plotSDPcompositionLevelPCT, results='asis'}
+dta%>%
+    filter(group=="all")%>%
+    mutate(pctSDPhospital=100*nSDPhospital/nSDP,
+           pctSDPlow=100*nSDPlow/nSDP)%>%
+    plot_ly(x = ~xsurvey, y = ~pctSDPhospital, type = "bar", name="Hospital", marker = list(color = '#FF7F0E')) %>%
+    add_trace( y = ~pctSDPlow, type = "bar", name="Non-hospital", marker = list(color = '#FFBD84')) %>%
+    layout(
+        xaxis = list(title = "",
+                     tickangle=-90, 
+                     tickfont = list(size=8)), 
+        yaxis = list(title = "% of SDP sample",
+                     titlefont=list(size=12),
+                     tickfont = list(size=8)), 
+        legend = list(orientation = 'h',x = 0.5, y = 1.05, xanchor = "center", yanchor = "center", size=8),
+        barmode = 'stack'
+        ) 
+
+
+
 ```
 
 ---
@@ -202,6 +271,26 @@ More importantly, the average number should remain stable across all rounds, wit
 * Burkina Faso Round 6    
 * Niger, Niamey Round 5   
 * Nigeria, Kano Round 3   
+```{r}
+temp<-dta%>%filter(group=="all")%>%
+    select(xsurvey, starts_with("num_SDP"))%>%
+    filter(xsurvey!="BFR6" & xsurvey!="NENiameyR5" & xsurvey!="NGKanoR3")
+
+summary(temp)
+numSDPall_av=round(mean(temp$num_SDPall), 1)
+numSDPpub_av=round(mean(temp$num_SDPpub), 1)
+numSDPlow_av=round(mean(temp$num_SDPlow), 1)
+numSDPall_min=round(min(temp$num_SDPall), 1)
+numSDPpub_min=round(min(temp$num_SDPpub), 1)
+numSDPlow_min=round(min(temp$num_SDPlow), 1)
+numSDPall_max=round(max(temp$num_SDPall), 1)
+numSDPpub_max=round(max(temp$num_SDPpub), 1)
+numSDPlow_max=round(max(temp$num_SDPlow), 1)
+```
+    
+* average number of SDPs linked to a EA: `r numSDPall_av` (`r numSDPall_min` - `r numSDPall_max`)   
+* average number of SDPs, excluding hospitals, linked to a EA:`r numSDPlow_av` (`r numSDPlow_min` - `r numSDPlow_max`)   
+* average number of public SDPs linked to a EA: `r numSDPpub_av` (`r numSDPpub_min` - `r numSDPpub_max`)   
 
 ```{r plotnumSDPperEA, results='asis', fig.align="left", out.width="900px"}
 dta%>%
@@ -216,11 +305,47 @@ dta%>%
               name = "Public SDPs, excluding hospitals", marker = list(color = '#8DC2D9'))%>%
     layout(
             title = c(""),
-            xaxis = list(titel = ""),  
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=10)), 
             yaxis = list(title = "Average number of linked SDPs per EA"),
             legend = list(orientation = 'h',x = 0.5, y = 1.05, xanchor = "center", yanchor = "center", size=8)
             )
 
+dta%>%
+    filter(group=="all")%>%
+    plot_ly(x = ~xsurvey, y = ~num_SDPall, type = "bar", 
+        name = "Any SDPs", marker = list(color = '#FF7F0E'))%>%
+    add_trace(y = ~num_SDPlow, type = "bar", 
+              name = "Any SDPs, excluding hospitals", marker = list(color = '#FFBD84'))%>%
+    
+    layout(
+            title = c(""),
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=10)),
+            yaxis = list(title = "Average number of linked SDPs per EA"),
+            legend = list(orientation = 'h',x = 0.5, y = 1.05, xanchor = "center", yanchor = "center", size=8)
+            )
+
+dta%>%
+    filter(group=="all")%>%
+    plot_ly(x = ~xsurvey, y = ~num_SDPall, type = "bar", 
+        name = "Any SDPs", marker = list(color = '#FF7F0E'))%>%
+    layout(
+            title = c(""),
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=10)),
+            yaxis = list(title = "Average number of linked SDPs per EA",
+                         titlefont = list(size=10))
+            )
+
+dta%>%
+    filter(group=="all")%>%
+    plot_ly(x = ~xsurvey, y = ~num_SDPlow, type = "bar", 
+        name = "Any SDPs, excluding hospitals", marker = list(color = '#FFBD84'))%>%
+    
+    layout(
+            title = c(""),
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=10)),
+            yaxis = list(title = "Average number of linked SDPs, excluding hospitals, per EA",
+                         titlefont = list(size=10))
+            )
 ```
 
 #####__3.2. Percent of EAs with no linked SDPs__
@@ -230,6 +355,7 @@ temp<-dta%>%filter(group=="all")
 nsurveys<-nrow(temp)
 mediananylow<-round(median(temp$noSDPlow), 1)
 medianpublow<-round(median(temp$noSDPpub12), 1)
+
 ```
 
 Theoretically, this should be 0%. But, see: 
@@ -238,15 +364,87 @@ Theoretically, this should be 0%. But, see:
 * Niger, Niamey Round 5
 * Nigeria, Kano Round 3   
 
-Other than these two survey, EA-SDP linking looks 'okay' (i.e., <5 %) with __any SDPs__ (dark orange bars) and __any public SDPs__ (dark blue bars). For women in these SDP-missing-EAs, any 'population-level accessibility to quality services' will be automatically none/missing.   
+Other than these survey, EA-SDP linking looks 'okay' (i.e., <5 %) with __any SDPs__ (dark orange bars) and __any public SDPs__ (dark blue bars). For women in these SDP-missing-EAs, any 'population-level accessibility to quality services' will be automatically none/missing. 
 
 However, percent of EAs without linked primary or secondary SDPs is high. Median (among `r nsurveys` surveys): `r mediananylow` % for _any primary or secondary SDPs_ (light orange bars) and `r medianpublow` % for _public primary or secondary SDPs_ (light blue bars).   
 
-```{r plotEAnoSDPall, results='asis', fig.align="left", out.width="900px"}
+```{r}
+temp<-dta%>%filter(group=="all")%>%
+    select(xsurvey, starts_with("noSDP"))
+summary(temp)
+nsurveys<-nrow(temp)
+
+nSDPall_av=round(mean(temp$noSDPany), 1)
+nSDPpub_av=round(mean(temp$noSDPpub), 1)
+nSDPlow_av=round(mean(temp$noSDPlow), 1)
+nSDPall_min=round(min(temp$noSDPany), 1)
+nSDPpub_min=round(min(temp$noSDPpub), 1)
+nSDPlow_min=round(min(temp$noSDPlow), 1)
+nSDPall_max=round(max(temp$noSDPany), 1)
+nSDPpub_max=round(max(temp$noSDPpub), 1)
+nSDPlow_max=round(max(temp$noSDPlow), 1)
+
+nSDPall_med=round(median(temp$noSDPany), 1)
+nSDPpub_med=round(median(temp$noSDPpub), 1)
+nSDPlow_med=round(median(temp$noSDPlow), 1)
+```
+
+Among `r nsurveys` surveys:   
+
+* average percent of EAs with no linked SDPs: `r nSDPall_av` (`r nSDPall_min` - `r nSDPall_max`). median: `r nSDPall_med`     
+* average percent of EAs with no linked SDPs that are not hospitals:`r nSDPlow_av` (`r nSDPlow_min` - `r nSDPlow_max`). median: `r nSDPlow_med`      
+* average percent of EAs with no linked public SDPs: `r nSDPpub_av` (`r nSDPpub_min` - `r nSDPpub_max`). median: `r nSDPpub_med`      
+
+```{r}
+temp<-dta%>%filter(group=="all")%>%
+    select(xsurvey, starts_with("noSDP"))%>%
+    filter(xsurvey!="BFR6" & xsurvey!="NENiameyR5" & xsurvey!="NGKanoR3")%>%
+    mutate(
+        linkSDPany5=noSDPany<5, 
+        linkSDPany10=noSDPany<10, 
+        linkSDPlow5=noSDPlow<5, 
+        linkSDPlow10=noSDPlow<10
+    )
+summary(temp)
+    
+nsurveys<-nrow(temp)
+
+nSDPall_av=round(mean(temp$noSDPany), 1)
+nSDPpub_av=round(mean(temp$noSDPpub), 1)
+nSDPlow_av=round(mean(temp$noSDPlow), 1)
+nSDPall_min=round(min(temp$noSDPany), 1)
+nSDPpub_min=round(min(temp$noSDPpub), 1)
+nSDPlow_min=round(min(temp$noSDPlow), 1)
+nSDPall_max=round(max(temp$noSDPany), 1)
+nSDPpub_max=round(max(temp$noSDPpub), 1)
+nSDPlow_max=round(max(temp$noSDPlow), 1)
+
+nSDPall_med=round(median(temp$noSDPany), 1)
+nSDPpub_med=round(median(temp$noSDPpub), 1)
+nSDPlow_med=round(median(temp$noSDPlow), 1)
+
+
+```
+
+Among `r nsurveys` surveys, excluding the three outiers: 
+
+* average percent of EAs with no linked SDPs: `r nSDPall_av` (`r nSDPall_min` - `r nSDPall_max`). median: `r nSDPall_med`     
+* average percent of EAs with no linked SDPs that are not hospitals:`r nSDPlow_av` (`r nSDPlow_min` - `r nSDPlow_max`). median: `r nSDPlow_med`      
+* average percent of EAs with no linked public SDPs: `r nSDPpub_av` (`r nSDPpub_min` - `r nSDPpub_max`). median: `r nSDPpub_med` 
+
+```{r, results="asis"}
+    table(temp$linkSDPany5)
+    table(temp$linkSDPany10)
+    table(temp$linkSDPlow5)
+    table(temp$linkSDPlow10)
+```
+
+
+```{r plotEAnoSDPall, results='asis', fig.align="left", out.width="1000px", out.height="400px"}
 dtafig<-dta%>%filter(group=="all")%>%
-    mutate(noSDPany=round(noSDPany, 1), 
-           noSDPpub=round(noSDPpub, 1),
-           noSDPlow=round(noSDPlow, 1))
+    mutate(noSDPany=round(noSDPany, 0), 
+           noSDPpub=round(noSDPpub, 0),
+           noSDPlow=round(noSDPlow, 0))
 
 dtafig%>%
     plot_ly( x = ~xsurvey) %>%
@@ -265,8 +463,27 @@ dtafig%>%
              showlegend=FALSE)%>%    
     layout(
         title = c(""),
-            xaxis = list(titel = ""),  
-            yaxis = list(title = "(%)"),
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=10)),
+            yaxis = list(title = "Percent"),
+            legend = list(orientation = 'h',x = 0.5, y = 1.05, xanchor = "center", yanchor = "center", size=8)
+            )
+
+
+dtafig%>%
+    plot_ly( x = ~xsurvey) %>%
+    add_trace(y = ~noSDPany, type = "bar", 
+              name = "Any SDPs", marker = list(color = '#FF7F0E'))%>%
+    add_trace(y = ~noSDPlow, type = "bar", 
+              name = "Any SDPs, excluding hospitals", marker = list(color = '#FFBD84'))%>%
+    add_segments(x = as.character("BFR1"), xend = as.character("UGR6"), 
+             y = 5, yend = 5,
+             marker = list(color = "gray",size = 2),
+             line= list(color = "gray", dash = 'dot'),
+             showlegend=FALSE)%>%    
+    layout(
+        title = c(""),
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=10)),
+            yaxis = list(title = "Percent"),
             legend = list(orientation = 'h',x = 0.5, y = 1.05, xanchor = "center", yanchor = "center", size=8)
             )
 
@@ -280,9 +497,8 @@ plot_ly(dtafig, x = ~xsurvey, y = ~noSDPany, type = "bar",
              line= list(color = "gray", dash = 'dot'),
              showlegend=FALSE)%>%    
     layout(
-            title = c("Percent of EAs without any linked SDPs"), 
-            xaxis = list(titel = ""),  
-            yaxis = list(title = "(%)"),
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=8)),
+            yaxis = list(title = "Percent"),
             showlegend = FALSE 
             )
 
@@ -297,9 +513,8 @@ plot_ly(dtafig, x = ~xsurvey, y = ~noSDPpub, type = "bar",
              line= list(color = "gray", dash = 'dot'),
              showlegend=FALSE)%>%
     layout(
-            title = c("Percent of EAs without any linked public SDPs"),
-            xaxis = list(titel = ""),  
-            yaxis = list(title = "(%)"),
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=8)),
+            yaxis = list(title = "Percent"),
             showlegend = FALSE
             )
 
@@ -313,9 +528,8 @@ plot_ly(dtafig, x = ~xsurvey, y = ~noSDPlow, type = "bar",
              line= list(color = "gray", dash = 'dot'),
              showlegend=FALSE)%>%
     layout(
-            title = c("Percent of EAs without any linked SDPs, exluding hospitals"),
-            xaxis = list(titel = ""),  
-            yaxis = list(title = "(%)"),
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=10)),
+            yaxis = list(title = "Percent"),
             showlegend = FALSE
             )
 
@@ -323,38 +537,52 @@ plot_ly(dtafig, x = ~xsurvey, y = ~noSDPlow, type = "bar",
 
 #####__3.3. Percent of EAs with no linked SDPs by residential area__
 
-Overall, urban EAs tend to have more problems in linking.   
+Overall, urban EAs tend to have more problems in linking. Excluding four countries/geographies, where urban/rurla stratification was not used because the entire geogrphy is primarily urban/rural.    
 
-```{r plotEAnoSDPur, results='asis', fig.align="left", out.width="900px"}
+```{r plotEAnoSDPur, fig.align="left", out.width="1000px", out.height="400px"}
 
-dtafig<-dta%>%filter(group!="all")
+dtafig<-dta%>%filter(group!="all")%>%
+    filter(country!="NENiamey" & country!="NGLagos" & country!="CDKinshasa" & country!="CDKongoCentral")%>%
+    filter(xsurvey!="BFR6" & xsurvey!="NENiameyR5" & xsurvey!="NGKanoR3")%>%
+    mutate(
+        grouplabel=ifelse(grouplabel=="1. urban", "Urban", grouplabel), 
+        grouplabel=ifelse(grouplabel=="2. rural", "Rural", grouplabel),
+        survey=paste0(country,"R",as.character(round)),
+        linkSDPany5=noSDPany<5, 
+        linkSDPany10=noSDPany<10, 
+        linkSDPlow5=noSDPlow<5, 
+        linkSDPlow10=noSDPlow<10,
+        noSDPany=round(noSDPany, 1),
+        noSDPpub=round(noSDPpub, 1),
+        noSDPlow=round(noSDPlow, 1)
+    )
+#length(unique(dtafig$xsurvey))
+#table(dtafig$survey)
+
 
 dtafig%>%
     split(dtafig$grouplabel) %>%
     lapply(function(x) {
         plot_ly(data = x, 
-                x = ~xsurvey, 
+                x = ~survey, 
                 y = ~noSDPany, type = "bar", 
                 name = "Any SDPs", marker = list(color = '#FF7F0E')
                 )%>%
+        add_text(text=~noSDPany, textposition = 'top', 
+                 textfont=list(size=8, color="black"))%>%    
         add_annotations(
             text = ~unique(grouplabel),
             x = 0.5, y = 0.9, xref = "paper", yref = "paper",    
             xanchor = "center", yanchor = "bottom", showarrow = FALSE,
             font = list(size = 12)
             )%>%
-        add_segments(x = as.character("BFR1"), xend = as.character("UGR6"), 
-             y = 5, yend = 5,
-             marker = list(color = "gray",size = 2),
-             line= list(color = "gray", dash = 'dot'),
-             showlegend=FALSE)%>%                
-        layout(xaxis = list(title = ""))      
+        layout(xaxis = list(title = "", tickangle=-90, tickfont = list(size=8)))
     }) %>%
-    subplot(margin=0.05, shareX = TRUE, shareY = TRUE)%>%
+    subplot( shareX = TRUE, shareY = TRUE)%>%
     layout(
-        title = c("EA-SDP link by residential area: Any SDP"),
-        xaxis = list(title = "", tickfont = list(size=10)),  
-        yaxis = list(title = "Percent of EAs without any linked SDPs"), 
+        title = c(""),
+        xaxis = list(title = "", tickangle=-90, tickfont = list(size=8)),  
+        yaxis = list(title = "Percent"), 
         showlegend=FALSE
         )
 
@@ -362,10 +590,12 @@ dtafig%>%
     split(dtafig$grouplabel) %>%
     lapply(function(x) {
         plot_ly(data = x, 
-                x = ~xsurvey, 
+                x = ~survey, 
                 y = ~noSDPpub, type = "bar", 
                 name = "Public SDPs", marker = list(color = '#1F88B4')
                 )%>%
+        add_text(text=~noSDPpub, textposition = 'top', 
+                 textfont=list(size=8, color="black"))%>%        
         add_annotations(
             text = ~unique(grouplabel),
             x = 0.5, y = 0.9, xref = "paper", yref = "paper",    
@@ -377,13 +607,13 @@ dtafig%>%
              marker = list(color = "gray",size = 2),
              line= list(color = "gray", dash = 'dot'),
              showlegend=FALSE)%>%                            
-        layout(xaxis = list(title = ""))      
+        layout(xaxis = list(title = "", tickangle=-90, tickfont = list(size=8))) 
     }) %>%
-    subplot(margin=0.05, shareX = TRUE, shareY = TRUE)%>%
+    subplot(shareX = TRUE, shareY = TRUE)%>%
     layout(
-        title = c("EA-SDP link by residential area: Public SDP"),
-        xaxis = list(title = "", tickfont = list(size=10)),   
-        yaxis = list(title = "Percent of EAs without any linked public SDPs"), 
+        title = c(""),
+        xaxis = list(title = "", tickangle=-90, tickfont = list(size=8)),   
+        yaxis = list(title = "Percent"), 
         showlegend=FALSE
         )
 
@@ -391,10 +621,12 @@ dtafig%>%
     split(dtafig$grouplabel) %>%
     lapply(function(x) {
         plot_ly(data = x, 
-                x = ~xsurvey, 
+                x = ~survey, 
                 y = ~noSDPlow, type = "bar", 
                 name = "Any lower level SDPs", marker = list(color = '#FFBD84')
                 )%>%
+        add_text(text=~noSDPlow, textposition = 'top', 
+                 textfont=list(size=8, color="black"))%>%        
         add_annotations(
             text = ~unique(grouplabel),
             x = 0.5, y = 0.9, xref = "paper", yref = "paper",    
@@ -406,18 +638,160 @@ dtafig%>%
              marker = list(color = "gray",size = 2),
              line= list(color = "gray", dash = 'dot'),
              showlegend=FALSE)%>%                            
-        layout(xaxis = list(title = ""))      
+        layout(xaxis = list(title = "", tickangle=-90, tickfont = list(size=8)))      
     }) %>%
-    subplot(margin=0.05, shareX = TRUE, shareY = TRUE)%>%
+    subplot(shareX = TRUE, shareY = TRUE)%>%
     layout(
-        title = c("EA-SDP link by residential area: any SDPs, exluding hospitals"),
-        xaxis = list(title = "", tickfont = list(size=10)),   
-        yaxis = list(title = "Percent of EAs without any linked SDPs, exluding hospitals"), 
+        title = c(""),
+        xaxis = list(title = "", tickangle=-90, tickfont = list(size=8)),   
+        yaxis = list(title = "Percent"), 
         showlegend=FALSE
         )
 
 
 ```
+
+
+```{r plotEAnoSDPur_new, results="asis", fig.align="left", out.width="1100px", out.height="400px"}
+
+dtafig<-dta%>%filter(group!="all")%>%
+    filter(country!="NENiamey" & country!="NGLagos" & country!="CDKinshasa" & country!="CDKongoCentral")%>%
+    filter(xsurvey!="BFR6" & xsurvey!="NENiameyR5" & xsurvey!="NGKanoR3")%>%
+    mutate(
+        grouplabel=ifelse(grouplabel=="1. urban", "Urban", grouplabel), 
+        grouplabel=ifelse(grouplabel=="2. rural", "Rural", grouplabel),
+        survey=paste0(country,"R",as.character(round)),
+        linkSDPany5=noSDPany<5, 
+        linkSDPany10=noSDPany<10, 
+        linkSDPlow5=noSDPlow<5, 
+        linkSDPlow10=noSDPlow<10,
+        noSDPany=round(noSDPany, 1),
+        noSDPpub=round(noSDPpub, 1),
+        noSDPlow=round(noSDPlow, 1)
+    )
+#length(unique(dtafig$xsurvey))
+#table(dtafig$survey)
+
+figurban<-dtafig%>%
+    filter(grouplabel=="Urban")%>%
+    plot_ly(x = ~survey, y = ~noSDPany, type = "bar", 
+        name = "Any SDPs", marker = list(color = '#FF7F0E', size=1)
+        )%>%
+    add_text(text=~noSDPany, textposition = 'top', textfont=list(size=8, color="black"))%>%
+    add_annotations(
+            text = ~unique(grouplabel),
+            x = 0.5, y = 0.9, xref = "paper", yref = "paper",    
+            xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+            font = list(size = 12)
+            )%>%
+    layout(
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=8)),
+            yaxis = list(title = "Percent"),
+            showlegend = FALSE 
+            )
+
+figrural<-dtafig%>%
+    filter(grouplabel=="Rural")%>%
+    plot_ly(x = ~survey, y = ~noSDPany, type = "bar", 
+        name = "Any SDPs", marker = list(color = '#FF7F0E', size=1)
+        )%>%
+    add_text(text=~noSDPany, textposition = 'top', textfont=list(size=8, color="black"))%>%
+    add_annotations(
+            text = ~unique(grouplabel),
+            x = 0.5, y = 0.9, xref = "paper", yref = "paper",    
+            xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+            font = list(size = 12)
+            )%>%
+    layout(
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=8)),
+            yaxis = list(title = "Percent"),
+            showlegend = FALSE 
+            )
+
+subplot(figurban, figrural,  shareX = TRUE, shareY = TRUE)%>%
+    layout(
+        title = c(""),
+        xaxis = list(title = "", tickangle=-90, tickfont = list(size=8)),  
+        yaxis = list(title = "Percent"), 
+        showlegend=FALSE
+        )
+
+figurban<-dtafig%>%
+    filter(grouplabel=="Urban")%>%
+    plot_ly(x = ~survey, y = ~noSDPlow, type = "bar", 
+        name = "Any SDPs", marker = list(color = '#FFBD84', size=1)
+        )%>%
+    add_text(text=~noSDPlow, textposition = 'top', textfont=list(size=8, color="black"))%>%
+    add_annotations(
+            text = ~unique(grouplabel),
+            x = 0.5, y = 0.9, xref = "paper", yref = "paper",    
+            xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+            font = list(size = 12)
+            )%>%
+    add_segments(x = as.character("BFR1"), xend = as.character("UGR6"), 
+             y = 5, yend = 5,
+             marker = list(color = "gray",size = 2),
+             line= list(color = "gray", dash = 'dot'),
+             showlegend=FALSE)%>%    
+    layout(
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=8)),
+            yaxis = list(title = "Percent"),
+            showlegend = FALSE 
+            )
+
+figrural<-dtafig%>%
+    filter(grouplabel=="Rural")%>%
+    plot_ly(x = ~survey, y = ~noSDPlow, type = "bar", 
+        name = "Any SDPs", marker = list(color = '#FFBD84', size=1)
+        )%>%
+    add_text(text=~noSDPlow, textposition = 'top', textfont=list(size=8, color="black"))%>%
+    add_annotations(
+            text = ~unique(grouplabel),
+            x = 0.5, y = 0.9, xref = "paper", yref = "paper",    
+            xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+            font = list(size = 12)
+            )%>%
+    add_segments(x = as.character("BFR1"), xend = as.character("UGR6"), 
+             y = 5, yend = 5,
+             marker = list(color = "gray",size = 2),
+             line= list(color = "gray", dash = 'dot'),
+             showlegend=FALSE)%>%    
+    layout(
+            xaxis = list(title="", tickangle=-90, tickfont = list(size=8)),
+            yaxis = list(title = "Percent"),
+            showlegend = FALSE 
+            )
+
+subplot(figurban, figrural,  shareX = TRUE, shareY = TRUE)%>%
+    layout(
+        title = c(""),
+        xaxis = list(title = "", tickangle=-90, tickfont = list(size=8)),  
+        yaxis = list(title = "Percent"), 
+        showlegend=FALSE
+        )
+    
+```
+
+
+
+```{r, results="asis"}
+    table(dtafig$grouplabel, dtafig$linkSDPany5)
+    table(dtafig$grouplabel, dtafig$linkSDPany10)
+    table(dtafig$grouplabel, dtafig$linkSDPlow5)
+    table(dtafig$grouplabel, dtafig$linkSDPlow10)
+```
+
+---
+
+####__Annex: EA_SDP link__
+
+#####__PMA data structure__
+
+In __PMA Female data__, __<span style="color: red;">EA_ID</span>__ is an ID variable for each women's EA. meta
+
+In __PMA SDP data__, each SDP can have multiple EAs that are designated to serve. Those EAs are identified in __<span style="color: red;">EAserve_1, EAserve_2, EAserve_3, etc</span>__.
+
+#####__EA_SDP link code - in Stata__
 
 ---
 

@@ -367,7 +367,32 @@ global covlist "yedu4 yagegroup10"
 			gen group="All clients"	
 			gen grouplabel="All clients"
 		save summary_Access_Indicators_CR.dta, replace 	
-	
+
+	use temp.dta, clear
+	foreach cov of varlist yedu_sec {
+		
+		keep if `cov'==0	
+			collapse (count) obs (mean) $indicatoroutcome $indicatortech $indicatorexp , by(xsurvey round year cmc)
+				foreach var of varlist $indicatoroutcome $indicatortech $indicatorexp {
+					replace `var'=round(`var'*100, 1)
+					}					
+				gen group="By `cov'"	
+				gen grouplabel="less than secondary"
+			append using summary_Access_Indicators_CR.dta, 
+			save summary_Access_Indicators_CR.dta, replace 	
+
+		use temp.dta, clear
+		keep if `cov'==1	
+			collapse (count) obs (mean) $indicatoroutcome $indicatortech $indicatorexp , by(xsurvey round year cmc)
+				foreach var of varlist $indicatoroutcome $indicatortech $indicatorexp {
+					replace `var'=round(`var'*100, 1)
+					}					
+				gen group="By `cov'"	
+				gen grouplabel="secondary or more"
+			append using summary_Access_Indicators_CR.dta, 
+			save summary_Access_Indicators_CR.dta, replace 				
+	}		
+		
 	use temp.dta, clear
 	foreach cov of varlist yedu4 {
 		
@@ -465,6 +490,7 @@ global covlist "yedu4 yagegroup10"
 
 		replace group="Education of clients" 	if group=="By yedu4" 
 		replace group="Age of clients" 			if group=="By yagegroup10"
+		replace group="Education (CR)" 	if group=="By yedu_sec" 
 				
 	gen country=substr(xsurvey, 1, length(xsurvey)-2)
 		replace country="Burkina Faso" 	if country=="BF"
@@ -492,7 +518,7 @@ global covlist "yedu4 yagegroup10"
 	
 	export delimited using summary_Access_Indicators_CR.csv, replace
 	* save in additional folders for apps
-	export delimited using ShinyAppEffectiveAccess/summary_Access_Indicators_CR.csv, replace
+	export delimited using ShinyAppAccess/summary_Access_Indicators_CR.csv, replace
 	export delimited using ShinyAppPopAccessToMethods/summary_Access_Indicators_CR.csv, replace
 	export delimited using ShinyAppPsychosocial/summary_Access_Indicators_CR.csv, replace
 		

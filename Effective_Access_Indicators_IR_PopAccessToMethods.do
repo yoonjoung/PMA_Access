@@ -13,7 +13,7 @@
 		do createPMA_SR_Nigeria.do
 		do createPMA_SR_Uganda.do 
 
-		***** create EA-level SDP linked data
+		***** create EA-level SDP linked data 
 		cd "C:\Users\YoonJoung Choi\Dropbox\0 iSquared\iSquared_PMA\Effective Access\"
 		do Effective_Access_Pop_SDP_Link.do
 		*/
@@ -176,11 +176,6 @@ save IR_`survey'_Access_Indicators.dta, replace
 
 *****8. MERGE with the EA-SDP data, created from "Effective_Access_Pop_SDP_`counry'.do"
 
-/*
-SINCE Kenya SDP-EA link is problematic, use only Uganda data
-Still check the number/% of EAs with no linked SDP information
-*/
-
 set more off
 foreach survey  in $surveylistEASDPLINK{
 	use "$data/EAlevel_SDP_`survey'.dta", clear
@@ -188,15 +183,6 @@ foreach survey  in $surveylistEASDPLINK{
 	sort EA_ID
 	save "$data/EAlevel_SDP_`survey'.dta", replace
 }
-
-/*
-set more off
-foreach survey  in $surveylistEASDPLINK{
-	use "$data/EAlevel_SDP_`survey'.dta", clear
-	tab xsurvey
-	sum round SDPall_essential5_noso SDPall_essential5_rnoso 
-}
-*/
 
 set more off
 foreach survey  in $surveylistEASDPLINK{
@@ -212,6 +198,7 @@ foreach survey  in $surveylistEASDPLINK{
 		sum SDP*
 		
 		foreach var of varlist SDP*{
+			gen num`var'=`var'
 			replace `var'=1 if `var'>=1 & `var'!=.
 			*replace `var'=1 if `var'>=1
 		}
@@ -264,14 +251,27 @@ global indicatorlist "
 
 	SDPall_essential5_offer
 	SDPall_essential5_curav
-	SDPall_essential5_rnoso
 	SDPall_essential5_noso 
 	SDPall_essential5_ready
+	SDPall_essential5_rnoso
+	
 	SDPlow_essential5_offer
 	SDPlow_essential5_curav
-	SDPlow_essential5_rnoso
 	SDPlow_essential5_noso 
-	SDPlow_essential5_ready	
+	SDPlow_essential5_ready
+	SDPlow_essential5_rnoso
+	
+	SDPall_essential5ec_offer
+	SDPall_essential5ec_curav
+	SDPall_essential5ec_noso 
+	SDPall_essential5ec_ready
+	SDPall_essential5ec_rnoso
+	
+	SDPlow_essential5ec_offer
+	SDPlow_essential5ec_curav
+	SDPlow_essential5ec_noso 
+	SDPlow_essential5ec_ready
+	SDPlow_essential5ec_rnoso
 	
 	";
 	#delimit cr
@@ -281,14 +281,27 @@ global indicatorlistall "
 
 	SDPall_essential5_offer
 	SDPall_essential5_curav
-	SDPall_essential5_rnoso
 	SDPall_essential5_noso 
 	SDPall_essential5_ready
+	SDPall_essential5_rnoso
+	
 	SDPlow_essential5_offer
 	SDPlow_essential5_curav
-	SDPlow_essential5_rnoso
 	SDPlow_essential5_noso 
-	SDPlow_essential5_ready	
+	SDPlow_essential5_ready
+	SDPlow_essential5_rnoso
+	
+	SDPall_essential5ec_offer
+	SDPall_essential5ec_curav
+	SDPall_essential5ec_noso 
+	SDPall_essential5ec_ready
+	SDPall_essential5ec_rnoso
+	
+	SDPlow_essential5ec_offer
+	SDPlow_essential5ec_curav
+	SDPlow_essential5ec_noso 
+	SDPlow_essential5ec_ready
+	SDPlow_essential5ec_rnoso
 
 	";
 	#delimit cr	
@@ -596,7 +609,7 @@ save temp.dta, replace
 	
 **************************************** APPEND BOTH DATA SETS 
 
-	use summary_Access_Indicators_IR_PopAccessToMethods.dta, replace
+	use summary_Access_Indicators_IR_PopAccessToMethods.dta, clear
 	append using summary_Access_Indicators_IR_PopAccessToMethods_demand.dta, 
 	
 ***** Further variables and data cleaning 
@@ -644,7 +657,7 @@ save temp.dta, replace
 		replace country="Uganda" if country=="UG"	
 	gen countrycode=substr(xsurvey, 1, 2)
 
-	gen year = 1900 + int(cmc/12) 
+	gen year = 1900 + trunc((cmc-1)/12)
 	gen month= cmc-12*(year - 1900)
 	
 	egen temp=max(round), by(country) 
@@ -669,15 +682,17 @@ save temp.dta, replace
 	save summary_Access_Indicators_IR_PopAccessToMethods.dta, replace 	
 	
 	export delimited using summary_Access_Indicators_IR_PopAccessToMethods.csv, replace
-	* save in additional folders for apps => NOT APPLICABLE
+		
+	* save in additional folders for apps 
+	export delimited using ShinyAppPopAccessToMethods/summary_Access_Indicators_IR_PopAccessToMethods.csv, replace
 	/*
 	export delimited using ShinyAppAccess/summary_Access_Indicators_IR_PopAccessToMethods.csv, replace
-	export delimited using ShinyAppPopAccessToMethods/summary_Access_Indicators_IR_PopAccessToMethods.csv, replace
 	export delimited using ShinyAppPsychosocial/summary_Access_Indicators_IR_PopAccessToMethods.csv, replace
 	*/
 	
 erase temp.dta		
 erase summary_Access_Indicators_IR_PopAccessToMethods_obs.dta
+
 
 set more off
 foreach survey in $surveylist{
@@ -687,3 +702,8 @@ foreach survey in $surveylist{
 OKAY Summary DATA READY FOR ANALYSIS and Shiny App
 
 */
+	/*
+	keep if group=="All" & groupdemand==0
+	sort xsurvey 
+	list xsurvey year month cmc
+	*/
