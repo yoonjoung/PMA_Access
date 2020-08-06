@@ -159,7 +159,7 @@ ui<-fluidPage(
                     h5(strong("Before checking indicators, see profile of women based on demand for FP, contraceptive use, and sexual activity.")),
                     hr(),
                     h6("See", a("GitHub",href="https://github.com/yoonjoung/PMA_Access"),"for more information, inluding Stata do fiels for estimation."),
-                    h6("Application last updated on June 15, 2020"),
+                    h6("Application last updated on July 1, 2020"),
                     h6("For typos, errors, and questions:", a("contact me",href="https://www.isquared.global/YJ"))
                 ), 
                 

@@ -2,14 +2,19 @@ library(shiny)
 
 library(plyr)
 library(dplyr)
+library(tidyr)
 library(tidyverse)
 library(plotly)
+
 library(lubridate)
+library(stringr)
+library(stringi)
 
 date<-as.Date(Sys.time(	), format='%d%b%Y')
 
-# This creates shiny app to display access indicators using PMA data 
+# This creates shiny app to display women's access to methods indicators using PMA data 
 # There are four parts in this document:
+# 0. Database update 
 # 1. USER INTERFACE 
 # 2. SERVER
 # 3. CREATE APP 
@@ -19,61 +24,82 @@ date<-as.Date(Sys.time(	), format='%d%b%Y')
 #******************************
 
 #setwd("C:/Users/YoonJoung Choi/Dropbox/0 iSquared/iSquared_PMA/Effective Access/ShinyAppPopAccessToMethods")
+#Summary data constructed from Stata
 
-dtaIR<-data.frame(read_csv("summary_Access_Indicators_IR.csv"))%>%
-    mutate(yearmonth = ISOdate(year, month, 15),
-           #yearmonth = as.POSIXct(as.numeric(yearmonth), origin="1970-01-01"), 
-           #yearmonth = substr(as.character(yearmonth),0,7), 
-           latestIRLINK=latestIR,
-           latestIRLINK=ifelse(xsurvey=="BFR5", 1, latestIRLINK),
-           latestIRLINK=ifelse(xsurvey=="BFR6", 0, latestIRLINK),
-           latestIRLINK=ifelse(xsurvey=="BFR7", 0, latestIRLINK),
-           latestIRLINK=ifelse(xsurvey=="KER7", 1, latestIRLINK),
-           latestIRLINK=ifelse(xsurvey=="KER8", 0, latestIRLINK), 
-           
-           linkissue=(country=="Nigeria, Kano" | country=="Nigeria, Lagos" | country=="India, Rajasthan" | 
-                      xsurvey=="NGKanoR3" | xsurvey=="BFR6"),
-           SDPall_essential5_rnoso=ifelse(linkissue==1, NA, SDPall_essential5_rnoso), 
-           SDPall_essential5_noso=ifelse(linkissue==1, NA, SDPall_essential5_noso), 
-           SDPall_essential5_ready=ifelse(linkissue==1, NA, SDPall_essential5_ready), 
-           SDPall_essential5ec_rnoso=ifelse(linkissue==1, NA, SDPall_essential5_rnoso), 
-           SDPall_essential5ec_noso=ifelse(linkissue==1, NA, SDPall_essential5_noso), 
-           SDPall_essential5ec_ready=ifelse(linkissue==1, NA, SDPall_essential5_ready) 
-           
-    )
-
-dtaCR<-data.frame(read_csv("summary_Access_Indicators_CR.csv"))%>%
-    mutate(yearmonth = ISOdate(year, month, 15)
-           #yearmonth = substr(as.character(yearmonth),0,7)
-    )
-
-    table(dtaIR$xsurvey)
-    table(dtaCR$xsurvey)
+dtaSDP<-read.csv("summary_Access_Indicators_SR.csv")%>%
+    filter(xsurvey!="NENiameyR5" & xsurvey!="BFR6" & xsurvey!="NGKanoR3")%>%
+    filter(country!="Niger, Niamey" & country!="Nigeria, Lagos" & country!="Nigeria, Kano")%>%
+    group_by(country)%>%
     
+    mutate(latest=round==max(round))%>%
+    ungroup()%>%
+    mutate(
+        month = ifelse(month==0, 12, month), 
+        yearmonth = ISOdate(year, month, 15),
+        essential5_offer=round(essential5_offer, 0),
+        essential5_curav=round(essential5_curav, 0),
+        essential5_noso =round(essential5_noso, 0),
+        essential5_ready=round(essential5_ready, 0),
+        essential5_rnoso=round(essential5_rnoso, 0),
+        
+        essential5ec_offer=round(essential5ec_offer, 0),
+        essential5ec_curav=round(essential5ec_curav, 0),
+        essential5ec_noso =round(essential5ec_noso, 0),
+        essential5ec_ready=round(essential5ec_ready, 0),
+        essential5ec_rnoso=round(essential5ec_rnoso, 0),
+        
+        group=as.character(group),
+        group=ifelse(group=="All", "All SDPs", group), 
+        group=ifelse(group=="Excluding hospitals", "Lower-level SDPs", group) 
+    )
+
+    nrow(dtaSDP)
+    length(unique(dtaSDP$country)) 
+    length(unique(dtaSDP$xsurvey)) 
+    table(dtaSDP$group)
+    
+dtaIR<-data.frame(read_csv("summary_Access_Indicators_IR_PopAccessToMethods.csv"))%>%
+    filter(xsurvey!="NENiameyR5" & xsurvey!="BFR6" & xsurvey!="NGKanoR3")%>%
+    filter(country!="Niger, Niamey" & country!="Nigeria, Lagos" & country!="Nigeria, Kano")%>%
+    filter(year<=2018)%>%
+    filter(group=="All")%>%
+    
+    mutate(month = ifelse(month==0, 12, month), 
+           yearmonth = ISOdate(year, month, 15),
+           flagSDPlow=( country=="Cote d'Ivoire" |
+                        country=="DRC, Kinshasa" |
+                        country=="DRC, Kongo Central" |
+                        country=="Kenya" |
+                        country=="Niger" 
+                        )
+           #replace with missing for the flasSDPlow countries 
+           #mutate_at(vars(starts_with("SDPlow")), funs(.=ifelse(flagSDPlow==TRUE,NA,.)))
+           #SDPlow_essential5_offer=ifelse(flagSDPlow==TRUE,NA,SDPlow_essential5_offer),
+           #SDPlow_essential5_curav=ifelse(flagSDPlow==TRUE,NA,SDPlow_essential5_curav),
+           #SDPlow_essential5_ready=ifelse(flagSDPlow==TRUE,NA,SDPlow_essential5_ready),
+           #SDPlow_essential5_rnoso=ifelse(flagSDPlow==TRUE,NA,SDPlow_essential5_rnoso),
+           #SDPlow_essential5ec_offer=ifelse(flagSDPlow==TRUE,NA,SDPlow_essential5ec_offer),
+           #SDPlow_essential5ec_curav=ifelse(flagSDPlow==TRUE,NA,SDPlow_essential5ec_curav),
+           #SDPlow_essential5ec_ready=ifelse(flagSDPlow==TRUE,NA,SDPlow_essential5ec_ready),
+           #SDPlow_essential5ec_rnoso=ifelse(flagSDPlow==TRUE,NA,SDPlow_essential5ec_rnoso)
+           
+           )%>%
+    group_by(country)%>%
+    mutate(latestIRLINK=round==max(round))%>%
+    ungroup()
+
+    nrow(dtaIR)
+    length(unique(dtaIR$country)) 
+    length(unique(dtaIR$xsurvey)) 
     table(dtaIR$group)
-    table(dtaCR$group)
+    table(dtaIR$xsurvey, dtaIR$latestIRLINK)
     
-    table(dtaIR$grouplabel)
-    table(dtaCR$grouplabel)    
+nsurvey<-length(unique(dtaSDP$country)) 
+ncountry<-length(unique(dtaSDP$xsurvey)) 
 
-    table(dtaIR$yearmonth)
-    table(dtaCR$yearmonth)
-
-dta<-rbind.fill(dtaIR, dtaCR)
-
-    dim(dtaIR)
-    dim(dtaCR)    
-    dim(dta)
-    
-countrylist<-unique(as.vector(dta$country))
-
-    #countrylist<-countrylist[!is.na(countrylist)]
-    #countrylist<-c("Burkina Faso", "Ethiopia", "Kenya", "Uganda")    
-
-surveylist<-unique(as.vector(dta$xsurvey))
-
-grouplistIR<-c("HH wealth", "Education", "Residential area", "Education x Residence")
-grouplistCR<-c("Education of clients", "Age of clients")
+countrylist<-unique(as.vector(dtaSDP$country))
+methodslist<-c("Five methods", 
+               "Five methods + EC")
 
 #******************************
 # 1. USER INTERFACE 
@@ -82,10 +108,10 @@ grouplistCR<-c("Education of clients", "Age of clients")
 ui<-fluidPage(
     
     # Header panel 
-    #headerPanel("Potential indicators for access"),
+    headerPanel("Changing perspectives: translating methods availability to women's access to methods"),
 
     # Title panel 
-    titlePanel("Application to internally explore potential indicators for access (DO NOT CIRCULATE the link since it has non-public survey data)"),
+    titlePanel("Application to explore metrics of women's access to contraceptive methods"),
 
     # Side panel: define input and output   
     sidebarLayout(
@@ -94,29 +120,21 @@ ui<-fluidPage(
         sidebarPanel(
             style = "position:fixed;width:inherit;", 
             width = 3,
-            br(),
-            h5(strong("Provide input below")),                        
+            h4(strong("Provide inputs for Parts 3 & 4")),
             br(),
             selectInput("country", 
                         "Select a country",
                         choices = countrylist, 
-                        selected = "Kenya"),                  
+                        selected = "Burkina Faso"), 
             br(),
-            h5("Sections A: Levels of indicators"),
-            h5("(No input needed)"),
             br(),
-            h5("Sections B: Trends of indicators"),    
-            h5("(No input needed)"),
             br(),
-            h5("Section C: Pattern of indicators"),
-            selectInput("groupIR", 
-                        "Select background characteristics to assess disparity among all women (all elements)",
-                        choices = grouplistIR, 
-                        selected = "Education"), 
-            br(),
-            h5("Section D: MCPR by indicators"),
-            h5("(No input needed)")
-            
+            selectInput("methods", 
+                        "Select 'a range of methods'",
+                        choices = methodslist, 
+                        selected = "Five methods*"), 
+            h6("Note: Five methods are IUD, implants, injectables, pills, and male condoms.")
+
         ),
         
         # Main page for output display 
@@ -124,64 +142,113 @@ ui<-fluidPage(
             width = 8,
             
             tabsetPanel(type = "tabs",
-                tabPanel("Introduction", 
-                    h5("This interactive app presents levels, trends, and patterns of potential access indicators.",
-                        "It also presents MCPR by status of each indicator."), 
+                        
+                tabPanel("1. Introduction",       
+                         
+                    h4("Access to a range of methods is a necessary, though insufficient, foundation for contraceptive choice - i.e., using methods of choice without barriers to access them. But, few metrics have been developed to capture this concept."),
+                    h4("Using PMA's data from both household and the linked SDP surveys, we develop novel metrics to measure and understand access to methods from women's perspectives.",
+                        "More information about the methodology can be found in a", a(strong("brief (forthcoming)"),href=""), 
+                        "and in a", a(strong("technical report (forthcoming)"),href="") ),
+                    hr(),
+                    h4(strong("This interactive application is to explore the metrics using data from nine select countries.")),
+                    br(),     
+                    h4("There are four parts:"), 
+                    h4("1. Introduction"),
+                    h4("2. Measures, using Uganda data as an example"), 
+                    h4("3. Latest levels in nine countries"), 
+                    h4("4. Trends in nine countries"), 
                     br(), 
-                    h5("Provide inputs on the left panel."), 
-                    h5("Hover over figures for estimates and other functions"),  
-                    
+                    h4("In Parts 3 & 4, provide inputs on the left panel to explore results by:"), 
+                    h4("-- country"), 
+                    h4("-- definition of 'a range of methods'"), 
                     hr(),
                     h6("See", a("GitHub",href="https://github.com/yoonjoung/PMA_Access"),"for more information."),
-                    h6("Application last updated on June 9, 2020"),
-                    h6("For typos, errors, and questions:", a("contact me",href="https://www.isquared.global/YJ"))
+                    h6("Application last updated on August 5, 2020"),
+                    h6("For typos, errors, and questions:", a("contact YJ Choi at www.iSquared.global",href="https://www.isquared.global/YJ"))
+                ), 
+                
+                tabPanel("2. Measures",                    
+                    h4(strong("Women are considered to have access to a range of methods, if a specific set of methods are available at one or more SDPs serving her community"), 
+                       "(i.e., sample cluster in the household survey) - hereinafter referred to as 'accessible SDPs'.",
+                       "For more information on how PMA sample SDPs,",
+                       a("see section 2.1 in this report.",href="https://www.pma2020.org/sites/default/files/SDP_report_2019-03-12-final.pdf")),
+                    h4("This measure is influences by:"), 
+                    h4("--", strong("how we define availability of methods at SDPs")),
+                    h4("--", strong("what and how many methods are included")),
+                    h4("--", strong("what SDPs are considered 'accessible' from women's perspectives")),
+                    h4("Below, we explore how estimates of women's access are affected by different definitions, using data from", strong("Uganda PMA 2018.")),
+                    
+                    hr(),
+                    h4(span("First, in all figures, we use four gradually restrictive definitions of 'availability'.", style = "color:blue")), 
+                    h4("-- SDP",em("offers all specified methods")),
+                    h4("-- SDP offers all specified methods and",em("has all methods in stock currently")),
+                    h4("-- SDP offers all specified methods, has all methods in stock currently, and",em("is ready to provide IUDs/implant services"), "(i.e., has trained personnel and all supplies/equipment available to insert and remove IUDs/implants)"), 
+                    h4("-- SDP offers all specified methods, has all methods in stock currently, is ready to provide IUD/implant services, and",em("has no history of stock-out for any of the methods in the past three months")), 
+                    h4("The stricter definitions (darker shade bars in below figures), the lower availability."), 
+                    
+                    hr(),
+                    h4(span("Second, we explore two sets of specific methods.", style = "color:blue")),
+                    h4("-- Select five* methods: IUD, implants, injectables, pills, and male condoms"),  
+                    h4("-- Five methods + emergency contraception (EC)"),  
+                    h4("Figure 2.1. Availability of a range of methods among SDPs,", strong("by definition of the methods")),  
+                    plotlyOutput("plot_UG_methods"),   
+                    br(),
+                    h4(strong("Key summary:"),"The more number of methods, the lower availability at SDPs. The amount of reduction varies across countries (See Part 3)."),
+                    
+                    hr(),
+                    h4(span("Finally, we compare two definitions of 'accessible SDPs'.", style = "color:blue")), 
+                    h4("-- All SDPs: public primary, secondary, and tertiary level SDPs that are designated to serve the community + private SDPs within the community"),  
+                    h4("-- Lower-level SDPs: all SDPs minus tertiary level hospitals."),  
+                    br(),
+                    h4("Figure 2.2. Availability of the five methods among SDPs,", strong("by level of SDPs")),
+                    plotlyOutput("plot_UG_SDPtype_SDP"),
+                    br(),
+                    h4(strong("Key summary:"),"Method availability is lower among lower-level SDPs than among all SDPs. The magnitude of differences varies across countries (See Part 3)."),
+                    br(),
+                    h4("Figure 2.3. Women's access to the five methods,", strong("by definition of accessible SDPs")),
+                    plotlyOutput("plot_UG_SDPtype_women"),                    
+                    br(),
+                    h4(strong("Key summary:")),
+                    h4("1. Women's access to methods is higher than methods availability at the SDP-level."),
+                    h4("2. Women's access to methods reduces when only lower-level SDPs are considered 'accessible'. The magnitude of differences varies across countries (See Part 3)."),
+                    
+                    hr(),
+                    h6("FOOTNOTE"),
+                    h6("*In certain settings, not all of the five essential methods have been introduced. In such case, specifically in Rajasthan, India, in this report, availability of the five methods is negligible. Thus, for the purpose of methodological exploration, we apply a modified definition of the essential methods (i.e., four methods: IUD, injectables, pills, and male condoms) to Rajasthan, India.")
                 ),
-                  
-                tabPanel("5. Service Quality", 
-                    h4(strong("5. Service quality")),    
-                    h4(strong("5.1. Service quality - from female survey")),
-                    h5(""), 
-                    h5(" - Left panel: MII"),
-                    h5(" - Right panel:", strong("geographic and administrative access to methods")), 
-                    h5(""), 
-                    h5("For definitions and data sources, see", a("here.",href="https://drive.google.com/file/d/1IgCkBOL_nTEv2KDsYl7Wweeak8RbmVeu/view?usp=sharing")),
-                    h5("*Five specific modern methods: IUD, implant, injectables, pills, & male condom (except in India, where implant is not yet widely available)"),    
-                    h5("**Ready: having commodity, trained personnel, & equipment. Applicable only for IUD and implant"),    
-                    h5(""),    
-                    h5("***Percent of all women with one or more linked SDPs meeting the service environment criteria (geographic and administrative access to methods/readiness)"),  
-                    h5(strong("Note 1"),": For these cluster-level service environment indicators, linked-EA variables are required.", 
-                       "The linked-EA variables are being created for Phase 1 surveys currently, and thus all phase 2 surveys are not included for the indicators.", 
-                       strong("Thus, latest surveys for MII indicators (green bars) and EA-level service-environment indicators (blue bars) can be different in a country.")),
-                    h5(strong("Note 2"),": Several surveys (i.e., BFR6, KanoR3, NiameyR5) are being further assessed for EA-SDP linkage results", 
-                       a("(see here)", href="https://rpubs.com/YJ_Choi/PMA_EA_SDP_Link"), ", and are excluded in this report."),
-                        
-                    br(),    
-                    h5(strong("5.1.A. Level of indicators in the latest survey")),
-                    plotlyOutput("plot_level_qualityIR"),   
+                
+                tabPanel("3. Latest levels",         
                     
-                    br(), 
-                    h5(strong("5.1.B. Trends of indicators in the country")),
-                    plotlyOutput("plot_trend_qualityIR"),   
-        
-                    br(), 
-                    h5(strong("5.1.C. SES pattern of indicators in the latest survey")),    
-                    h5("As we discussed earlier, there is not much typical differences by individual SES background, partially because these are either among current users (green bars) or cluster-level service environment (blue bars)."),      
-                    h5("For year of the latest survey, see 5.1.A."),    
-                    plotlyOutput("plot_pattern_qualityIR1"),   
-                    plotlyOutput("plot_pattern_qualityIR2"), 
+                    h4("The following output is latest level in:"),
+                    verbatimTextOutput("text_source"),
                     
-                    br(), 
-                    h5(strong("5.1.D. MCPR by indicators in the latest survey")),   
-                    h5(strong("Question 1"),": reverse causality?"), 
-                    h5(strong("Question 2"),": Quality as rights, then do we care for any association here?"), 
-                    h5("For year of the latest survey, see 5.1.A."),    
-                    plotlyOutput("plot_mcpr_qualityIR")   
-                                               
+                    hr(),
+                    h4("Figure 3.1. Availability of methods among SDPs,", strong("by level of SDPs")),    
+                    plotlyOutput("plot_SDP_level"), 
+                    
+                    hr(),
+                    h4("Figure 3.1. Women's access to methods,", strong("by definition of accessible SDPs")),
+                    plotlyOutput("plot_women_level") 
+                ),
+          
+                tabPanel("4. Trends",           
+
+                    h4("The following output is trends, using the five methods, in:"),
+                    verbatimTextOutput("text_country"),
+                    
+                    hr(),
+                    h4("Figure 4.1. Availability of the five methods among SDPs,", strong("by level of SDPs")),    
+                    plotlyOutput("plot_SDP_trend"), 
+                    
+                    hr(),
+                    h4("Figure 4.2. Women's access to the five methods,", strong("by definition of accessible SDPs")),
+                    plotlyOutput("plot_women_trend") 
                 )
             )
         )
     )
 )
+
 
 #******************************
 # 2. SERVER
@@ -194,217 +261,582 @@ server<-function(input, output) {
     output$text_country <- renderText({
         paste(input$country) 
         })    
-    output$text_groupIR <- renderText({
-        paste(input$groupIR) 
+    output$text_methods <- renderText({
+        paste(input$methods) 
         })        
-    output$text_groupCR <- renderText({
-        paste(input$groupCR) 
-        })        
-
-    ##### output: Service quality: IR #####
-    
-    output$plot_level_qualityIR <- renderPlotly({
-
-        dtafig<-filter(dta, country==input$country & is.na(xmii_side)==FALSE & group=="All" & groupdemand==0)%>%    
-            filter(round==max(round))
-    
-        fig1<-plot_ly(dtafig, x=~year, y=~xmii_side, type = 'bar', 
-                name = "MII: side effect", marker = list(color = 'rgb(199,233,192)'),
-                text = ~xmii_side, textposition = 'outside') %>%
-            add_trace(y = ~xmii_sidewhat, name = "MII: what to do", 
-                      marker = list(color = 'rgb(161,217,155)'),
-                      text = ~xmii_sidewhat, textposition = 'outside') %>% 
-            add_trace(y = ~xmii_other, name = "MII: other methods", 
-                      marker = list(color = 'rgb(116,196,118)'),
-                      text = ~xmii_other, textposition = 'outside') %>% 
-            add_trace(y = ~xmii_switch, name = "MII: switch (NEW)", 
-                      marker = list(color = 'rgb(65,171,93)'),
-                      text = ~xmii_switch, textposition = 'outside') %>% 
-            add_trace(y = ~xmii3, name = "MII: all three items", 
-                      marker = list(color = 'rgb(35,139,69)'),
-                      text = ~xmii3, textposition = 'outside') %>% 
-            add_trace(y = ~xmii4, name = "MII: all four items (NEW)", 
-                      marker = list(color = 'rgb(0,109,44)'),
-                      text = ~xmii4, textposition = 'outside') %>% 
-            layout(
-                yaxis = list(title = "Percent of modern method (except LAM) users",
-                             range = c(0, 100)),
-                xaxis = list(title = "Survey year")
-            )
-        
-        dtafig<-filter(dta, country==input$country & is.na(SDPall_essential5_noso)==FALSE & group=="All" & groupdemand==0)%>%
-            filter(round==max(round))
-        
-        fig2<-plot_ly(dtafig, x=~year, y=~SDPall_essential5_noso, type = 'bar', 
-                name = "5 specific methods* available currently/3-month", marker = list(color = 'rgb(158,202,225)'),
-                text = ~SDPall_essential5_noso, textposition = 'outside') %>%
-            add_trace(y = ~SDPall_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
-                      marker = list(color = 'rgb(107,174,214)'),
-                      text = ~SDPall_essential5_ready, textposition = 'outside') %>% 
-            add_trace(y = ~SDPall_essential5_rnoso, name = "Meeting both conditions", 
-                      marker = list(color = 'rgb(33,113,181)'),
-                      text = ~SDPall_essential5_rnoso, textposition = 'outside') %>% 
-            layout(
-                yaxis = list(title = "Percent of all women with service environment***",
-                             range = c(0, 100)),
-                xaxis = list(title = "Survey year")
-            )
-        
-        subplot(fig1, fig2, nrows=1, margin=0.04, titleY = TRUE) %>%
-        layout( legend=list(orientation = 'v'), 
-                yaxis = list(range = c(0, 100)) )
-        
-        })
-    
-    output$plot_trend_qualityIR <- renderPlotly({
-
-        dtafig<-filter(dta, country==input$country & group=="All" & groupdemand==0)
-    
-        fig1<-dtafig%>%
-            plot_ly(x=~round, y=~xmii_side, name = "MII: side effect", 
-                marker = list(color = 'rgb(199,233,192)'),
-                line = list(color = 'rgb(199,233,192)')) %>%
-            add_lines()%>%
-            add_lines(y = ~xmii_sidewhat, name = "MII: what to do", 
-                      marker = list(color = 'rgb(161,217,155)'),
-                      line = list(color = 'rgb(161,217,155)')) %>% 
-            add_lines(y = ~xmii_other, name = "MII: other methods", 
-                      marker = list(color = 'rgb(116,196,118)'),
-                      line = list(color = 'rgb(116,196,118)')) %>% 
-            add_lines(y = ~xmii_switch, name = "MII: switch (NEW)", 
-                      marker = list(color = 'rgb(65,171,93)'),
-                      line = list(color = 'rgb(65,171,93)')) %>% 
-            add_lines(y = ~xmii3, name = "MII: all three items", 
-                      marker = list(color = 'rgb(35,139,69)'),
-                      line = list(color = 'rgb(35,139,69)')) %>% 
-            add_lines(y = ~xmii4, name = "MII: all four items (NEW)", 
-                      marker = list(color = 'rgb(0,109,44)'),
-                      line = list(color = 'rgb(0,109,44)')) %>% 
-            layout(
-                yaxis = list(title = "Percent of modern method (except LAM) users",
-                             range = c(0, 100)),
-                xaxis = list(title = "Survey round", 
-                             range = c(1,8) )
-                )
-        
-        dtafig<-filter(dta, country==input$country & group=="All" & groupdemand==0)
-
-        fig2<-plot_ly(dtafig, x=~round, y=~SDPall_essential5_noso, type = 'scatter', mode = 'lines',
-                name = "5 specific methods* available currently/3-month", 
-                marker = list(color = 'rgb(158,202,225)'),
-                line = list(color = 'rgb(158,202,225)')) %>%
-            add_trace(y = ~SDPall_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
-                      marker = list(color = 'rgb(107,174,214)'),
-                      line = list(color = 'rgb(107,174,214)')) %>% 
-            add_trace(y = ~SDPall_essential5_rnoso, name = "Meeting both conditions", 
-                      marker = list(color = 'rgb(33,113,181)'),
-                      line = list(color = 'rgb(33,113,181)')) %>% 
-            layout(
-                yaxis = list(title = "Percent of all women with service environment***",
-                             range = c(0, 100)),
-                xaxis = list(title = "Survey round",
-                             range = c(1,8) )
-            )
-        
-        subplot(fig1, fig2, nrows=1, margin=0.04, titleY = TRUE, shareX = TRUE) %>%
-        layout( legend=list(orientation = 'v'),
-                xaxis = list(title = "Survey round",
-                             range = c(1,8) )
-                )
-        })
-
-    output$plot_pattern_qualityIR1 <- renderPlotly({
-
-        dtafig<-filter(dta, country==input$country & group==input$groupIR & latestIR==1 & groupdemand==0) 
-    
-        plot_ly(dtafig, x=~grouplabel, y=~xmii_side, type = 'bar', 
-                name = "MII: side effect", marker = list(color = 'rgb(199,233,192)'),
-                text = ~xmii_side, textposition = 'outside') %>%
-            add_trace(y = ~xmii_sidewhat, name = "MII: what to do", 
-                      marker = list(color = 'rgb(161,217,155)'),
-                      text = ~xmii_sidewhat, textposition = 'outside') %>% 
-            add_trace(y = ~xmii_other, name = "MII: other methods", 
-                      marker = list(color = 'rgb(116,196,118)'),
-                      text = ~xmii_other, textposition = 'outside') %>% 
-            add_trace(y = ~xmii_switch, name = "MII: switch (NEW)", 
-                      marker = list(color = 'rgb(65,171,93)'),
-                      text = ~xmii_switch, textposition = 'outside') %>% 
-            add_trace(y = ~xmii3, name = "MII: all three items", 
-                      marker = list(color = 'rgb(35,139,69)'),
-                      text = ~xmii3, textposition = 'outside') %>% 
-            add_trace(y = ~xmii4, name = "MII: all four items (NEW)", 
-                      marker = list(color = 'rgb(0,109,44)'),
-                      text = ~xmii4, textposition = 'outside') %>% 
-            layout(
-                autosize = F, width = 1000, height = 400, 
-                yaxis = list(title = "Percent of modern method (except LAM) users",
-                             range = c(0, 100)),
-                xaxis = list(title = " "),
-                legend = list(font=list(size=10), 
-                              orientation = "v",x = 100, y = 0.5),
-                showlegend=TRUE
-            )
-        
-        })
-
-    output$plot_pattern_qualityIR2 <- renderPlotly({
-
-        dtafig<-filter(dta, country==input$country & is.na(SDPall_essential5_noso)==FALSE & group==input$groupIR & groupdemand==0)%>%
-            filter(round==max(round))
-
-        plot_ly(dtafig, x=~grouplabel, y=~SDPall_essential5_noso, type = 'bar', 
-                name = "5 specific methods* available currently/3-month", 
-                marker = list(color = 'rgb(158,202,225)'),
-                text = ~SDPall_essential5_noso, textposition = 'outside') %>%
-            add_trace(y = ~SDPall_essential5_ready, name = "Currently ready** to provide 5 specific methods*", 
-                      marker = list(color = 'rgb(107,174,214)'),
-                      text = ~SDPall_essential5_ready, textposition = 'outside') %>% 
-            add_trace(y = ~SDPall_essential5_rnoso, name = "Meeting both conditions", 
-                      marker = list(color = 'rgb(33,113,181)'),
-                      text = ~SDPall_essential5_rnoso, textposition = 'outside') %>% 
-            layout(
-                autosize = F, width = 1150, height = 400, 
-                yaxis = list(title = "Percent of all women",
-                             range = c(0, 100)),
-                xaxis = list(title = " "),
-                legend = list(font=list(size=10), 
-                              orientation = "v",x = 100, y = 0.5),
-                showlegend=TRUE
-            )
-        
-        })       
-
-    output$plot_mcpr_qualityIR <- renderPlotly({
-
-        dtafig<-dta%>%filter(country==input$country & (grouplabel=="Yes" | grouplabel=="No") &  groupdemand==0 & latestIRLINK==1)%>%
-            select(xsurvey, mcp, group, grouplabel)%>%
-            filter(group=="By SDPall_essential5_noso"|
-                       group=="By SDPall_essential5_ready"|
-                       group=="By SDPall_essential5_rnoso")
-        
-        dtafig$group<-fct_relevel(factor(dtafig$group, levels = unique(dtafig$group)),
-                                  c("By SDPall_essential5_noso", "By SDPall_essential5_ready", "By SDPall_essential5_rnoso"))
-        
-        plot_ly(dtafig, x=~group, y=~mcp, type = 'bar', 
-                color = ~grouplabel                )%>% 
-            add_annotations(text = ~mcp, textposition = 'top',arrowhead = 0,
-                  arrowsize = 0 )%>%
-            layout(
-                autosize = F, width = 1000, height = 400, 
-                yaxis = list(title = "Percent of women in the group",
-                             range = c(0, 100)),
-                xaxis = list(title = " "),
-                legend = list(font=list(size=10), 
-                              orientation = "v",x = 100, y = 0.5)
-                
-            )                
-
+    output$text_source <- renderText({
+        #source<-dataselected()[1,]  
+        #paste(source$country, source$type, source$year, sep = " ")
+        paste(input$country, ", using ", input$methods, sep = "")
         })    
-    
-    
 
-}     
+    ##### output: Part 2 #####
     
+    output$plot_UG_methods <- renderPlotly({
+        
+        temp<-dtaSDP%>%filter(group=="All SDPs")%>%filter(latest==TRUE)%>%filter(country=="Uganda")
+        
+        temp1<-temp%>%select(ends_with("offer"))%>%
+            gather(key=methods,value=offer)%>%
+            mutate(methods=sapply(strsplit(methods,"_"), `[`, 1))
+        temp2<-temp%>%select(ends_with("curav"))%>%
+            gather(key=methods,value=curav)%>%
+            mutate(methods=sapply(strsplit(methods,"_"), `[`, 1))
+        temp3<-temp%>%select(ends_with("ready"))%>%
+            gather(key=methods,value=ready)%>%
+            mutate(methods=sapply(strsplit(methods,"_"), `[`, 1))
+        temp4<-temp%>%select(ends_with("rnoso"))%>%
+            gather(key=methods,value=rnoso)%>%
+            mutate(methods=sapply(strsplit(methods,"_"), `[`, 1))
+        
+        dtafig<-join_all(list(temp1, temp2, temp3, temp4), by='methods', type='left')%>%
+            mutate(
+                xsurvey="",
+                methods=ifelse(methods=="essential5", "Five methods", methods), 
+                methods=ifelse(methods=="essential5ec", "Five methods + EC", methods) 
+            )
+
+        panel <- . %>% 
+            plot_ly(x=~xsurvey, y=~offer, type = 'bar', 
+                        name = "methods offered", 
+                        marker = list(color = '#fdd0a2'),
+                        text = ~offer, textfont = list(size = 10, color="black"), textposition = 'outside')%>%
+            add_trace(y=~curav, 
+                        name = "+ currently in-stock",
+                        marker = list(color = '#fdae6b'),
+                        text = ~curav, textfont = list(size = 10) , textposition = 'outside') %>%
+            add_trace(y = ~ready, 
+                        name = "+ ready to insert/remove implants and IUDs", 
+                        marker = list(color = '#f16913'),
+                        text = ~ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+            add_trace(y = ~rnoso, 
+                        name = "+ no stock-out in the past 3 months", 
+                        marker = list(color = '#d94801'),
+                        text = ~rnoso, textfont = list(size = 10) , textposition = 'outside') %>%    
+            add_annotations(
+                text = ~unique(methods),
+                x = 0.5, y = 0.90, xref = "paper", yref = "paper",    
+                xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+                font = list(size = 16)
+                ) %>%
+            layout(
+                yaxis = list(title = "Percent of SDPs",
+                                     range = c(0, 100), tickfont = list(size=12)),
+                xaxis = list(title = "", tickfont = list(size=12))
+                )
+        
+        dtafig%>%group_by(methods)%>%
+            do(p = panel(.)) %>%
+            subplot(nrows = 1, shareY = TRUE)%>%
+            layout(
+                yaxis = list(title = "Percent of SDPs",
+                                     range = c(0, 100), tickfont = list(size=12)),
+                xaxis = list(title = "", tickfont = list(size=12)),
+                legend = list(font=list(size=12), 
+                              orientation="v", 
+                              xanchor = "left", yanchor = "center", 
+                              x = 1.01, y = 0.5))
+    })    
+
+    output$plot_UG_SDPtype_SDP <- renderPlotly({
+        
+        dtafig<-dtaSDP%>%filter(latest==TRUE)%>%filter(country=="Uganda")%>%mutate(xsurvey="")
+
+        panel <- . %>% 
+            plot_ly(x=~xsurvey, y=~essential5_offer, type = 'bar', 
+                        name = "Five methods offered",
+                        marker = list(color = '#fdd0a2'),
+                        text = ~essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+            add_trace(y=~essential5_curav, 
+                        name = "+ currently in-stock",
+                        marker = list(color = '#fdae6b'),
+                        text = ~essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+            add_trace(y = ~essential5_ready, 
+                        name = "+ ready to insert/remove implants and IUDs",  
+                        marker = list(color = '#f16913'),
+                        text = ~essential5_ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+            add_trace(y = ~essential5_rnoso, 
+                        name = "+ no stock-out in the past 3 months",
+                        marker = list(color = '#d94801'),
+                        text = ~essential5_rnoso, textfont = list(size = 10) , textposition = 'outside') %>%     
+            add_annotations(
+                text = ~unique(group),
+                x = 0.5, y = 0.90, xref = "paper", yref = "paper",    
+                xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+                font = list(size = 16) )%>%
+            layout(
+                yaxis = list(title = "Percent of SDPs",
+                                     range = c(0, 100), tickfont = list(size=8)),
+                xaxis = list(title = "Survey year", tickfont = list(size=8))
+                )
+        
+        dtafig%>%group_by(group)%>%
+            do(p = panel(.)) %>%
+            subplot(nrows = 1, shareY = TRUE)%>%
+            layout(
+                yaxis = list(title = "Percent of SDPs",
+                                     range = c(0, 100), tickfont = list(size=12)),
+                xaxis = list(title = "", tickfont = list(size=12)),
+                legend = list(font=list(size=12), 
+                              orientation="v", 
+                              xanchor = "left", yanchor = "center", 
+                              x = 1.01, y = 0.5))
+    })    
+    
+    output$plot_UG_SDPtype_women <- renderPlotly({
+        
+        dtafig<-dtaIR%>%filter(groupdemand==0)%>%
+            filter(group=="All" & latestIRLINK==1)%>%
+            filter(is.na(SDPall_essential5_noso)==FALSE)%>%
+            filter(country=="Uganda")%>%mutate(xsurvey="")
+        
+        fig1UG<-dtafig%>% 
+            plot_ly(x=~xsurvey, y=~SDPall_essential5_offer, type = 'bar', 
+                        name = "Five methods offered",
+                        marker = list(color = '#9ecae1'),
+                        text = ~SDPall_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+            add_trace(y=~SDPall_essential5_curav, type = 'bar', 
+                        name = "+ currently in-stock",
+                        marker = list(color = '#6baed6'),
+                        text = ~SDPall_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+            add_trace(y = ~SDPall_essential5_ready, 
+                              name = "+ ready to insert/remove implants and IUDs", 
+                              marker = list(color = '#2171b5'),
+                              text = ~SDPall_essential5_ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+            add_trace(y = ~SDPall_essential5_rnoso, 
+                              name = "+ no stock-out in the past 3 months", 
+                              marker = list(color = '#084594'),
+                              text = ~SDPall_essential5_rnoso, textfont = list(size = 10) , textposition = 'outside') %>%  
+            add_annotations(
+                text = "All linked SDPs",
+                x = 0.5, y = 0.92, xref = "paper", yref = "paper",    
+                xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+                font = list(size = 16)
+                ) %>%
+            layout(
+                yaxis = list(title = "Percent of women",
+                                     range = c(0, 110), tickfont = list(size=8)),
+                xaxis = list(title = "Survey year", tickfont = list(size=8)),
+                showlegend = FALSE 
+                )
+        
+        fig2UG<-dtafig%>%
+            plot_ly(x=~xsurvey, y=~SDPlow_essential5_offer, type = 'bar', 
+                        name = "Five methods offered",
+                        marker = list(color = '#9ecae1'),
+                        text = ~SDPlow_essential5_offer, textfont = list(size = 10) , textposition = 'outside') %>%
+            add_trace(y=~SDPlow_essential5_curav, type = 'bar', 
+                        name = "+ currently in-stock",
+                        marker = list(color = '#6baed6'),
+                        text = ~SDPlow_essential5_curav, textfont = list(size = 10) , textposition = 'outside') %>%
+            add_trace(y = ~SDPlow_essential5_ready, 
+                              name = "+ ready to insert/remove implants and IUDs", 
+                              marker = list(color = '#2171b5'),
+                              text = ~SDPlow_essential5_ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+            add_trace(y = ~SDPlow_essential5_rnoso, 
+                              name = "+ no stock-out in the past 3 months", 
+                              marker = list(color = '#084594'),
+                              text = ~SDPlow_essential5_rnoso, textfont = list(size = 10) , textposition = 'outside') %>%     
+            add_annotations(
+                text = "Lower-level linked SDPs",
+                x = 0.5, y = 0.92, xref = "paper", yref = "paper",    
+                xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+                font = list(size = 16)
+                ) %>%
+            layout(
+                yaxis = list(title = "Percent of women",
+                                     range = c(0, 110), tickfont = list(size=12)),
+                xaxis = list(title = "Survey year", tickfont = list(size=12))
+                )
+        
+        subplot(fig1UG, fig2UG, nrows=1, shareY = TRUE) %>%
+            layout( 
+                    yaxis = list(title = "Percent of women",
+                                     range = c(0, 110), tickfont = list(size=12)),
+                    legend = list(font=list(size=12), 
+                              orientation="v", 
+                              xanchor = "left", yanchor = "center", 
+                              x = 1.01, y = 0.5)
+                    )
+
+    })    
+
+    ##### output: Part 3 #####
+    
+    output$plot_SDP_level <- renderPlotly({
+        
+        temp<-dtaSDP%>%filter(country==input$country)%>%filter(latest==TRUE)%>%arrange(group)
+        
+        temp1<-temp%>%select(ends_with("offer"))%>%
+            gather(key=methods,value=offer)%>%
+            mutate(methods=sapply(strsplit(methods,"_"), `[`, 1))
+        temp2<-temp%>%select(ends_with("curav"))%>%
+            gather(key=methods,value=curav)%>%
+            select(-methods)
+        temp3<-temp%>%select(ends_with("ready"))%>%
+            gather(key=methods,value=ready)%>%
+            select(-methods)
+        temp4<-temp%>%select(ends_with("rnoso"))%>%
+            gather(key=methods,value=rnoso)%>%
+            select(-methods)
+        
+        dtafig<-cbind(temp1, temp2, temp3, temp4)%>%
+            select(methods, offer, curav, ready, rnoso)%>%
+            mutate(
+                methods=ifelse(methods=="essential5", "Five methods", methods), 
+                methods=ifelse(methods=="essential5ec", "Five methods + EC", methods),
+                xsurvey="",
+                group="All SDPs"
+            )
+        
+        dtafig$group[2]<-"Lower-level SDPs"
+        dtafig$group[4]<-"Lower-level SDPs"
+        
+        dtafig<-dtafig%>%
+            filter(methods==input$methods)
+        
+        panel <- . %>% 
+            plot_ly(x=~xsurvey, y=~offer, type = 'bar', 
+                        name = "methods offered", 
+                        marker = list(color = '#fdd0a2'),
+                        text = ~offer, textfont = list(size = 10, color="black"), textposition = 'outside')%>%
+            add_trace(y=~curav, 
+                        name = "+ currently in-stock",
+                        marker = list(color = '#fdae6b'),
+                        text = ~curav, textfont = list(size = 10) , textposition = 'outside') %>%
+            add_trace(y = ~ready, 
+                        name = "+ ready to insert/remove implants and IUDs", 
+                        marker = list(color = '#f16913'),
+                        text = ~ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+            add_trace(y = ~rnoso, 
+                        name = "+ no stock-out in the past 3 months", 
+                        marker = list(color = '#d94801'),
+                        text = ~rnoso, textfont = list(size = 10) , textposition = 'outside') %>%    
+            add_annotations(
+                text = ~unique(group),
+                x = 0.5, y = 0.90, xref = "paper", yref = "paper",    
+                xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+                font = list(size = 16)
+                ) %>%
+            layout(
+                yaxis = list(title = "Percent of SDPs",
+                                     range = c(0, 100), tickfont = list(size=12)),
+                xaxis = list(title = "", tickfont = list(size=12))
+                )
+
+        dtafig%>%group_by(group)%>%
+            do(p = panel(.)) %>%
+            subplot(nrows = 1, shareY = TRUE)%>%
+            layout(
+                yaxis = list(title = "Percent of SDPs",
+                                     range = c(0, 100), tickfont = list(size=12)),
+                xaxis = list(title = "", tickfont = list(size=12)),
+                legend = list(font=list(size=12), 
+                              orientation="v", 
+                              xanchor = "left", yanchor = "center", 
+                              x = 1.01, y = 0.5))
+    })    
+    
+    output$plot_women_level <- renderPlotly({
+                      
+        panel <- . %>% 
+            plot_ly(x=~xsurvey, y=~offer, type = 'bar', 
+                        name = "methods offered", 
+                        marker = list(color = '#9ecae1'),
+                        text = ~offer, textfont = list(size = 10, color="black"), textposition = 'outside')%>%
+            add_trace(y=~curav, 
+                        name = "+ currently in-stock",
+                        marker = list(color = '#6baed6'),
+                        text = ~curav, textfont = list(size = 10) , textposition = 'outside') %>%
+            add_trace(y = ~ready, 
+                        name = "+ ready to insert/remove implants and IUDs", 
+                        marker = list(color = '#2171b5'),
+                        text = ~ready, textfont = list(size = 10) , textposition = 'outside') %>% 
+            add_trace(y = ~rnoso, 
+                        name = "+ no stock-out in the past 3 months", 
+                        marker = list(color = '#084594'),
+                        text = ~rnoso, textfont = list(size = 10) , textposition = 'outside') %>%   
+            add_annotations(
+                text = ~unique(group),
+                x = 0.5, y = 0.90, xref = "paper", yref = "paper",    
+                xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+                font = list(size = 16)
+                ) %>%
+            layout(
+                yaxis = list(title = "Percent of women",
+                                     range = c(0, 100), tickfont = list(size=12)),
+                xaxis = list(title = "", tickfont = list(size=12))
+                )
+
+        #All SDPS
+        temp<-dtaIR%>%filter(country==input$country)%>%
+            filter(groupdemand==0 & grouplabel=="All" & latestIRLINK==1)%>%
+            filter(is.na(SDPall_essential5_noso)==FALSE)%>%
+            select(starts_with("SDPall_"))
+        
+        temp1<-temp%>%select(ends_with("offer"))%>%
+            gather(key=methods,value=offer)%>%
+            mutate(methods=sapply(strsplit(methods,"_"), `[`, 2))
+        temp2<-temp%>%select(ends_with("curav"))%>%
+            gather(key=methods,value=curav)%>%
+            select(-methods)
+        temp3<-temp%>%select(ends_with("ready"))%>%
+            gather(key=methods,value=ready)%>%
+            select(-methods)
+        temp4<-temp%>%select(ends_with("rnoso"))%>%
+            gather(key=methods,value=rnoso)%>%
+            select(-methods)
+        
+        dtafig<-cbind(temp1, temp2, temp3, temp4)%>%
+            select(methods, offer, curav, ready, rnoso)%>%
+            mutate(
+                methods=ifelse(methods=="essential5", "Five methods", methods), 
+                methods=ifelse(methods=="essential5ec", "Five methods + EC", methods),
+                xsurvey="",
+                group="All SDPs"
+            )
+
+        dtafig<-dtafig%>%
+            filter(methods==input$methods)
+        
+        fig1<-dtafig%>%group_by(group)%>%
+            do(p = panel(.)) %>%
+            subplot(nrows = 1, shareY = TRUE)%>%
+            layout(
+                yaxis = list(title = "Percent of women",
+                                     range = c(0, 100), tickfont = list(size=12)),
+                xaxis = list(title = "", tickfont = list(size=12)),
+                legend = list(font=list(size=12), 
+                              orientation="v", 
+                              xanchor = "left", yanchor = "center", 
+                              x = 1.01, y = 0.5))
+        
+        #Lower-level SDPS
+        temp<-dtaIR%>%filter(country==input$country)%>%
+            filter(groupdemand==0 & grouplabel=="All" & latestIRLINK==1)%>%
+            filter(is.na(SDPall_essential5_noso)==FALSE)%>%
+            select(starts_with("SDPlow_"))
+        
+        temp1<-temp%>%select(ends_with("offer"))%>%
+            gather(key=methods,value=offer)%>%
+            mutate(methods=sapply(strsplit(methods,"_"), `[`, 2))
+        temp2<-temp%>%select(ends_with("curav"))%>%
+            gather(key=methods,value=curav)%>%
+            select(-methods)
+        temp3<-temp%>%select(ends_with("ready"))%>%
+            gather(key=methods,value=ready)%>%
+            select(-methods)
+        temp4<-temp%>%select(ends_with("rnoso"))%>%
+            gather(key=methods,value=rnoso)%>%
+            select(-methods)
+        
+        dtafig<-cbind(temp1, temp2, temp3, temp4)%>%
+            select(methods, offer, curav, ready, rnoso)%>%
+            mutate(
+                methods=ifelse(methods=="essential5", "Five methods", methods), 
+                methods=ifelse(methods=="essential5ec", "Five methods + EC", methods),
+                xsurvey="",
+                group="Lower-level SDPs"
+            )
+
+        dtafig<-dtafig%>%
+            filter(methods==input$methods)
+        
+        fig2<-dtafig%>%group_by(group)%>%
+            do(p = panel(.)) %>%
+            subplot(nrows = 1, shareY = TRUE)%>%
+            layout(
+                yaxis = list(title = "Percent of women",
+                                     range = c(0, 100), tickfont = list(size=12)),
+                xaxis = list(title = "", tickfont = list(size=12)),
+                legend = list(font=list(size=12), 
+                              orientation="v", 
+                              xanchor = "left", yanchor = "center", 
+                              x = 1.01, y = 0.5))
+        #subplot
+        subplot(fig1, fig2, nrows=1, shareY = TRUE) %>%
+            layout( 
+                    yaxis = list(title = "Percent of women",
+                                     range = c(0, 110), tickfont = list(size=12)),
+                    legend = list(font=list(size=12), 
+                              orientation="v", 
+                              xanchor = "left", yanchor = "center", 
+                              x = 1.01, y = 0.5)
+                    )
+    })    
+    
+    ##### output: Part 4 #####
+    
+    output$plot_SDP_trend <-renderPlotly({
+    
+        panel <- . %>%
+            plot_ly(x=~yearmonth, y=~essential5_offer, type = 'scatter', mode = 'lines',
+                    name = "5 methods offered", 
+                    marker = list(color = '#fdd0a2'),
+                    line = list(color = '#fdd0a2')) %>%
+            add_trace(y=~essential5_curav, type = 'scatter', mode = 'lines',
+                    name = "+ currently in-stock",
+                    marker = list(color = '#fdae6b'),
+                    line = list(color = '#fdae6b')) %>%
+            add_trace(y = ~essential5_ready, type = 'scatter', mode = 'lines',
+                      name = "+ ready to insert/remove implants and IUDs", 
+                      marker = list(color = '#f16913'),
+                      line = list(color = '#f16913')) %>% 
+            add_trace(y = ~essential5_rnoso, type = 'scatter', mode = 'lines',
+                      name = "+ no stock-out in the past 3 months", 
+                      marker = list(color = '#d94801'),
+                      line = list(color = '#d94801')) %>% 
+            add_annotations(
+                text = ~unique(group),
+                x = 0.5, y = 0.92, xref = "paper", yref = "paper",    
+                xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+                font = list(size = 16)
+                ) %>%    
+            layout(
+                    yaxis = list(title = "Percent of SDPs",
+                                 range = c(0, 100), tickfont = list(size=12)),
+                    xaxis = list(title = "Survey year", 
+                                 range=c(as.character("2014-06-15"),as.character("2019-12-15")),
+                                  tickfont = list(size=12))
+                    )
+        
+        dtafig<-dtaSDP%>%filter(country==input$country)
+        
+        dtafig%>%
+            group_by(group) %>%
+            do(p = panel(.)) %>%
+            subplot(nrows = 1, shareX=TRUE, shareY = FALSE)%>%
+            layout(
+                    yaxis = list(title = "Percent of SDPs",
+                                 range = c(0, 100), tickfont = list(size=12)),
+                    xaxis = list(title = "Survey year", 
+                                range=c(as.character("2014-06-15"),as.character("2019-12-15")),
+                                tickfont = list(size=12)),
+                    legend = list(font=list(size=12), 
+                              orientation="v", 
+                              xanchor = "left", yanchor = "center", 
+                              x = 1.01, y = 0.5)
+                )
+    }) 
+    
+    output$plot_women_trend <-renderPlotly({
+        ############### IR: SDPall
+        
+        panel <- . %>%
+            plot_ly(x=~yearmonth, y=~SDPall_essential5_offer, type = 'scatter', mode = 'lines',
+                    name = "5 methods offered",
+                    marker = list(color = '#9ecae1'),
+                    line = list(color = '#9ecae1')) %>%
+            add_trace(y=~SDPall_essential5_curav, type = 'scatter', mode = 'lines',
+                    name = "+ currently in-stock",  
+                    marker = list(color = '#6baed6'),
+                    line = list(color = '#6baed6')) %>%
+            add_trace(y = ~SDPall_essential5_ready, type = 'scatter', mode = 'lines',
+                      name = "+ read to insert/remove IUDs/implants", 
+                      marker = list(color = '#2171b5'),
+                      line = list(color = '#2171b5')) %>% 
+            add_trace(y = ~SDPall_essential5_rnoso, type = 'scatter', mode = 'lines',
+                      name = "+ no stock-out in the past 3 months", 
+                      marker = list(color = '#084594'),
+                      line = list(color = '#084594')) %>% 
+            add_annotations(
+                text = "All SDPs",
+                x = 0.5, y = 0.92, xref = "paper", yref = "paper",    
+                xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+                font = list(size = 12)
+                ) %>%    
+            layout(
+                    yaxis = list(title = "",
+                                 range = c(0, 110), tickfont = list(size=12)),
+                    xaxis = list(title = "Survey year", 
+                                 range=c(as.character("2014-06-15"),as.character("2019-12-15")),
+                                  tickfont = list(size=12))
+                    )
+        
+        dtafig<-dtaIR%>%filter(groupdemand==0)%>%
+            filter(group=="All" )%>%
+            filter(is.na(SDPall_essential5_noso)==FALSE)%>%
+            filter(country==input$country)
+        
+        fig1<-dtafig%>%
+            group_by(country) %>%
+            do(p = panel(.)) %>%
+            subplot(nrows = 1, shareY = FALSE)%>%
+            layout(
+                    yaxis = list(title = "",
+                                 range = c(0, 110), tickfont = list(size=12)),
+                    xaxis = list(title = "Survey year", 
+                                 range=c(as.character("2014-06-15"),as.character("2019-12-15")),
+                                  tickfont = list(size=12))                
+            )
+        
+        ############### IR: SDPlow
+        
+        panel <- . %>%
+            plot_ly(x=~yearmonth, y=~SDPlow_essential5_offer, type = 'scatter', mode = 'lines',
+                    name = "5 methods offered",
+                    marker = list(color = '#9ecae1'),
+                    line = list(color = '#9ecae1')) %>%
+            add_trace(y=~SDPlow_essential5_curav, type = 'scatter', mode = 'lines',
+                    name = "+ currently in-stock",  
+                    marker = list(color = '#6baed6'),
+                    line = list(color = '#6baed6')) %>%
+            add_trace(y = ~SDPlow_essential5_ready, 
+                      name = "+ read to insert/remove IUDs/implants", 
+                      marker = list(color = '#2171b5'),
+                      line = list(color = '#2171b5')) %>% 
+            add_trace(y = ~SDPlow_essential5_rnoso, 
+                      name = "+ no stock-out in the past 3 months", 
+                      marker = list(color = '#084594'),
+                      line = list(color = '#084594')) %>% 
+            add_annotations(
+                text = "Lower-level SDPs",
+                x = 0.5, y = 0.92, xref = "paper", yref = "paper",    
+                xanchor = "center", yanchor = "bottom", showarrow = FALSE,
+                font = list(size = 16)
+                ) %>%    
+            layout(
+                    yaxis = list(title = "",
+                                 range = c(0, 110), tickfont = list(size=12)),
+                    xaxis = list(title = "Survey year", 
+                                 range=c(as.character("2014-06-15"),as.character("2019-12-15")),
+                                  tickfont = list(size=12))
+                    )
+                
+        dtafig<-dtaIR%>%filter(groupdemand==0)%>%
+            filter(group=="All" )%>%
+            filter(is.na(SDPlow_essential5_noso)==FALSE)%>%
+            filter(country==input$country)
+        
+        fig2<-dtafig%>%
+            group_by(country) %>%
+            do(p = panel(.)) %>%
+            subplot(nrows = 1, shareY = FALSE)%>%
+            layout(
+                    yaxis = list(title = "",
+                                 range = c(0, 110), tickfont = list(size=12)),
+                    xaxis = list(title = "Survey year", 
+                                 range=c(as.character("2014-06-15"),as.character("2019-12-15")),
+                                  tickfont = list(size=12))
+                    )
+        
+        #subplot
+        subplot(fig1, fig2, nrows=1, shareX=TRUE, shareY = FALSE) %>%
+            layout( 
+                    yaxis = list(title = "Percent of women",
+                                     range = c(0, 110), tickfont = list(size=12)),
+                    xaxis = list(title = "Survey year", 
+                                 range=c(as.character("2014-06-15"),as.character("2019-12-15")),
+                                  tickfont = list(size=12)),
+                    legend = list(font=list(size=12), 
+                              orientation="v", 
+                              xanchor = "left", yanchor = "center", 
+                              x = 1.01, y = 0.5)
+                    )
+        
+    })
+
+}       
 
 #******************************
 # 3. CREATE APP 
